@@ -2,6 +2,22 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <string>
+#include <cctype> 
+#include <sys/socket.h>  // socket, bind, listen, accept, setsockopt, send, recv
+#include <netinet/in.h>  // htons, htonl, ntohs, ntohl
+#include <arpa/inet.h>   // inet_addr, inet_ntoa
+#include <netdb.h>       // getprotobyname, gethostbyname, getaddrinfo, freeaddrinfo
+#include <unistd.h>      // close, lseek
+#include <fcntl.h>       // fcntl
+#include <poll.h>        // poll
+#include <csignal>       // signal, sigaction
+#include <sys/types.h>   // types for socket(), accept()
+#include <sys/stat.h>    // fstat
+#include <cerrno>        // errno
+
+#include "Socket.hpp"
+
 
 #define ARGUMENTS_REQUIRED 3
 
@@ -15,8 +31,10 @@
 #define WHITE "\033[37m"
 
 enum t_errors {
-    ERR_BAD_ARGUMENTS
+    ERR_BAD_ARGUMENTS,
+    ERR_BAD_PORT
 };
 
-void display_error_message(t_errors code);
-void irc_exit(int exit_code);
+void    display_error_message(t_errors code);
+bool    checkPort(const char *port);
+void    irc_exit(int exit_code);
