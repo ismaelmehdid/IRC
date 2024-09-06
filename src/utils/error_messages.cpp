@@ -1,5 +1,10 @@
 #include "../../include/irc.hpp"
 
+/**
+ * @brief Displays an error message based on the provided error code.
+ * 
+ * @param code The error code.
+ */
 void display_error_message(t_errors code)
 {
     switch (code)

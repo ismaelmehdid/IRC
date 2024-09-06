@@ -1,10 +1,11 @@
 NAME = ircserv
 
 SRCS =	src/main.cpp \
-		src/utils/error_messages.cpp \
-		src/utils/checkPort.cpp \
+        src/utils/error_messages.cpp \
         src/utils/cleanup_and_exit.cpp \
-		src/Socket.cpp \
+        src/server/server.cpp \
+        src/server/Socket.cpp \
+        src/parsing/parsing.cpp
 
 CC = c++
 FLAGS = -Wall -Wextra -Werror -std=c++98
@@ -14,15 +15,13 @@ RM = rm -rf
 OBJS_DIR = build/
 OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-all: $(OBJS_DIR) $(NAME)
-
-$(OBJS_DIR):
-	@mkdir -p $(OBJS_DIR)src/utils
+all: $(NAME)
 
 $(NAME): $(OBJS)
 	@$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
 $(OBJS_DIR)src/%.o: src/%.cpp
+	@mkdir -p $(dir $@)
 	@$(CC) $(FLAGS) -c $< -o $@
 	@echo "\033[92mCompiled: $<\033[0m"
 

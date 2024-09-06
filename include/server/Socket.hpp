@@ -1,12 +1,12 @@
 #pragma once
 
-#include "irc.hpp"
+#include <string>
 
 class Socket
 {
     private:
         int         _sock_fd;
-        int         _backlog;
+        int         _backlog; // max clients in queu
 
     public:
         Socket();
