@@ -22,7 +22,7 @@ bool    Socket::bind(int port)
 {
     sockaddr_in addr;
 
-    memset(&addr, 0, sizeof(addr));
+    std::memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port);
@@ -73,7 +73,7 @@ std::string Socket::receive(int client_fd)
     char    buffer[1024];
     int     bytes_received;
 
-    memset(buffer, 0, sizeof(buffer));
+    std::memset(buffer, 0, sizeof(buffer));
     bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
     
     if (bytes_received == -1)
