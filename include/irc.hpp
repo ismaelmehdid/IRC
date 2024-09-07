@@ -36,7 +36,7 @@ enum t_errors {
 };
 
 // Server
-int start_server(Socket &ircserv, char **argv);
+int start_server(Socket *ircserv, char **argv);
 
 // Parsing
 void    display_error_message(t_errors code);

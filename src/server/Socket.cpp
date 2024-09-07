@@ -1,11 +1,15 @@
 #include "../../include/server/Socket.hpp"
 #include "../../include/irc.hpp"
 
-Socket::Socket() : _sock_fd(-1), _backlog(5) {}
+Socket::Socket() : _fd(-1), _backlog(5), _nbr_clients(0), _clients() {}
 
-Socket::~Socket()
+Socket::~Socket() 
 {
-    close();
+    close(_fd); // closing socket
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) { // closing every sockets of every clients
+        delete it->second;
+    }
+    std::cout << "Socket destroyed." << std::endl;
 }
 
 /**
@@ -18,8 +22,8 @@ Socket::~Socket()
  */
 bool Socket::create()
 {
-    this->_sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->_sock_fd == -1)
+    this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (this->_fd == -1)
     {
         std::cerr << "Socket creation failed" << std::endl;
         return (false);
@@ -45,7 +49,7 @@ bool    Socket::bind(int port)
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port); // convert port to big endian value (network communication standard) if needed
 
-    if (::bind(this->_sock_fd, (sockaddr*)&addr, sizeof(addr)) == -1)
+    if (::bind(this->_fd, (sockaddr*)&addr, sizeof(addr)) == -1)
     {
         std::cerr << "Bind failed" << std::endl;
         return (false);
@@ -62,7 +66,7 @@ bool    Socket::bind(int port)
  */
 bool    Socket::listen()
 {
-    if (::listen(this->_sock_fd, this->_backlog) == -1)
+    if (::listen(this->_fd, this->_backlog) == -1)
     {
         std::cerr << "Listen failed" << std::endl;
         return (false);
@@ -81,7 +85,7 @@ int Socket::accept()
     socklen_t   client_len = sizeof(client_addr);
     int         client_fd;
     
-    client_fd = ::accept(this->_sock_fd, (sockaddr*)&client_addr, &client_len);
+    client_fd = ::accept(this->_fd, (sockaddr*)&client_addr, &client_len);
     if (client_fd == -1)
         std::cerr << "Accept failed" << std::endl;
 
@@ -97,12 +101,19 @@ int Socket::accept()
  */
 bool    Socket::send(int client_fd, const std::string &message)
 {
-    if (::send(client_fd, message.c_str(), message.size(), 0) == -1)
-    {
-        std::cerr << "Send failed" << std::endl;
-        return (false);
+    size_t total_sent = 0;
+    size_t message_length = message.size();
+    const char *message_cstr = message.c_str();
+
+    while (total_sent < message_length) {
+        ssize_t sent = ::send(client_fd, message_cstr + total_sent, message_length - total_sent, 0);
+        if (sent == -1) {
+            std::cerr << "Send failed: " << strerror(errno) << std::endl;
+            return false;
+        }
+        total_sent += sent;
     }
-    return (true);
+    return true;
 }
 
 /**
@@ -131,32 +142,32 @@ std::string Socket::receive(int client_fd)
 }
 
 /**
- * @brief Closes the socket.
+ * @brief Adds a client to the socket.
  * 
- * This function closes the socket if it is open.
- * If the socket is already closed, this function does nothing.
+ * This function adds a client to the socket by storing it in the `_clients` map
+ * using the client's file descriptor as the key. It also increments the `_nbr_clients`
+ * counter.
+ * 
+ * @param client A pointer to the client object to be added.
  */
-void    Socket::close()
+void    Socket::add_client(Client *client)
 {
-    if (this->_sock_fd != -1)
-    {
-        ::close(this->_sock_fd);
-        this->_sock_fd = -1;
-    }
+    _clients[client->get_fd()] = client;
+    _nbr_clients++;
 }
 
 /**
- * @brief Closes the client socket.
+ * @brief Removes a client from the Socket object.
  *
- * This function closes the client socket identified by the given file descriptor.
- * If the file descriptor is -1, no action is taken.
+ * This function removes a client with the given file descriptor from the Socket object.
+ * It deletes the client object and erases it from the internal map of clients.
+ * The number of clients is decremented by one.
  *
- * @param client_fd The file descriptor of the client socket to be closed.
+ * @param fd The file descriptor of the client to be removed.
  */
-void    Socket::close_client(int client_fd)
+void    Socket::remove_client(int fd)
 {
-    if (client_fd != -1)
-    {
-        ::close(client_fd);
-    }
+    delete _clients[fd];
+    _clients.erase(fd);
+    _nbr_clients--;
 }

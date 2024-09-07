@@ -5,6 +5,7 @@ SRCS =	src/main.cpp \
         src/utils/cleanup_and_exit.cpp \
         src/server/server.cpp \
         src/server/Socket.cpp \
+		src/server/Client.cpp \
         src/parsing/parsing.cpp
 
 CC = c++

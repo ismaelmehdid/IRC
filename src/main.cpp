@@ -2,7 +2,9 @@
 
 int main(int argc, char **argv)
 {
-    Socket ircserv;
+    Socket *ircserv = new Socket();
+    if (!ircserv)
+        return 1;
 
     parsing(argc, argv);
 
