@@ -1,16 +1,27 @@
 #pragma once
 
+# include "OperatorRole.hpp"
+# include "RegularRole.hpp"
+
+class IRole;
+
 class Client
 {
     public:
         Client();
-        Client(int fd);
+        Client(int fd, IRole* role);
         // Client (const Client& other);
         // Client& operator=(const Client& other);
         ~Client();
 
-        int get_fd() const;
+        int     get_fd() const;
+        void    executeKick();
+        void    executeInvite();
+        void    executeTopic();
+        void    executeMode(char arg);
+        void    setRole(IRole* newRole);
 
     private:
-        int _fd;
+        int     _fd;
+        IRole*  _role;
 };

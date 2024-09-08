@@ -28,8 +28,9 @@ static void serverLoop(Socket& ircserv)
         if (client_fd == -1)
             continue;
 
-        Client *newClient = new Client(client_fd);
-        if (newClient) {
+        Client *newClient = new Client(client_fd, new OperatorRole());
+        if (newClient)
+        {
             ircserv.add_client(newClient);
             std::cout << "Client connected!" << std::endl;
 
