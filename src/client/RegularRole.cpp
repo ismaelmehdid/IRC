@@ -1,5 +1,7 @@
 #include "../../include/server/RegularRole.hpp"
 
+#include "../../include/server/Socket.hpp"
+
 RegularRole::RegularRole() {}
 
 RegularRole::RegularRole(const RegularRole& other)

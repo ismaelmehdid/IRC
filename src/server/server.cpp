@@ -2,7 +2,7 @@
 
 Socket *global_ircserv = NULL;
 
-static void handle_sigint(int sig)
+static void handleShuttingDown(int sig)
 {
     std::cout << "Caught signal " << sig << ", shutting down server..." << std::endl;
     if (global_ircserv != NULL) {
@@ -64,7 +64,8 @@ int start_server(Socket *ircserv, char **argv)
 
     global_ircserv = ircserv;
 
-    signal(SIGINT, handle_sigint);
+    signal(SIGINT, handleShuttingDown);
+    signal(SIGQUIT, handleShuttingDown);
 
     if (!ircserv->create()) return 1;
     if (!ircserv->bind(std::strtol(argv[1], NULL, 10))) return 1;
