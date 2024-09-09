@@ -1,13 +1,15 @@
 NAME = ircserv
 
 SRCS =	src/main.cpp \
+		src/ServerLoop.cpp \
         src/utils/error_messages.cpp \
         src/utils/cleanup_and_exit.cpp \
-        src/server/server.cpp \
+        src/server/Server.cpp \
         src/server/Socket.cpp \
 		src/client/Client.cpp \
 		src/client/OperatorRole.cpp \
 		src/client/RegularRole.cpp \
+		src/channel/Channel.cpp \
         src/parsing/parsing.cpp
 
 CC = c++

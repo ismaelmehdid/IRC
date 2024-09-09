@@ -2,7 +2,7 @@
 
 int main(int argc, char **argv)
 {
-    Socket *ircserv = new Socket();
+    Server *ircserv = new Server();
     if (!ircserv)
         return 1;
 

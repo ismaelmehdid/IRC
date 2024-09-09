@@ -1,6 +1,6 @@
 #pragma once
 
-#include "server/Socket.hpp"
+#include "server/Server.hpp"
 
 #include <iostream>
 #include <cstdlib>
@@ -37,7 +37,7 @@ enum t_errors
 };
 
 // Server
-int     start_server(Socket *ircserv, char **argv);
+int     start_server(Server *ircserv, char **argv);
 
 // Parsing
 void    display_error_message(t_errors code);

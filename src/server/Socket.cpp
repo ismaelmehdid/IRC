@@ -1,15 +1,11 @@
 #include "../../include/server/Socket.hpp"
 #include "../../include/irc.hpp"
 
-Socket::Socket() : _fd(-1), _backlog(5), _nbr_clients(0), _clients() {}
+Socket::Socket() : _fd(-1), _backlog(5) {}
 
 Socket::~Socket() 
 {
     close(_fd); // closing socket
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) { // closing every sockets of every clients
-        delete it->second;
-    }
-    std::cout << "Socket destroyed." << std::endl;
 }
 
 /**
@@ -139,35 +135,4 @@ std::string Socket::receive(int client_fd)
     }
 
     return (std::string(buffer));
-}
-
-/**
- * @brief Adds a client to the socket.
- * 
- * This function adds a client to the socket by storing it in the `_clients` map
- * using the client's file descriptor as the key. It also increments the `_nbr_clients`
- * counter.
- * 
- * @param client A pointer to the client object to be added.
- */
-void    Socket::add_client(Client *client)
-{
-    _clients[client->get_fd()] = client;
-    _nbr_clients++;
-}
-
-/**
- * @brief Removes a client from the Socket object.
- *
- * This function removes a client with the given file descriptor from the Socket object.
- * It deletes the client object and erases it from the internal map of clients.
- * The number of clients is decremented by one.
- *
- * @param fd The file descriptor of the client to be removed.
- */
-void    Socket::remove_client(int fd)
-{
-    delete _clients[fd];
-    _clients.erase(fd);
-    _nbr_clients--;
 }
