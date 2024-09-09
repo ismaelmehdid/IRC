@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Client.hpp"
-
-#include <string>
+#include "../client/Client.hpp"
 #include <map>
 
 class Socket

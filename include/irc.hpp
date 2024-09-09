@@ -20,6 +20,7 @@
 #include <sys/types.h>   // types for socket(), accept()
 #include <sys/stat.h>    // fstat
 #include <cerrno>        // errno
+#include <vector>
 
 #define ARGUMENTS_REQUIRED 3
 #define MAX_CLIENTS_IN_QUEU 5
@@ -41,7 +42,7 @@ enum t_errors {
 };
 
 // Server
-int start_server(Socket *ircserv, char **argv);
+int     start_server(Socket *ircserv, char **argv);
 
 // Parsing
 void    display_error_message(t_errors code);

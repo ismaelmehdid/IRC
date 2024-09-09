@@ -13,5 +13,5 @@ class RegularRole : public IRole
         virtual void    kick();
         virtual void    invite();
         virtual void    topic();
-        virtual void    changeMode(char arg);
+        virtual void    mode(char arg);
 };
