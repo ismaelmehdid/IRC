@@ -30,13 +30,14 @@
 #define CYAN "\033[36m"
 #define WHITE "\033[37m"
 
-enum t_errors {
+enum t_errors
+{
     ERR_BAD_ARGUMENTS,
     ERR_BAD_PORT
 };
 
 // Server
-int start_server(Socket *ircserv, char **argv);
+int     start_server(Socket *ircserv, char **argv);
 
 // Parsing
 void    display_error_message(t_errors code);

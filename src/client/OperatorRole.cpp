@@ -1,4 +1,4 @@
-#include "../../include/server/OperatorRole.hpp"
+#include "../../include/client/OperatorRole.hpp"
 
 OperatorRole::OperatorRole() {}
 
@@ -27,7 +27,7 @@ void    OperatorRole::topic()
 {
 }
 
-void    OperatorRole::changeMode(char arg)
+void    OperatorRole::mode(char arg)
 {
     (void)arg;
 }

@@ -1,14 +1,17 @@
 #include "../../include/irc.hpp"
 
-Socket *global_ircserv = NULL;
+Socket *global_ircserv = NULL; // is it allowed?
 
 static void handleShuttingDown(int sig)
 {
-    std::cout << "Caught signal " << sig << ", shutting down server..." << std::endl;
-    if (global_ircserv != NULL) {
-        delete global_ircserv;
+    std::cout << "Caught signal " << sig 
+              << ", shutting down server..." << std::endl;
+
+    if (global_ircserv != NULL)
+    {
+        delete (global_ircserv);
     }
-    exit(0);
+    std::exit(0);
 }
 
 /**
@@ -28,14 +31,15 @@ static void serverLoop(Socket& ircserv)
         if (client_fd == -1)
             continue;
 
-        Client *newClient = new Client(client_fd, new OperatorRole());
+        Client *newClient = new Client("noname", client_fd, new OperatorRole());
         if (newClient)
         {
             ircserv.add_client(newClient);
             std::cout << "Client connected!" << std::endl;
 
             std::string welcome_msg = ":server 001 client :Welcome to the IRC server!\r\n";
-            if (!ircserv.send(client_fd, welcome_msg)) {
+            if (!ircserv.send(client_fd, welcome_msg))
+            {
                 std::cerr << "Error sending welcome message to client." << std::endl;
                 ircserv.remove_client(client_fd);
                 continue;

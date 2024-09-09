@@ -1,6 +1,4 @@
-#include "../../include/server/RegularRole.hpp"
-
-#include "../../include/server/Socket.hpp"
+#include "../../include/client/RegularRole.hpp"
 
 RegularRole::RegularRole() {}
 
@@ -32,7 +30,7 @@ void    RegularRole::topic()
     // send permission error
 }
 
-void    RegularRole::changeMode(char arg)
+void    RegularRole::mode(char arg)
 {
     (void)arg;
     // send permission error
