@@ -11,10 +11,13 @@ class Socket
         int                     _fd;
         int                     _backlog; // max clients in queu
         unsigned int            _nbr_clients;
-        std::map<int, Client*>   _clients;
+        std::map<int, Client*>  _clients;
+        std::string             _password;
+
+        Socket();
 
     public:
-        Socket();
+        Socket(const std::string &password);
         // Socket (const Socket& other);
         // Socket& operator=(const Socket& other);
         ~Socket();

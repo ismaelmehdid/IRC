@@ -5,7 +5,9 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <cstring>
+#include <sstream>
+#include <iostream>
+#include <sstream>
 #include <cctype> 
 #include <sys/socket.h>  // socket, bind, listen, accept, setsockopt, send, recv
 #include <netinet/in.h>  // htons, htonl, ntohs, ntohl
@@ -20,6 +22,7 @@
 #include <cerrno>        // errno
 
 #define ARGUMENTS_REQUIRED 3
+#define MAX_CLIENTS_IN_QUEU 5
 
 #define RESET "\033[0m"
 #define RED "\033[31m"
@@ -29,6 +32,8 @@
 #define MAGENTA "\033[35m"
 #define CYAN "\033[36m"
 #define WHITE "\033[37m"
+
+#define MSG_WELCOME ":server 001 client :" GREEN "Welcome to the IRC server!" RESET "\r\n";
 
 enum t_errors {
     ERR_BAD_ARGUMENTS,

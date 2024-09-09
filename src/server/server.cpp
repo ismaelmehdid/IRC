@@ -11,6 +11,32 @@ static void handleShuttingDown(int sig)
     exit(0);
 }
 
+static void extract_connection_infos(const std::string &connection_message, std::string &nick_name, std::string &password)
+{
+    std::istringstream iss(connection_message);
+    std::string line;
+
+    while (std::get_line(iss, line)) {
+        std::istringstream iss(connection_message);
+    }
+}
+
+static int connection_process(int client_fd)
+{
+    if (client_fd == -1)
+        return 1;
+    
+    std::string connection_message = ircserv.receive(client_fd);
+    if (connection_message.empty()) {
+        std::cerr << "Error receiving message or connection closed by client." << std::endl;
+        ::close(client_fd);
+        return 1;
+    }
+    std::string nick_name, password;
+
+    // extract kickname and password
+}
+
 /**
  * @brief The main server loop that accepts client connections and handles communication.
  * 
@@ -25,6 +51,10 @@ static void serverLoop(Socket& ircserv)
     while (true)
     {
         int client_fd = ircserv.accept();
+        if (connection_process != 0) {
+            continue ;
+        }
+
         if (client_fd == -1)
             continue;
 
@@ -34,19 +64,13 @@ static void serverLoop(Socket& ircserv)
             ircserv.add_client(newClient);
             std::cout << "Client connected!" << std::endl;
 
-            std::string welcome_msg = ":server 001 client :Welcome to the IRC server!\r\n";
-            if (!ircserv.send(client_fd, welcome_msg)) {
+            if (!ircserv.send(client_fd, MSG_WELCOME)) {
                 std::cerr << "Error sending welcome message to client." << std::endl;
                 ircserv.remove_client(client_fd);
                 continue;
             }
 
-            std::string received_message = ircserv.receive(client_fd);
-            if (received_message.empty()) {
-                std::cerr << "Error receiving message or connection closed by client." << std::endl;
-                ircserv.remove_client(client_fd);
-                continue;
-            }
+
             std::cout << "Received: " << received_message << std::endl;
         }
     }

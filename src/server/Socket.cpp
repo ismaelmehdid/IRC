@@ -1,7 +1,9 @@
 #include "../../include/server/Socket.hpp"
 #include "../../include/irc.hpp"
 
-Socket::Socket() : _fd(-1), _backlog(5), _nbr_clients(0), _clients() {}
+Socket::Socket() : _fd(-1), _backlog(MAX_CLIENTS_IN_QUEU), _nbr_clients(0), _clients(), _password() {}
+
+Socket::Socket(const std::string &password) : _fd(-1), _backlog(MAX_CLIENTS_IN_QUEU), _nbr_clients(0), _clients(), _password(password) { }
 
 Socket::~Socket() 
 {
