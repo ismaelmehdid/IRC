@@ -83,7 +83,7 @@ int Socket::accept()
     
     client_fd = ::accept(this->_fd, (sockaddr*)&client_addr, &client_len);
     if (client_fd == -1)
-        std::cerr << "Accept failed" << std::endl;
+        std::cerr << "Accept failed: " << strerror(errno) << std::endl;
 
     return (client_fd);
 }
