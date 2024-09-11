@@ -4,7 +4,7 @@ int main(int argc, char **argv)
 {
     parsing(argc, argv);
 
-    Socket *ircserv = new Socket(argv[2]);
+    Server *ircserv = new Server(argv[2]);
     if (!ircserv)
         return 1;
 

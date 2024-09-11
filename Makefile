@@ -1,14 +1,18 @@
 NAME = ircserv
 
 SRCS =	src/main.cpp \
+        src/ServerLoop.cpp \
         src/utils/error_messages.cpp \
         src/utils/cleanup_and_exit.cpp \
-        src/server/server.cpp \
+        src/server/Server.cpp \
+        src/server/handshake.cpp \
         src/server/Socket.cpp \
-		src/client/Client.cpp \
-		src/client/OperatorRole.cpp \
-		src/client/RegularRole.cpp \
-        src/parsing/parsing.cpp
+        src/client/Client.cpp \
+        src/client/OperatorRole.cpp \
+        src/client/RegularRole.cpp \
+        src/channel/Channel.cpp \
+        src/parsing/parsing.cpp \
+        src/parsing/commands.cpp
 
 CC = c++
 FLAGS = -Wall -Wextra -Werror -std=c++98
@@ -23,7 +27,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	@$(CC) $(FLAGS) $(OBJS) -o $(NAME)
 
-$(OBJS_DIR)src/%.o: src/%.cpp
+$(OBJS_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
 	@$(CC) $(FLAGS) -c $< -o $@
 	@echo "\033[92mCompiled: $<\033[0m"

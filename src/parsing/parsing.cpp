@@ -1,8 +1,5 @@
 #include "../../include/irc.hpp"
 
-#define MIN_PORT_VALUE 1024
-#define MAX_PORT_VALUE 65535
-
 /**
  * @brief Checks if a given port is valid.
  * 

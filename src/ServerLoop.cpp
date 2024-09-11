@@ -1,6 +1,6 @@
-#include "../../include/irc.hpp"
+#include "../include/irc.hpp"
 
-Socket *global_ircserv = NULL; // is it allowed?
+Server *global_ircserv = NULL; // is it allowed?
 
 static void handleShuttingDown(int sig)
 {
@@ -14,32 +14,6 @@ static void handleShuttingDown(int sig)
     std::exit(0);
 }
 
-static void extract_connection_infos(const std::string &connection_message, std::string &nick_name, std::string &password)
-{
-    std::istringstream iss(connection_message);
-    std::string line;
-
-    while (std::getline(iss, line)) {
-        std::istringstream iss(connection_message);
-    }
-}
-
-static int connection_process(int client_fd)
-{
-    if (client_fd == -1)
-        return 1;
-    
-    std::string connection_message = ircserv.receive(client_fd);
-    if (connection_message.empty()) {
-        std::cerr << "Error receiving message or connection closed by client." << std::endl;
-        ::close(client_fd);
-        return 1;
-    }
-    std::string nick_name, password;
-
-    // extract nickname and password
-}
-
 /**
  * @brief The main server loop that accepts client connections and handles communication.
  * 
@@ -49,34 +23,25 @@ static int connection_process(int client_fd)
  * 
  * @param ircserv The Socket object representing the server socket.
  */
-static void serverLoop(Socket& ircserv)
+static void serverLoop(Server& ircserv)
 {
     while (true)
     {
-        int client_fd = ircserv.accept();
-        if (connection_process != 0) {
-            continue ;
-        }
+        int client_fd = ircserv._socket.accept();
+        Client *newClient = perform_handshake(client_fd);
 
-        if (client_fd == -1)
-            continue;
-
-        Client *newClient = new Client("noname", client_fd, new OperatorRole());
         if (newClient)
         {
-            ircserv.add_client(newClient);
-            std::cout << "Client connected!" << std::endl;
+            ircserv. add_client(newClient);
+            std::cout << GREEN << "Client connected!" << RESET << std::endl;
 
             std::string welcome_msg = ":server 001 client :Welcome to the IRC server!\r\n";
-            if (!ircserv.send(client_fd, welcome_msg))
+            if (!ircserv._socket.send(client_fd, welcome_msg))
             {
                 std::cerr << "Error sending welcome message to client." << std::endl;
                 ircserv.remove_client(client_fd);
                 continue;
             }
-
-
-            std::cout << "Received: " << received_message << std::endl;
         }
     }
 }
@@ -88,7 +53,7 @@ static void serverLoop(Socket& ircserv)
  * @param argv      The command line arguments passed to the program.
  * @return          int Returns 0 if the server started successfully, otherwise returns 1.
  */
-int start_server(Socket *ircserv, char **argv)
+int start_server(Server *ircserv, char **argv)
 {
 
     global_ircserv = ircserv;
@@ -96,9 +61,9 @@ int start_server(Socket *ircserv, char **argv)
     signal(SIGINT, handleShuttingDown);
     signal(SIGQUIT, handleShuttingDown);
 
-    if (!ircserv->create()) return 1;
-    if (!ircserv->bind(std::strtol(argv[1], NULL, 10))) return 1;
-    if (!ircserv->listen()) return 1;
+    if (!ircserv->_socket.create()) return 1;
+    if (!ircserv->_socket.bind(std::strtol(argv[1], NULL, 10))) return 1;
+    if (!ircserv->_socket.listen()) return 1;
 
     std::cout << "Waiting for connections on port " << argv[1] << "..." << std::endl;
     serverLoop(*ircserv);
