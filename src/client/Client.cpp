@@ -1,14 +1,20 @@
 #include "../../include/irc.hpp"
 #include "../../include/client/Client.hpp"
 
-Client::Client() : _nickName("noName"), _userName("noUserName"), _fullName("noFullName"), _fd(-1), _role(new RegularRole()) {}
+Client::Client() : _nickName("noName"), _userName("noUserName"),
+                   _fullName("noFullName"), _fd(-1), _role(new RegularRole()),
+                   _isAuthenticated(false) {}
 
-Client::Client(const std::string& nickName, const std::string& userName, const std::string& fullName, int fd, IRole* role)
-                : _nickName(nickName), _userName(userName), _fullName(fullName), _fd(fd), _role(role) {}
+Client::Client(const std::string& nickName,const std::string& userName, 
+               const std::string& fullName, int fd, IRole* role)
+                : _nickName(nickName), _userName(userName),
+                  _fullName(fullName), _fd(fd), _role(role), 
+                  _isAuthenticated(false) {}
 
 Client::Client (const Client& other)
-                : _nickName(other._nickName), _userName(other._userName), _fullName(other._fullName), _fd(other.get_fd()),
-                  _role(other._role) {}
+                : _nickName(other._nickName), _userName(other._userName),
+                  _fullName(other._fullName), _fd(other.get_fd()),
+                  _role(other._role), _isAuthenticated(false) {}
 
 Client& Client::operator=(const Client& other)
 {
@@ -21,6 +27,7 @@ Client& Client::operator=(const Client& other)
         this->_nickName = other._nickName;
         this->_userName = other._userName;
         this->_fullName = other._fullName;
+        this->_isAuthenticated = other._isAuthenticated;
     }
     return (*this);
 }
