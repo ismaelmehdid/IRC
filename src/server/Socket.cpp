@@ -18,7 +18,7 @@ Socket::~Socket()
  */
 bool Socket::create()
 {
-    this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+    this->_fd = socket(AF_INET, SOCK_STREAM, 0); // this->_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
     if (this->_fd == -1)
     {
         std::cerr << "Socket creation failed" << std::endl;
@@ -122,28 +122,23 @@ bool    Socket::send(int client_fd, const std::string &message)
  */
 std::string Socket::receive(int client_fd)
 {
-    char        buffer[1024];
-    int         bytes_received;
-    std::string result;
+    char    buffer[1024];
+    int     bytes_received;
 
-    while (true)
+    std::memset(buffer, 0, sizeof(buffer));
+    bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    
+    if (bytes_received == -1)
     {
-        std::memset(buffer, 0, sizeof(buffer));
-        bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-
-        if (bytes_received == -1)
-        {
-            std::cerr << "Receive failed" << std::endl;
-            return ("");
-        }
-        if (bytes_received == 0)
-        {
-            return (result);
-        }
-
-        result.append(buffer, bytes_received);
-
+        std::cerr << "Receive failed" << std::endl;
+        return ("");
     }
-    return (result);
+
+    return (std::string(buffer));
+}
+
+int Socket::get_fd() const
+{
+    return _fd;
 }
 

@@ -21,4 +21,6 @@ class Socket
         int         accept();
         bool        send(int client_fd, const std::string &message);
         std::string receive(int client_fd);
+        int         get_fd() const;
+
 };
