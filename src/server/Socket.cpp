@@ -126,24 +126,20 @@ std::string Socket::receive(int client_fd)
     int         bytes_received;
     std::string result;
 
-    while (true)
+    std::memset(buffer, 0, sizeof(buffer));
+    bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
+    
+    if (bytes_received == -1)
     {
-        std::memset(buffer, 0, sizeof(buffer));
-        bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-
-        if (bytes_received == -1)
-        {
-            std::cerr << "Receive failed" << std::endl;
-            return ("");
-        }
-        if (bytes_received == 0)
-        {
-            return (result);
-        }
-
-        result.append(buffer, bytes_received);
-
+        std::cerr << "Receive failed" << std::endl;
+        return ("");
     }
+    if (bytes_received == 0)
+    {
+        return (result);
+    }
+    result.append(buffer, bytes_received);
+
     return (result);
 }
 
