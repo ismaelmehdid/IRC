@@ -1,7 +1,5 @@
 #pragma once
 
-#include "server/Server.hpp"
-
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -44,16 +42,23 @@
 #define ERR_NO_NICKNAME_GIVEN   ":server 431 * :No nickname given\r\n"
 #define ERR_NOT_ENOUGH_PARAMS   ":server 461 * USER :Not enough parameters\r\n"
 
+class Socket;
+class Server;
+class Client;
+class IRole;
+class OperatorRole; // inherit from IRole
+class RegularRole; // inherit from IRole
+
 enum t_errors {
     ERR_BAD_ARGUMENTS,
     ERR_BAD_PORT
 };
 
 struct t_IRCCommand {
-    std::string prefix;
-    std::string command;
-    std::vector<std::string> params;
-    std::string trailing;
+    std::string                 prefix;
+    std::string                 command;
+    std::vector<std::string>    params;
+    std::string                 trailing;
 };
 
 extern Server *global_ircserv;
@@ -63,8 +68,7 @@ int     start_server(Server *ircserv, char **argv);
 Client  *perform_handshake(int client_fd);
 
 // Parsing
-void            display_error_message(t_errors code);
-void            irc_exit(int exit_code);
-void            parsing(int argc, char **argv);
-t_IRCCommand    parse_IRC_command(const std::string &command);
-
+void                        display_error_message(t_errors code);
+void                        irc_exit(int exit_code);
+void                        parsing(int argc, char **argv);
+std::vector<t_IRCCommand>   parse_client_commands(const std::string &commands);

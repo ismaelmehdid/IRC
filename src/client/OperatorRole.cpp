@@ -15,19 +15,42 @@ OperatorRole&   OperatorRole::operator=(const OperatorRole& other)
 
 OperatorRole::~OperatorRole() {}
 
-void    OperatorRole::kick()
+OperatorRole* OperatorRole::clone() const
 {
+    return new OperatorRole();
 }
 
-void    OperatorRole::invite()
+void OperatorRole::kick(const t_IRCCommand &command)
 {
+    (void)command;
 }
 
-void    OperatorRole::topic()
+void OperatorRole::invite(const t_IRCCommand &command)
 {
+    (void)command;
 }
 
-void    OperatorRole::mode(char arg)
+void OperatorRole::topic(const t_IRCCommand &command)
 {
-    (void)arg;
+    (void)command;
+}
+
+void OperatorRole::mode(const t_IRCCommand &command)
+{
+    (void)command;
+}
+
+void OperatorRole::pass(const t_IRCCommand &command)
+{
+    (void)command;
+}
+
+void OperatorRole::nick(const t_IRCCommand &command)
+{
+    (void)command;
+}
+
+void OperatorRole::user(const t_IRCCommand &command)
+{
+    (void)command;
 }

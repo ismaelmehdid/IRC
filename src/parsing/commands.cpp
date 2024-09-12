@@ -1,6 +1,6 @@
 #include "../../include/irc.hpp"
 
-t_IRCCommand parse_IRC_command(const std::string &command)
+static t_IRCCommand parse_single_command(const std::string &command)
 {
     t_IRCCommand ircMessage;
 
@@ -13,7 +13,6 @@ t_IRCCommand parse_IRC_command(const std::string &command)
     }
 
     iss >> ircMessage.command;
-    std::cout << "Parsing command: " << ircMessage.command << std::endl;
 
     while (iss >> token) {
         if (token[0] == ':') {
@@ -27,4 +26,21 @@ t_IRCCommand parse_IRC_command(const std::string &command)
         }
     }
     return ircMessage;
+}
+
+std::vector<t_IRCCommand>   parse_client_commands(const std::string &commands)
+{
+
+    std::vector<t_IRCCommand>   extracted;
+    size_t                      start = 0;
+    size_t                      end;
+
+    while ((end = commands.find("\r\n", start)) != std::string::npos) {
+        std::string command = commands.substr(start, end - start);
+        t_IRCCommand parsed_command = parse_single_command(command);
+        extracted.push_back(parsed_command);
+        start = end + 2;
+    }
+
+    return extracted;
 }

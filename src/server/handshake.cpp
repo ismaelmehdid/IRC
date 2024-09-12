@@ -1,20 +1,5 @@
 #include "../../include/irc.hpp"
-
-// static std::vector<t_IRCCommand> get_commands(const std::string &commands)
-// {
-//     std::vector<t_IRCCommand>   extracted;
-//     size_t                      start = 0;
-//     size_t                      end;
-
-//     while ((end = commands.find("\r\n", start)) != std::string::npos) {
-//         std::string command = commands.substr(start, end - start);
-//         t_IRCCommand parsed_command = parse_IRC_command(command);
-//         extracted.push_back(parsed_command);
-//         start = end + 2;
-//     }
-
-//     return extracted;
-// }
+#include "../../include/server/Server.hpp"
 
 // static void print_received(const std::string &received)
 // {

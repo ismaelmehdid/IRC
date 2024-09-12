@@ -15,23 +15,49 @@ RegularRole&    RegularRole::operator=(const RegularRole& other)
 
 RegularRole::~RegularRole() {}
 
-void    RegularRole::kick()
+RegularRole* RegularRole::clone() const
 {
+    return new RegularRole();
+}
+
+void RegularRole::kick(const t_IRCCommand &command)
+{
+    (void)command;
     // send permission error
 }
 
-void    RegularRole::invite()
+void RegularRole::invite(const t_IRCCommand &command)
 {
+    (void)command;
     // send permission error
 }
 
-void    RegularRole::topic()
+void RegularRole::topic(const t_IRCCommand &command)
 {
+    (void)command;
     // send permission error
 }
 
-void    RegularRole::mode(char arg)
+void RegularRole::mode(const t_IRCCommand &command)
 {
-    (void)arg;
+    (void)command;
     // send permission error
+}
+
+void RegularRole::pass(const t_IRCCommand &command)
+{
+    (void)command;
+
+}
+
+void RegularRole::nick(const t_IRCCommand &command)
+{
+    (void)command;
+
+}
+
+void RegularRole::user(const t_IRCCommand &command)
+{
+    (void)command;
+
 }

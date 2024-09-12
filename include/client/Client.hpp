@@ -3,6 +3,9 @@
 # include "OperatorRole.hpp"
 # include "RegularRole.hpp"
 
+# include <string>
+# include <map>
+
 class IRole;
 
 class Client
@@ -14,19 +17,29 @@ class Client
         ~Client();
 
         int         get_fd() const;
-        void        executeKick();
-        void        executeInvite();
-        void        executeTopic();
-        void        executeMode(char arg);
-        void        setRole(IRole* newRole);
+        void        execute_command(const std::string &message);
 
     private:
         Client();
 
-        std::string _nickName; // the server must check uniqueness
-        std::string _userName;
-        std::string _fullName;
-        int         _fd;
-        IRole*      _role;
-        bool        _isAuthenticated;
+        typedef void (Client::*CommandFunction)(const t_IRCCommand &);
+        void        initializeCommandMap();
+
+        void        executeKick     (const t_IRCCommand &);
+        void        executeInvite   (const t_IRCCommand &);
+        void        executeTopic    (const t_IRCCommand &);
+        void        executeMode     (const t_IRCCommand &);
+        void        executePass     (const t_IRCCommand &);
+        void        executeNick     (const t_IRCCommand &);
+        void        executeUser     (const t_IRCCommand &);
+
+        void        setRole         (IRole* newRole);
+
+        std::string                             _nickName; // the server must check uniqueness
+        std::string                             _userName;
+        std::string                             _fullName;
+        int                                     _fd;
+        IRole*                                  _role;
+        bool                                    _isAuthenticated;
+        std::map<std::string, CommandFunction>  _commandMap; // map associating every command string to the proper function ptr
 };

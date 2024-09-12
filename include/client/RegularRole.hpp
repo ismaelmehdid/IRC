@@ -10,8 +10,13 @@ class RegularRole : public IRole
         RegularRole&    operator=(const RegularRole& other);
         virtual         ~RegularRole();
 
-        virtual void    kick();
-        virtual void    invite();
-        virtual void    topic();
-        virtual void    mode(char arg);
+        void    kick    (const t_IRCCommand &);
+        void    invite  (const t_IRCCommand &);
+        void    topic   (const t_IRCCommand &);
+        void    pass    (const t_IRCCommand &);
+        void    nick    (const t_IRCCommand &);
+        void    user    (const t_IRCCommand &);
+        void    mode    (const t_IRCCommand &);
+
+        RegularRole* clone() const;
 };
