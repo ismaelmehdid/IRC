@@ -87,10 +87,12 @@ void Server::handlePollEvent(size_t i)
     {
         if (_fds[i].fd == _socket.get_fd())
         {
+            std::cout << GREEN << "im new client" << RESET << std::endl << std::endl;
             handleNewConnection();
         }
         else
         {
+            std::cout << MAGENTA << "im message from client" << RESET << std::endl << std::endl;
             handleClientMessage(i);
         }
     }
