@@ -9,17 +9,24 @@
 # include "../exception/ServerListenException.hpp"
 # include "../exception/PollException.hpp"
 
+/**
+ * @brief Main class representing the server.
+ * 
+ * This class is responsible for managing client connections, communication, and server events.
+ * It handles incoming connections, client disconnections, and message processing.
+ */
 class Server
 {
     private:
-        unsigned int            _nbr_clients;
-        const std::string       _password;
-        Socket                  _socket;
-        std::map<int, Client*>  _clients;
-        Channel                 _channels;
-        std::vector<pollfd>     _fds;
-        pollfd                  _server_pollfd;
-        int                     _poll_count;
+        unsigned int            _nbr_clients;      ///< Number of connected clients
+        const std::string       _password;         ///< Server password for client authentication
+        Socket                  _socket;           ///< Socket instance for network operations
+        std::map<int, Client*>  _clients;          ///< Map of connected clients, key is client file descriptor
+        Channel                 _channels;         ///< Channel for managing group communication
+        std::vector<pollfd>     _fds;              ///< Poll file descriptors for client sockets
+        pollfd                  _server_pollfd;    ///< Pollfd structure for the server socket
+        int                     _poll_count;       ///< Number of poll events
+
     
         void                    ServerLoop();
 

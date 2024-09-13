@@ -16,24 +16,53 @@ Server::~Server()
     }
 }
 
-void    Server::addClient(Client *client) 
+/**
+ * @brief Adds a new client to the server.
+ * 
+ * This function stores the client in the _clients map, 
+ * using the client's file descriptor as the key, and increments the total number of clients.
+ * 
+ * @param client A pointer to the Client object to be added.
+ */
+void Server::addClient(Client *client) 
 {
     this->_clients[client->get_fd()] = client;
     this->_nbr_clients++;
 }
 
-void    Server::removeClient(int fd)
+/**
+ * @brief Removes a client from the server.
+ * 
+ * This function deletes the Client object corresponding to the given file descriptor,
+ * removes it from the _clients map, and decrements the total number of clients.
+ * 
+ * @param fd The file descriptor of the client to be removed.
+ */
+void Server::removeClient(int fd)
 {
     delete (this->_clients[fd]);
     this->_clients.erase(fd);
     this->_nbr_clients--;
 }
 
+/**
+ * @brief Retrieves the server's password.
+ * 
+ * This function returns the password required to connect to the server.
+ * 
+ * @return The server password as a const string.
+ */
 const std::string Server::get_password() const
 {
     return (this->_password);
 }
 
+/**
+ * @brief The main server loop for handling connections and events.
+ * 
+ * This function continuously polls the file descriptors in the _fds array for events.
+ * If poll fails, it throws a PollException. For each event, it delegates to handlePollEvent().
+ */
 void Server::ServerLoop()
 {
     while (true)
@@ -50,7 +79,18 @@ void Server::ServerLoop()
     }
 }
 
-void    Server::RunServer(char **argv)
+/**
+ * @brief Starts the server and sets it up for accepting connections.
+ * 
+ * This function creates the server socket, binds it to a port, and starts listening for connections.
+ * It sets up the server file descriptor in the pollfd array and enters the ServerLoop() to begin processing connections.
+ * 
+ * @param argv Command-line arguments. argv[1] should contain the port number to bind to.
+ * @throws ServerCreationException if socket creation fails.
+ * @throws ServerBindException if binding the socket fails.
+ * @throws ServerListenException if the server fails to start listening for connections.
+ */
+void Server::RunServer(char **argv)
 {
     if (!this->_socket.create())
         throw ServerCreationException();
