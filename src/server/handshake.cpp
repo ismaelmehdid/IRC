@@ -15,7 +15,7 @@
 //     }
 // }
 
-Client *perform_handshake(int client_fd)
+Client* Server::perform_handshake(int client_fd)
 {
     if (client_fd == -1) {
         return NULL;
