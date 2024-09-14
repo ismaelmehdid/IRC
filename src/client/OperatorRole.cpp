@@ -1,15 +1,16 @@
 #include "../../include/client/OperatorRole.hpp"
 
-OperatorRole::OperatorRole() {}
+OperatorRole::OperatorRole() : ARole(NULL) { }
 
-OperatorRole::OperatorRole(const OperatorRole& other)
-{
-    (void)other; // nothing to copy
-}
+OperatorRole::OperatorRole(Client *client) : ARole(client) { }
+
+OperatorRole::OperatorRole(const OperatorRole& other) : ARole(other._client) { }
 
 OperatorRole&   OperatorRole::operator=(const OperatorRole& other)
 {
-    (void)other; // nothing to copy
+    if (this != &other) {
+        ARole::operator=(other);
+    }
     return (*this);
 }
 
@@ -36,21 +37,6 @@ void OperatorRole::topic(const t_IRCCommand &command)
 }
 
 void OperatorRole::mode(const t_IRCCommand &command)
-{
-    (void)command;
-}
-
-void OperatorRole::pass(const t_IRCCommand &command)
-{
-    (void)command;
-}
-
-void OperatorRole::nick(const t_IRCCommand &command)
-{
-    (void)command;
-}
-
-void OperatorRole::user(const t_IRCCommand &command)
 {
     (void)command;
 }

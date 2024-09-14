@@ -1,11 +1,11 @@
 #pragma once
 
-# include "IRole.hpp"
+# include "ARole.hpp"
 
-class RegularRole : public IRole
+class RegularRole : public ARole
 {
     public:
-        RegularRole();
+        RegularRole(Client *);
         RegularRole(const RegularRole& other);
         RegularRole&    operator=(const RegularRole& other);
         virtual         ~RegularRole();
@@ -13,10 +13,10 @@ class RegularRole : public IRole
         void    kick    (const t_IRCCommand &);
         void    invite  (const t_IRCCommand &);
         void    topic   (const t_IRCCommand &);
-        void    pass    (const t_IRCCommand &);
-        void    nick    (const t_IRCCommand &);
-        void    user    (const t_IRCCommand &);
         void    mode    (const t_IRCCommand &);
 
         RegularRole* clone() const;
+
+    private:
+        RegularRole();
 };

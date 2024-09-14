@@ -1,15 +1,16 @@
 #include "../../include/client/RegularRole.hpp"
 
-RegularRole::RegularRole() {}
+RegularRole::RegularRole() : ARole(NULL) { }
 
-RegularRole::RegularRole(const RegularRole& other)
-{
-    (void)other; // nothing to copy
-}
+RegularRole::RegularRole(Client *client) : ARole(client) { }
+
+RegularRole::RegularRole(const RegularRole& other) : ARole(other._client) {}
 
 RegularRole&    RegularRole::operator=(const RegularRole& other)
 {
-    (void)other; // nothing to copy
+    if (this != &other) {
+        ARole::operator=(other);
+    }
     return (*this);
 }
 
@@ -42,22 +43,4 @@ void RegularRole::mode(const t_IRCCommand &command)
 {
     (void)command;
     // send permission error
-}
-
-void RegularRole::pass(const t_IRCCommand &command)
-{
-    (void)command;
-
-}
-
-void RegularRole::nick(const t_IRCCommand &command)
-{
-    (void)command;
-
-}
-
-void RegularRole::user(const t_IRCCommand &command)
-{
-    (void)command;
-
 }

@@ -8,6 +8,7 @@ SRCS =	src/main.cpp \
         src/server/handshake.cpp \
         src/server/Socket.cpp \
         src/client/Client.cpp \
+		src/client/ARole.cpp \
         src/client/OperatorRole.cpp \
         src/client/RegularRole.cpp \
         src/channel/Channel.cpp \

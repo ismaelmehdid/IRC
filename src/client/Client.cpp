@@ -1,26 +1,41 @@
 #include "../../include/irc.hpp"
 #include "../../include/client/Client.hpp"
 
-Client::Client() : _nickName("noName"), _userName("noUserName"),
-                   _fullName("noFullName"), _fd(-1), _role(new RegularRole()),
-                   _isAuthenticated(false)
+Client::Client()
+    :   _has_set_password(false),
+        _nickName(),
+        _userName(),
+        _fullName(),
+        _fd(-1),
+        _role(new RegularRole(this))
 {
     initializeCommandMap();
 }
 
-Client::Client(const std::string& nickName,const std::string& userName, 
-               const std::string& fullName, int fd, IRole* role)
-                : _nickName(nickName), _userName(userName),
-                  _fullName(fullName), _fd(fd), _role(role), 
-                  _isAuthenticated(false)
+Client::Client(
+    const std::string& nickName,
+    const std::string& userName,
+    const std::string& fullName,
+    int fd,
+    ARole* role)
+    :   _has_set_password(false),
+        _nickName(nickName),
+        _userName(userName),
+        _fullName(fullName),
+        _fd(fd),
+        _role(role)
+        
 {
     initializeCommandMap();                
 }
 
 Client::Client (const Client& other)
-                : _nickName(other._nickName), _userName(other._userName),
-                  _fullName(other._fullName), _fd(other.get_fd()),
-                  _role(other._role ? other._role->clone() : NULL), _isAuthenticated(false)
+    :   _has_set_password(other._has_set_password),
+        _nickName(other._nickName),
+        _userName(other._userName),
+        _fullName(other._fullName),
+        _fd(other.get_fd()),
+        _role(other._role ? other._role->clone() : NULL)
 {
     initializeCommandMap();
 }
@@ -36,7 +51,7 @@ Client& Client::operator=(const Client& other)
         this->_nickName = other._nickName;
         this->_userName = other._userName;
         this->_fullName = other._fullName;
-        this->_isAuthenticated = other._isAuthenticated;
+        this->_has_set_password = other._has_set_password;
     }
     return (*this);
 }
@@ -89,7 +104,7 @@ void Client::executeUser(const t_IRCCommand &command)
 }
 
 
-void Client::setRole(IRole* newRole)
+void Client::setRole(ARole* newRole)
 {
     delete (this->_role);
     this->_role = newRole;
@@ -118,4 +133,11 @@ void Client::initializeCommandMap() {
     _commandMap["PASS"] = &Client::executePass;
     _commandMap["NICK"] = &Client::executeNick;
     _commandMap["USER"] = &Client::executeUser;
+}
+
+// AUTHENTICATION
+
+bool Client::is_authenticated()
+{
+    return _has_set_password && !_nickName.empty() && !_userName.empty() && !_fullName.empty();
 }

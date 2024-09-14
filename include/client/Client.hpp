@@ -6,18 +6,22 @@
 # include <string>
 # include <map>
 
-class IRole;
+class ARole;
 
 class Client
 {
     public:
-        Client(const std::string& nickName, const std::string& userName, const std::string& fullName, int fd, IRole* role);
+        Client(const std::string& nickName, const std::string& userName, const std::string& fullName, int fd, ARole* role);
         Client (const Client& other);
         Client& operator=(const Client& other);
         ~Client();
 
         int         get_fd() const;
         void        execute_command(const std::string &message);
+        bool        is_authenticated();
+
+        //Auth
+        bool                                    _has_set_password;
 
     private:
         Client();
@@ -33,13 +37,12 @@ class Client
         void        executeNick     (const t_IRCCommand &);
         void        executeUser     (const t_IRCCommand &);
 
-        void        setRole         (IRole* newRole);
+        void        setRole         (ARole* newRole);
 
         std::string                             _nickName; // the server must check uniqueness
         std::string                             _userName;
         std::string                             _fullName;
         int                                     _fd;
-        IRole*                                  _role;
-        bool                                    _isAuthenticated;
+        ARole*                                  _role;
         std::map<std::string, CommandFunction>  _commandMap; // map associating every command string to the proper function ptr
 };

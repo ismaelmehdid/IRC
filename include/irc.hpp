@@ -40,12 +40,13 @@
 #define ERR_PASSWORD_REQUIRED   ":server 461 * PASS :Password required\r\n"
 #define ERR_PASSWORD_INCORRECT  ":server 464 * :Password incorrect\r\n"
 #define ERR_NO_NICKNAME_GIVEN   ":server 431 * :No nickname given\r\n"
-#define ERR_NOT_ENOUGH_PARAMS   ":server 461 * USER :Not enough parameters\r\n"
+#define ERR_NEED_MORE_PARAMS    ":server 461 * USER :Not enough parameters\r\n"
+#define ERR_ALREADY_REGISTERED  ":server 462 * :You may not reregister\r\n"
 
 class Socket;
 class Server;
 class Client;
-class IRole;
+class ARole;
 class OperatorRole; // inherit from IRole
 class RegularRole; // inherit from IRole
 
