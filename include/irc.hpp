@@ -20,6 +20,7 @@
 #include <sys/stat.h>    // fstat
 #include <cerrno>        // errno
 #include <vector>
+#include <exception>
 
 #define MIN_PORT_VALUE 1024
 #define MAX_PORT_VALUE 65535
@@ -50,12 +51,14 @@ class ARole;
 class OperatorRole; // inherit from IRole
 class RegularRole; // inherit from IRole
 
-enum t_errors {
+enum t_errors
+{
     ERR_BAD_ARGUMENTS,
     ERR_BAD_PORT
 };
 
-struct t_IRCCommand {
+struct t_IRCCommand
+{
     std::string                 prefix;
     std::string                 command;
     std::vector<std::string>    params;
@@ -63,10 +66,6 @@ struct t_IRCCommand {
 };
 
 extern Server *global_ircserv;
-
-// Server
-int     start_server(Server *ircserv, char **argv);
-Client  *perform_handshake(int client_fd);
 
 // Parsing
 void                        display_error_message(t_errors code);
