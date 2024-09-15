@@ -40,7 +40,12 @@ static t_IRCCommand parse_single_command(const std::string &raw_command)
     return (command);
 }
 
-
+/**
+ * Parses a string of client commands and extracts individual commands into a vector of t_IRCCommand.
+ *
+ * @param commands The string of client commands to be parsed.
+ * @return A vector of t_IRCCommand containing the extracted commands.
+ */
 std::vector<t_IRCCommand>   parse_client_commands(const std::string &commands)
 {
 

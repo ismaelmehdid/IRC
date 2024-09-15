@@ -43,6 +43,21 @@ void ARole::pass(const t_IRCCommand &command)
     }
 }
 
+/**
+ * @brief Changes the nickname of the client.
+ * 
+ * This function is used to change the nickname of the client. If the client is not authenticated,
+ * it checks if a password has been set. If a password has not been set, it sends an error message
+ * indicating that the password is incorrect. If the command parameters are empty, it sends an error
+ * message indicating that more parameters are needed. If the nickname is already taken by another
+ * client, it sends an error message indicating that the nickname is in use. Otherwise, it sets the
+ * new nickname for the client.
+ * 
+ * If the client is already authenticated, it sends an error message indicating that the client is
+ * already registered.
+ * 
+ * @param command The IRC command containing the new nickname.
+ */
 void ARole::nick(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated())
@@ -74,7 +89,18 @@ void ARole::nick(const t_IRCCommand &command)
     }
 }
 
-void    ARole::user(const t_IRCCommand &command)
+/**
+ * @brief Handles the user command received from the client.
+ * 
+ * This function is responsible for processing the user command received from the client.
+ * It checks if the client is authenticated and if the necessary parameters are provided.
+ * If the client is not authenticated and the required parameters are provided, it sets the client's username and full name,
+ * sends a welcome message to the client, and marks the client as registered.
+ * If the client is already registered, it sends an error message indicating that the client is already registered.
+ * 
+ * @param command The IRC command received from the client.
+ */
+void ARole::user(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated() && _client->getUserName().empty() && _client->getFullName().empty())
     {

@@ -60,6 +60,15 @@ void Client::setRole(ARole* newRole)
     this->_role = newRole;
 }
 
+/**
+ * Executes the given client command.
+ *
+ * This function parses the provided message into a vector of IRC commands and iterates over each command.
+ * For each command, it looks up the corresponding command function in the _commandMap and executes it.
+ * If the command is not found in the map, it sends the ERR_UNKNOWNCOMMAND response to the client.
+ *
+ * @param message The message containing the client command.
+ */
 void Client::execute_command(const std::string &message)
 {
     std::vector<t_IRCCommand> parsed_commands = parse_client_commands(message);
@@ -78,8 +87,29 @@ void Client::execute_command(const std::string &message)
     }
 }
 
-void Client::initializeCommandMap()
-{
+/**
+ * @brief Initializes the command map for the client.
+ * 
+ * This function assigns the appropriate member functions of the Client class to the corresponding commands in the command map.
+ * The command map is a std::map that maps command names to member function pointers.
+ * 
+ * The following commands are supported:
+ * - KICK: Executes the kick command.
+ * - INVITE: Executes the invite command.
+ * - TOPIC: Executes the topic command.
+ * - MODE: Executes the mode command.
+ * - PASS: Executes the pass command.
+ * - NICK: Executes the nick command.
+ * - USER: Executes the user command.
+ */
+void Client::initializeCommandMap() {
+    _commandMap["KICK"]  = &Client::executeKick;
+    _commandMap["INVITE"] = &Client::executeInvite;
+    _commandMap["TOPIC"] = &Client::executeTopic;
+    _commandMap["MODE"] = &Client::executeMode;
+    _commandMap["PASS"] = &Client::executePass;
+    _commandMap["NICK"] = &Client::executeNick;
+    _commandMap["USER"] = &Client::executeUser;
     _commandMap["KICK"]    = &Client::executeKick;
     _commandMap["INVITE"]  = &Client::executeInvite;
     _commandMap["TOPIC"]   = &Client::executeTopic;
@@ -93,7 +123,11 @@ void Client::initializeCommandMap()
     _commandMap["PING"]    = &Client::executePing;
 }
 
-// AUTHENTICATION
+/**
+ * @brief Checks if the client is authenticated.
+ * 
+ * @return true if the client is authenticated, false otherwise.
+ */
 bool Client::is_authenticated()
 {
     return _has_set_password && !_nickName.empty() && !_userName.empty() && !_fullName.empty();
