@@ -13,8 +13,8 @@ SRCS =	src/main.cpp \
         src/client/RegularRole.cpp \
         src/client/ClientCommands.cpp \
         src/channel/Channel.cpp \
-        src/parsing/parsing.cpp \
-        src/parsing/commands.cpp \
+        src/parsing/Parsing.cpp \
+        src/parsing/Commands.cpp \
         src/exception/ServerBindException.cpp \
         src/exception/ServerListenException.cpp \
         src/exception/ServerCreationException.cpp \
