@@ -33,15 +33,15 @@ void Server::handleClientMessage(size_t i)
 void Server::handleNewConnection()
 {
     int client_fd = _socket.accept();
+
     if (client_fd != -1)
     {
-        pollfd client_pollfd;
+        pollfd  client_pollfd;
+
         client_pollfd.fd = client_fd;
         client_pollfd.events = POLLIN;
         _fds.push_back(client_pollfd);
-
-        Client* newClient = new Client(client_fd);
-        addClient(newClient);
+        addClient(new Client(client_fd));
     }
 }
 
