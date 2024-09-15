@@ -1,5 +1,11 @@
 #include "../../include/irc.hpp"
 
+/**
+ * Parses a single IRC command from the given string.
+ *
+ * @param command The string containing the IRC command to parse.
+ * @return The parsed IRC command as a t_IRCCommand struct.
+ */
 static t_IRCCommand parse_single_command(const std::string &command)
 {
     t_IRCCommand ircMessage;
@@ -28,6 +34,12 @@ static t_IRCCommand parse_single_command(const std::string &command)
     return ircMessage;
 }
 
+/**
+ * Parses a string of client commands and extracts individual commands into a vector of t_IRCCommand.
+ *
+ * @param commands The string of client commands to be parsed.
+ * @return A vector of t_IRCCommand containing the extracted commands.
+ */
 std::vector<t_IRCCommand>   parse_client_commands(const std::string &commands)
 {
 
