@@ -75,17 +75,22 @@ bool    Socket::listen()
  * 
  * @return The file descriptor of the accepted connection, or -1 if an error occurred.
  */
-int Socket::accept()
+Client* Socket::accept()
 {
     sockaddr_in client_addr; // client's network infos
     socklen_t   client_len = sizeof(client_addr);
     int         client_fd;
+    char	    host[INET_ADDRSTRLEN];
     
     client_fd = ::accept(this->_fd, (sockaddr*)&client_addr, &client_len);
     if (client_fd == -1)
+    {
         std::cerr << "Accept failed: " << strerror(errno) << std::endl;
+        return (NULL);
+    }
+    inet_ntop(AF_INET, &client_addr.sin_addr, host, INET_ADDRSTRLEN);
 
-    return (client_fd);
+    return (new Client(client_fd, host));
 }
 
 /**
@@ -97,19 +102,22 @@ int Socket::accept()
  */
 bool    Socket::send(int client_fd, const std::string &message)
 {
-    size_t total_sent = 0;
-    size_t message_length = message.size();
-    const char *message_cstr = message.c_str();
+    size_t      total_sent     = 0;
+    size_t      message_length = message.size();
+    const char  *message_cstr  = message.c_str();
 
-    while (total_sent < message_length) {
+    std::cout << "Sending message: " << message << std::endl;
+    while (total_sent < message_length)
+    {
         ssize_t sent = ::send(client_fd, message_cstr + total_sent, message_length - total_sent, 0);
-        if (sent == -1) {
+        if (sent == -1)
+        {
             std::cerr << "Send failed: " << strerror(errno) << std::endl;
-            return false;
+            return (false);
         }
         total_sent += sent;
     }
-    return true;
+    return (true);
 }
 
 /**

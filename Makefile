@@ -6,10 +6,12 @@ SRCS =	src/main.cpp \
         src/server/Server.cpp \
         src/server/PollEvent.cpp \
         src/server/Socket.cpp \
+        src/server/ChannelHandling.cpp \
         src/client/Client.cpp \
 		src/client/ARole.cpp \
         src/client/OperatorRole.cpp \
         src/client/RegularRole.cpp \
+        src/client/ClientCommands.cpp \
         src/channel/Channel.cpp \
         src/parsing/Parsing.cpp \
         src/parsing/Commands.cpp \

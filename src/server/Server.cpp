@@ -24,7 +24,7 @@ Server::~Server()
  * 
  * @param client A pointer to the Client object to be added.
  */
-void Server::addClient(Client *client) 
+void    Server::addClient(Client *client) 
 {
     this->_clients[client->get_fd()] = client;
     this->_nbr_clients++;
@@ -38,7 +38,7 @@ void Server::addClient(Client *client)
  * 
  * @param fd The file descriptor of the client to be removed.
  */
-void Server::removeClient(int fd)
+void    Server::removeClient(int fd)
 {
     delete (this->_clients[fd]);
     this->_clients.erase(fd);
@@ -52,9 +52,21 @@ void Server::removeClient(int fd)
  * 
  * @return The server password as a const string.
  */
-const std::string Server::get_password() const
+const   std::string Server::get_password() const
 {
     return (this->_password);
+}
+
+bool    Server::isNickNameTaken(const std::string &nickName)
+{
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
+    {
+        if (it->second->getNickName() == nickName)
+        {
+            return (true);
+        }
+    }
+    return (false);
 }
 
 /**
@@ -63,7 +75,7 @@ const std::string Server::get_password() const
  * This function continuously polls the file descriptors in the _fds array for events.
  * If poll fails, it throws a PollException. For each event, it delegates to handlePollEvent().
  */
-void Server::serverLoop()
+void    Server::serverLoop()
 {
     while (true)
     {
@@ -90,7 +102,7 @@ void Server::serverLoop()
  * @throws ServerBindException if binding the socket fails.
  * @throws ServerListenException if the server fails to start listening for connections.
  */
-void Server::runServer(char **argv)
+void    Server::runServer(char **argv)
 {
     if (!this->_socket.create())
         throw ServerCreationException();
@@ -107,14 +119,4 @@ void Server::runServer(char **argv)
               << argv[1] << "..." << std::endl;
 
     serverLoop();
-}
-
-bool Server::isNickNameTaken(const std::string &nickName)
-{
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
-        if (it->second->getNickName() == nickName) {
-            return (true);
-        }
-    }
-    return (false);
 }

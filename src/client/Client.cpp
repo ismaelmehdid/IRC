@@ -2,19 +2,9 @@
 #include "../../include/client/Client.hpp"
 #include "../../include/server/Server.hpp"
 
-Client::Client()
+Client::Client(int fd, char	*host)
     :   _has_set_password(false),
-        _nickName(),
-        _userName(),
-        _fullName(),
-        _fd(-1),
-        _role(new RegularRole(this))
-{
-    initializeCommandMap();
-}
-
-Client::Client(int fd)
-    :   _has_set_password(false),
+        _hostMask(host),
         _nickName(),
         _userName(),
         _fullName(),
@@ -64,42 +54,6 @@ int Client::get_fd() const
     return (this->_fd);
 }
 
-// COMMANDS
-void Client::executeKick(const t_IRCCommand &command)
-{
-    this->_role->kick(command);
-}
-
-void Client::executeInvite(const t_IRCCommand &command)
-{
-    this->_role->invite(command);
-}
-
-void Client::executeTopic(const t_IRCCommand &command)
-{
-    this->_role->topic(command);
-}
-
-void Client::executeMode(const t_IRCCommand &command)
-{
-    this->_role->mode(command);
-}
-
-void Client::executePass(const t_IRCCommand &command)
-{
-    this->_role->pass(command);
-}
-
-void Client::executeNick(const t_IRCCommand &command)
-{
-    this->_role->nick(command);
-}
-
-void Client::executeUser(const t_IRCCommand &command)
-{
-    this->_role->user(command);
-}
-
 void Client::setRole(ARole* newRole)
 {
     delete (this->_role);
@@ -110,24 +64,33 @@ void Client::execute_command(const std::string &message)
 {
     std::vector<t_IRCCommand> parsed_commands = parse_client_commands(message);
 
-    for (size_t i = 0; i < parsed_commands.size(); i++) {
+    for (size_t i = 0; i < parsed_commands.size(); i++)
+    {
         std::map<std::string, CommandFunction>::iterator it = _commandMap.find(parsed_commands[i].command);
-        if (it != _commandMap.end()) {
+        if (it != _commandMap.end())
+        {
             (this->*(it->second))(parsed_commands[i]);
-        } else {
+        }
+        else
+        {
             global_ircserv->_socket.send(_fd, ERR_UNKNOWNCOMMAND);
         }
     }
 }
 
-void Client::initializeCommandMap() {
-    _commandMap["KICK"]  = &Client::executeKick;
-    _commandMap["INVITE"] = &Client::executeInvite;
-    _commandMap["TOPIC"] = &Client::executeTopic;
-    _commandMap["MODE"] = &Client::executeMode;
-    _commandMap["PASS"] = &Client::executePass;
-    _commandMap["NICK"] = &Client::executeNick;
-    _commandMap["USER"] = &Client::executeUser;
+void Client::initializeCommandMap()
+{
+    _commandMap["KICK"]    = &Client::executeKick;
+    _commandMap["INVITE"]  = &Client::executeInvite;
+    _commandMap["TOPIC"]   = &Client::executeTopic;
+    _commandMap["MODE"]    = &Client::executeMode;
+    _commandMap["PASS"]    = &Client::executePass;
+    _commandMap["NICK"]    = &Client::executeNick;
+    _commandMap["USER"]    = &Client::executeUser;
+    _commandMap["JOIN"]    = &Client::executeJoin;
+    _commandMap["PART"]    = &Client::executePart;
+    _commandMap["PRIVMSG"] = &Client::executePrivMsg;
+    _commandMap["PING"]    = &Client::executePing;
 }
 
 // AUTHENTICATION
@@ -139,31 +102,36 @@ bool Client::is_authenticated()
 //Getters
 std::string Client::getNickName()
 {
-    return _nickName;
+    return (this->_nickName);
 }
 
 std::string Client::getUserName()
 {
-    return _userName;
+    return (this->_userName);
 }
 
 std::string Client::getFullName()
 {
-    return _fullName;
+    return (this->_fullName);
+}
+
+std::string Client::getHostMask()
+{
+    return (this->_hostMask);
 }
 
 //Setters
 void    Client::setNickName(const std::string &nickName)
 {
-    _nickName = nickName;
+   this->_nickName = nickName;
 }
 
 void    Client::setUserName(const std::string &userName)
 {
-    _userName = userName;
+    this->_userName = userName;
 }
 
 void    Client::setFullName(const std::string &fullName)
 {
-    _fullName = fullName;
+    this->_fullName = fullName;
 }
