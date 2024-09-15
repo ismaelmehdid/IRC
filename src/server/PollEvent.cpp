@@ -18,17 +18,17 @@ void Server::handleClientMessage(size_t i)
     }
     else
     {
-        std::cout << "Message received from client: " << message << std::endl;
-        _socket.send(_fds[i].fd, "Message received\n");
+        global_ircserv->_clients[_fds[i].fd]->execute_command(message);
     }
 }
 
 /**
- * @brief Handles a new incoming connection to the server.
+ * Handles a new client connection.
  * 
- * This function accepts a new client connection, adds the client's file descriptor to the pollfd array,
- * and performs the handshake with the new client. If the handshake is successful, it adds the client 
- * to the server and sends a welcome message.
+ * This function accepts a new client connection, creates a pollfd structure for the client,
+ * adds it to the list of file descriptors to be polled, creates a new Client object for the client,
+ * adds the client to the server's list of clients, sends a welcome message to the client,
+ * and prints a message indicating that a client has connected.
  */
 void Server::handleNewConnection()
 {
@@ -39,15 +39,9 @@ void Server::handleNewConnection()
         client_pollfd.fd = client_fd;
         client_pollfd.events = POLLIN;
         _fds.push_back(client_pollfd);
-        
-        Client* newClient = perform_handshake(client_fd);
-        if (newClient)
-        {
-            addClient(newClient);
-            std::cout << "Client connected!" << std::endl;
-            std::string welcome_msg = ":server 001 client :Welcome to the IRC server!\r\n";
-            _socket.send(client_fd, welcome_msg);
-        }
+
+        Client* newClient = new Client(client_fd);
+        addClient(newClient);
     }
 }
 
@@ -62,7 +56,6 @@ void Server::handleNewConnection()
 void Server::handleClientDisconnection(size_t i)
 {
     std::cerr << "Client error or hangup on fd " << _fds[i].fd << std::endl;
-    close(_fds[i].fd);
     removeClient(_fds[i].fd);
     _fds.erase(_fds.begin() + i);
 }
@@ -87,12 +80,10 @@ void Server::handlePollEvent(size_t i)
     {
         if (_fds[i].fd == _socket.get_fd())
         {
-            std::cout << GREEN << "im new client" << RESET << std::endl << std::endl;
             handleNewConnection();
         }
         else
         {
-            std::cout << MAGENTA << "im message from client" << RESET << std::endl << std::endl;
             handleClientMessage(i);
         }
     }

@@ -5,19 +5,18 @@ SRCS =	src/main.cpp \
         src/utils/cleanup_and_exit.cpp \
         src/server/Server.cpp \
         src/server/PollEvent.cpp \
-        src/server/Handshake.cpp \
         src/server/Socket.cpp \
         src/client/Client.cpp \
 		src/client/ARole.cpp \
         src/client/OperatorRole.cpp \
         src/client/RegularRole.cpp \
         src/channel/Channel.cpp \
-        src/parsing/Parsing.cpp \
-        src/parsing/Commands.cpp \
+        src/parsing/parsing.cpp \
+        src/parsing/commands.cpp \
         src/exception/ServerBindException.cpp \
         src/exception/ServerListenException.cpp \
         src/exception/ServerCreationException.cpp \
-        src/exception/PollException.cpp \
+        src/exception/PollException.cpp
 
 CC = c++
 FLAGS = -Wall -Wextra -Werror -std=c++98

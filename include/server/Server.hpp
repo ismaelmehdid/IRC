@@ -20,15 +20,13 @@ class Server
     private:
         unsigned int            _nbr_clients;      ///< Number of connected clients
         const std::string       _password;         ///< Server password for client authentication
-        Socket                  _socket;           ///< Socket instance for network operations
         std::map<int, Client*>  _clients;          ///< Map of connected clients, key is client file descriptor
         Channel                 _channels;         ///< Channel for managing group communication
         std::vector<pollfd>     _fds;              ///< Poll file descriptors for client sockets
         pollfd                  _server_pollfd;    ///< Pollfd structure for the server socket
         int                     _poll_count;       ///< Number of poll events
 
-    
-        void                    ServerLoop();
+        void                    serverLoop();
 
         void                    handlePollEvent(size_t i);
         void                    handleClientDisconnection(size_t i);
@@ -37,12 +35,15 @@ class Server
 
         void                    addClient(Client *client);
         void                    removeClient(int fd);
-        Client                  *perform_handshake(int client_fd);
 
     public:
         Server(const std::string &password);
         ~Server();
 
-        void                    RunServer(char **argv);
+        void                    runServer(char **argv);
         const std::string       get_password() const;
+        bool                    isNickNameTaken(const std::string &nickName);
+
+        Socket                  _socket;           ///< Socket instance for network operations
+
 };

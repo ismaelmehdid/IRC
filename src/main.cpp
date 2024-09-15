@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 
     try
     {
-        ircserv->RunServer(argv);
+        ircserv->runServer(argv);
     }
     catch(const std::exception& e)
     {

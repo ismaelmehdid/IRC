@@ -1,5 +1,6 @@
 #include "../../include/irc.hpp"
 #include "../../include/client/Client.hpp"
+#include "../../include/server/Server.hpp"
 
 Client::Client()
     :   _has_set_password(false),
@@ -12,18 +13,13 @@ Client::Client()
     initializeCommandMap();
 }
 
-Client::Client(
-    const std::string& nickName,
-    const std::string& userName,
-    const std::string& fullName,
-    int fd,
-    ARole* role)
+Client::Client(int fd)
     :   _has_set_password(false),
-        _nickName(nickName),
-        _userName(userName),
-        _fullName(fullName),
+        _nickName(),
+        _userName(),
+        _fullName(),
         _fd(fd),
-        _role(role)
+        _role(new RegularRole(this))
         
 {
     initializeCommandMap();                
@@ -68,6 +64,7 @@ int Client::get_fd() const
     return (this->_fd);
 }
 
+// COMMANDS
 void Client::executeKick(const t_IRCCommand &command)
 {
     this->_role->kick(command);
@@ -103,7 +100,6 @@ void Client::executeUser(const t_IRCCommand &command)
     this->_role->user(command);
 }
 
-
 void Client::setRole(ARole* newRole)
 {
     delete (this->_role);
@@ -119,12 +115,11 @@ void Client::execute_command(const std::string &message)
         if (it != _commandMap.end()) {
             (this->*(it->second))(parsed_commands[i]);
         } else {
-            // TODO: executeUnknown
+            global_ircserv->_socket.send(_fd, ERR_UNKNOWNCOMMAND);
         }
     }
 }
 
-// INIT MAP TO STORE ALL COMMANDS
 void Client::initializeCommandMap() {
     _commandMap["KICK"]  = &Client::executeKick;
     _commandMap["INVITE"] = &Client::executeInvite;
@@ -136,8 +131,39 @@ void Client::initializeCommandMap() {
 }
 
 // AUTHENTICATION
-
 bool Client::is_authenticated()
 {
     return _has_set_password && !_nickName.empty() && !_userName.empty() && !_fullName.empty();
+}
+
+//Getters
+std::string Client::getNickName()
+{
+    return _nickName;
+}
+
+std::string Client::getUserName()
+{
+    return _userName;
+}
+
+std::string Client::getFullName()
+{
+    return _fullName;
+}
+
+//Setters
+void    Client::setNickName(const std::string &nickName)
+{
+    _nickName = nickName;
+}
+
+void    Client::setUserName(const std::string &userName)
+{
+    _userName = userName;
+}
+
+void    Client::setFullName(const std::string &fullName)
+{
+    _fullName = fullName;
 }

@@ -1,7 +1,7 @@
 #include "../../include/server/Server.hpp"
 
 Server::Server(const std::string &password)
-    : _nbr_clients(0), _password(password), _socket(), _clients(), _channels() {}
+    : _nbr_clients(0), _password(password), _clients(), _channels(), _socket() {}
 
 Server::~Server()
 {
@@ -63,7 +63,7 @@ const std::string Server::get_password() const
  * This function continuously polls the file descriptors in the _fds array for events.
  * If poll fails, it throws a PollException. For each event, it delegates to handlePollEvent().
  */
-void Server::ServerLoop()
+void Server::serverLoop()
 {
     while (true)
     {
@@ -90,7 +90,7 @@ void Server::ServerLoop()
  * @throws ServerBindException if binding the socket fails.
  * @throws ServerListenException if the server fails to start listening for connections.
  */
-void Server::RunServer(char **argv)
+void Server::runServer(char **argv)
 {
     if (!this->_socket.create())
         throw ServerCreationException();
@@ -106,5 +106,15 @@ void Server::RunServer(char **argv)
     std::cout << "Waiting for connections on port "
               << argv[1] << "..." << std::endl;
 
-    ServerLoop();
+    serverLoop();
+}
+
+bool Server::isNickNameTaken(const std::string &nickName)
+{
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++) {
+        if (it->second->getNickName() == nickName) {
+            return (true);
+        }
+    }
+    return (false);
 }
