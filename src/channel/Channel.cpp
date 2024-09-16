@@ -53,7 +53,7 @@ void    Channel::broadcastMessage(const std::string& message)
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
         std::cout << "Sending message: " << message << " to client " << it->first << std::endl;
-        if (!global_ircserv->_socket.send(it->second->get_fd(), message))
+        if (!global_ircserv->socketSend(it->second->get_fd(), message))
         {
             std::cerr << "Failed to send message to client " << it->first << std::endl;
         }

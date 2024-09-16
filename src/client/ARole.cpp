@@ -15,7 +15,7 @@ void    ARole::cap(const t_IRCCommand &command)
 	if (command.params[0] == "LS")
 	{
         std::string empty_list_response = ":server CAP " + _client->getNickName() + "LS :\r\n"; // server doesn't have any special features
-        global_ircserv->_socket.send(_client->get_fd(), empty_list_response);
+        global_ircserv->socketSend(_client->get_fd(), empty_list_response);
 	}
 }
 
@@ -25,11 +25,11 @@ void    ARole::pass(const t_IRCCommand &command)
     {
         if (command.params.empty())
         {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
+            global_ircserv->socketSend(_client->get_fd(), ERR_NEED_MORE_PARAMS);
         }
         else if (command.params[0] != global_ircserv->get_password())
         {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_INCORRECT);
+            global_ircserv->socketSend(_client->get_fd(), ERR_PASSWORD_INCORRECT);
         }
         else
         {
@@ -39,7 +39,7 @@ void    ARole::pass(const t_IRCCommand &command)
     }
     else
     {
-        global_ircserv->_socket.send(_client->get_fd(), ERR_ALREADY_REGISTERED);
+        global_ircserv->socketSend(_client->get_fd(), ERR_ALREADY_REGISTERED);
     }
 }
 
@@ -62,8 +62,9 @@ void    ARole::pass(const t_IRCCommand &command)
 static bool is_nickname_valid(const std::string &nick)
 {
     if (std::isdigit(nick[0]) || nick[0] == '#' || nick[0] == '&')
-        return false;
-    for (size_t i = 1; i < nick.size(); i++) {
+        return (false);
+    for (size_t i = 1; i < nick.size(); i++)
+    {
         if (!std::isalnum(nick[0]) &&
             nick[0] != '-' &&
             nick[0] != '[' &&
@@ -74,20 +75,20 @@ static bool is_nickname_valid(const std::string &nick)
             nick[0] != '{' &&
             nick[0] != '}'
             )
-            return false;
+            return (false);
     }
-    return true;
+    return (true);
 }
 
 void    ARole::nick(const t_IRCCommand &command)
 {
     if (!_client->_has_set_password)
     {
-        global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_REQUIRED);
+        global_ircserv->socketSend(_client->get_fd(), ERR_PASSWORD_REQUIRED);
     } 
     else if (command.params.empty())
     {
-        global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
+        global_ircserv->socketSend(_client->get_fd(), ERR_NEED_MORE_PARAMS);
     }
     else
     {
@@ -96,11 +97,11 @@ void    ARole::nick(const t_IRCCommand &command)
             return ;
         if (!is_nickname_valid(newNick))
         {
-            global_ircserv->_socket.send(_client->get_fd(), ":server 432 * " + newNick + " :Erroneous nickname\r\n");
+            global_ircserv->socketSend(_client->get_fd(), ":server 432 * " + newNick + " :Erroneous nickname\r\n");
         }
         else if (global_ircserv->isNickNameTaken(newNick))
         {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_NICKNAME_IN_USE);
+            global_ircserv->socketSend(_client->get_fd(), ERR_NICKNAME_IN_USE);
         }
         else
         {
@@ -126,15 +127,15 @@ void    ARole::user(const t_IRCCommand &command)
     if (!_client->is_authenticated() && _client->getUserName().empty() && _client->getFullName().empty()) {
         if (!_client->_has_set_password)
         {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_REQUIRED);
+            global_ircserv->socketSend(_client->get_fd(), ERR_PASSWORD_REQUIRED);
         }
         else if (_client->getNickName().empty())
         {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_NONICKNAMEGIVEN);
+            global_ircserv->socketSend(_client->get_fd(), ERR_NONICKNAMEGIVEN);
         }
         else if (command.params.size() < 3 || command.trailing.empty())
         {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
+            global_ircserv->socketSend(_client->get_fd(), ERR_NEED_MORE_PARAMS);
         }
         else
         {
@@ -142,12 +143,12 @@ void    ARole::user(const t_IRCCommand &command)
             _client->setFullName(command.trailing);
             std::cout << GREEN << "Client connected!" << RESET << std::endl;
 
-            global_ircserv->_socket.send(_client->get_fd(), ":server 001 " + this->_client->getNickName() + " :Welcome to the Internet Relay Network " + this->_client->getNickName() + "!" + this->_client->getUserName() + "@" + this->_client->getHostMask() + "\r\n");
+            global_ircserv->socketSend(_client->get_fd(), ":server 001 " + this->_client->getNickName() + " :Welcome to the Internet Relay Network " + this->_client->getNickName() + "!" + this->_client->getUserName() + "@" + this->_client->getHostMask() + "\r\n");
         }
     }
     else
     {
-        global_ircserv->_socket.send(_client->get_fd(), ERR_ALREADY_REGISTERED);
+        global_ircserv->socketSend(_client->get_fd(), ERR_ALREADY_REGISTERED);
     }
 }
 
@@ -155,7 +156,7 @@ void    ARole::quit(const t_IRCCommand &command)
 {
 	std::string reason = (command.params.empty()) ? "" : (":" + command.params[0]);
 
-	global_ircserv->_socket.send(this->_client->get_fd(), SERVER_NAME " QUIT " + this->_client->getNickName() + " " + reason);
+	global_ircserv->socketSend(this->_client->get_fd(), SERVER_NAME " QUIT " + this->_client->getNickName() + " " + reason);
     global_ircserv->removeClient(this->_client, reason);
     
     std::cout << YELLOW << this->_client->getNickName() << " disconnected!" << RESET << std::endl;
@@ -166,7 +167,7 @@ void    ARole::join(const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
-        global_ircserv->_socket.send(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
+        global_ircserv->socketSend(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
         return ;
     }
 
@@ -203,7 +204,7 @@ void    ARole::join(const t_IRCCommand &command)
                         .append(this->_client->getNickName()).append(" ")
                         .append(channelName).append(" :No topic is set\r\n");
         }
-        global_ircserv->_socket.send(this->_client->get_fd(), topicMessage);
+        global_ircserv->socketSend(this->_client->get_fd(), topicMessage);
 
         std::string namesReply;
         namesReply.append(":").append(SERVER_NAME).append(" 353 ")
@@ -217,13 +218,13 @@ void    ARole::join(const t_IRCCommand &command)
             namesReply.append(it->second->getNickName());
         }
         namesReply.append("\r\n");
-        global_ircserv->_socket.send(this->_client->get_fd(), namesReply);
+        global_ircserv->socketSend(this->_client->get_fd(), namesReply);
 
         std::string endOfNames;
         endOfNames.append(":").append(SERVER_NAME).append(" 366 ")
                   .append(this->_client->getNickName()).append(" ")
                   .append(channelName).append(" :End of NAMES list\r\n");
-        global_ircserv->_socket.send(this->_client->get_fd(), endOfNames);
+        global_ircserv->socketSend(this->_client->get_fd(), endOfNames);
     }
     else
     {
@@ -233,7 +234,7 @@ void    ARole::join(const t_IRCCommand &command)
                 .append(this->_client->getNickName()).append(" ")
                 .append(channelName).append(" :")
                 .append(ERR_ALREADY_JOINED_MSG);
-        global_ircserv->_socket.send(this->_client->get_fd(), errorMsg);
+        global_ircserv->socketSend(this->_client->get_fd(), errorMsg);
     }
 }
 
@@ -241,7 +242,7 @@ void    ARole::part(const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
-        global_ircserv->_socket.send(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
+        global_ircserv->socketSend(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
         return;
     }
 
@@ -250,7 +251,7 @@ void    ARole::part(const t_IRCCommand &command)
     
     if (!channel)
     {
-        global_ircserv->_socket.send(this->_client->get_fd(), ERR_NO_SUCH_CHANNEL);
+        global_ircserv->socketSend(this->_client->get_fd(), ERR_NO_SUCH_CHANNEL);
         return;
     }
 
@@ -263,7 +264,7 @@ void    ARole::privMsg(const t_IRCCommand &command)
 {
     if (command.params.empty() || command.trailing.empty())
     {
-        global_ircserv->_socket.send(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
+        global_ircserv->socketSend(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
         return ;
     }
 
@@ -275,7 +276,7 @@ void    ARole::privMsg(const t_IRCCommand &command)
         Channel *channel = global_ircserv->findChannel(target);
         if (!channel)
         {
-            global_ircserv->_socket.send(this->_client->get_fd(), ERR_NO_SUCH_CHANNEL);
+            global_ircserv->socketSend(this->_client->get_fd(), ERR_NO_SUCH_CHANNEL);
             return ;
         }
 
@@ -287,11 +288,11 @@ void    ARole::privMsg(const t_IRCCommand &command)
         Client *target_client = global_ircserv->findClientByNick(target);
         if (!target_client)
         {
-            global_ircserv->_socket.send(this->_client->get_fd(), ERR_NO_SUCH_NICK);
+            global_ircserv->socketSend(this->_client->get_fd(), ERR_NO_SUCH_NICK);
             return;
         }
         std::string privmsg = ":" + this->_client->getNickName() + " PRIVMSG " + target + " :" + message + "\r\n";
-        global_ircserv->_socket.send(target_client->get_fd(), privmsg);
+        global_ircserv->socketSend(target_client->get_fd(), privmsg);
     }
 }
 
@@ -299,14 +300,14 @@ void    ARole::ping(const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
-        global_ircserv->_socket.send(this->_client->get_fd(), ":server 461 * PING :Not enough parameters\r\n");
+        global_ircserv->socketSend(this->_client->get_fd(), ":server 461 * PING :Not enough parameters\r\n");
         return ;
     }
 
     const std::string   &server_name = command.params[0];
     std::string         pong_message = ":" + server_name + " PONG " + server_name + "\r\n";
 
-    global_ircserv->_socket.send(this->_client->get_fd(), pong_message);
+    global_ircserv->socketSend(this->_client->get_fd(), pong_message);
 }
 
 

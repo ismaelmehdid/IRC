@@ -25,7 +25,7 @@ RegularRole* RegularRole::clone() const
 
 static void send_permission_denied(int fd, const std::string &nickName)
 {
-    global_ircserv->_socket.send(fd, ":server 481 " + nickName + ": Permission Denied - You're not an IRC operator.\r\n");
+    global_ircserv->socketSend(fd, ":server 481 " + nickName + ": Permission Denied - You're not an IRC operator.\r\n");
 }
 
 void RegularRole::kick(const t_IRCCommand &command)

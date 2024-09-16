@@ -90,7 +90,7 @@ void Server::pollRemove(int index)
 	--this->_poll_count;
 }
 
-const   std::string Server::get_password() const
+const std::string   Server::get_password() const
 {
     return (this->_password);
 }
@@ -107,6 +107,12 @@ bool    Server::isNickNameTaken(const std::string &nickName)
     return (false);
 }
 
+bool    Server::socketSend(int fd, const std::string& message)
+{
+    bool    res = this->_socket.send(fd, message);
+    
+    return (res);
+}
 /**
  * @brief The main server loop for handling connections and events.
  * 

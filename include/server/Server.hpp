@@ -26,6 +26,7 @@ class Server
         std::vector<pollfd>             _fds;              ///< Poll file descriptors for client sockets
         pollfd                          _server_pollfd;    ///< Pollfd structure for the server socket
         int                             _poll_count;       ///< Number of poll events
+        Socket                          _socket;           ///< Socket instance for network operations
 
         void                serverLoop();
 
@@ -42,6 +43,8 @@ class Server
         ~Server();
 
         void                runServer(char **argv);
+
+        bool                socketSend(int fd, const std::string &message);
         const std::string   get_password() const;
         bool                isNickNameTaken(const std::string &nickName);
 
@@ -51,7 +54,4 @@ class Server
         Channel*            findChannel(const std::string& channelName);
         Client*             findClientByNick(const std::string& target);
         void                sendChannelMessage(const std::string& msg, const std::string& channelName);
-
-        Socket              _socket;           ///< Socket instance for network operations
-
 };

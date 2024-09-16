@@ -82,7 +82,7 @@ void Client::executeCommand(const std::string &message)
         }
         else
         {
-            global_ircserv->_socket.send(_fd, ERR_UNKNOWNCOMMAND);
+            global_ircserv->socketSend(_fd, ERR_UNKNOWNCOMMAND);
         }
     }
 }
