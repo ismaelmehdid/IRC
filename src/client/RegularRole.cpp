@@ -1,14 +1,15 @@
 #include "../../include/client/RegularRole.hpp"
 
-RegularRole::RegularRole() : ARole(NULL) { }
+RegularRole::RegularRole() : ARole(NULL) {}
 
-RegularRole::RegularRole(Client *client) : ARole(client) { }
+RegularRole::RegularRole(Client *client) : ARole(client) {}
 
 RegularRole::RegularRole(const RegularRole& other) : ARole(other._client) {}
 
 RegularRole&    RegularRole::operator=(const RegularRole& other)
 {
-    if (this != &other) {
+    if (this != &other)
+    {
         ARole::operator=(other);
     }
     return (*this);
@@ -18,7 +19,7 @@ RegularRole::~RegularRole() {}
 
 RegularRole* RegularRole::clone() const
 {
-    return new RegularRole();
+    return (new RegularRole());
 }
 
 void RegularRole::kick(const t_IRCCommand &command)

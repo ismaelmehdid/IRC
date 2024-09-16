@@ -2,7 +2,6 @@
 
 # include "OperatorRole.hpp"
 # include "RegularRole.hpp"
-
 # include <string>
 # include <map>
 
@@ -10,37 +9,19 @@ class ARole;
 
 class Client
 {
-    public:
-        Client(int fd, char *host);
-        Client (const Client& other);
-        Client& operator=(const Client& other);
-        ~Client();
-
-        int         get_fd() const;
-        void        execute_command(const std::string &message);
-        bool        is_authenticated();
-
-        // Getters
-        std::string getNickName() const;
-        std::string getUserName() const;
-        std::string getFullName() const;
-        std::string getHostMask() const;
-        std::string getPrefix() const;
-
-        //Setters
-        void        setNickName(const std::string &nickName);
-        void        setUserName(const std::string &username);
-        void        setFullName(const std::string &fullname);
-        
-        //Auth
-        bool                                    _has_set_password;
-
     private:
-        Client();
-
         typedef void (Client::*CommandFunction)(const t_IRCCommand &);
         void        initializeCommandMap();
 
+        std::string                             _hostMask;
+        std::string                             _nickName;
+        std::string                             _userName;
+        std::string                             _fullName;
+        int                                     _fd;
+        ARole*                                  _role;
+        std::map<std::string, CommandFunction>  _commandMap;
+
+//----------Commands
         void        executeKick     (const t_IRCCommand &);
         void        executeInvite   (const t_IRCCommand &);
         void        executeTopic    (const t_IRCCommand &);
@@ -57,11 +38,28 @@ class Client
 
         void        setRole         (ARole* newRole);
 
-        std::string                             _hostMask;
-        std::string                             _nickName; // the server must check uniqueness
-        std::string                             _userName;
-        std::string                             _fullName;
-        int                                     _fd;
-        ARole*                                  _role;
-        std::map<std::string, CommandFunction>  _commandMap; // map associating every command string to the proper function ptr
+    public:
+        Client(int fd, char *host);
+        Client (const Client& other);
+        Client& operator=(const Client& other);
+        ~Client();
+
+        int         get_fd() const;
+        void        executeCommand(const std::string &message);
+        bool        is_authenticated();
+
+//----------Getters
+        std::string getNickName() const;
+        std::string getUserName() const;
+        std::string getFullName() const;
+        std::string getHostMask() const;
+        std::string getPrefix() const;
+
+//----------Setters
+        void        setNickName(const std::string &nickName);
+        void        setUserName(const std::string &username);
+        void        setFullName(const std::string &fullname);
+        
+//----------Auth
+        bool        _has_set_password;
 };

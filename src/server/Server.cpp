@@ -44,7 +44,7 @@ void Server::removeClient(Client* user, std::string reason)
 
     for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
     {
-        Channel* channel = it->second;
+        Channel*            channel = it->second;
         
         if (channel->isMember(user))
         {
@@ -61,8 +61,8 @@ void Server::removeClient(Client* user, std::string reason)
 
     for (std::list<std::string>::const_iterator it = empty_channels.begin(); it != empty_channels.end(); ++it)
     {
-        delete _channels[*it];
-        _channels.erase(*it);
+        delete (this->_channels[*it]);
+        this->_channels.erase(*it);
     }
 
     for (int i = 0; i < this->_poll_count; ++i)
@@ -74,7 +74,7 @@ void Server::removeClient(Client* user, std::string reason)
         }
     }
 
-    delete this->_clients[fd];
+    delete (this->_clients[fd]);
     this->_clients.erase(fd);
     this->_nbr_clients--;
 }

@@ -4,8 +4,8 @@ Channel* Server::createChannel(const std::string& channelName)
 {
     if (_channels.find(channelName) == _channels.end())
     {
-        Channel* new_channel = new Channel(channelName);
-        _channels[channelName] = new_channel;
+        Channel*    new_channel = new Channel(channelName);
+        this->_channels[channelName] = new_channel;
         return  (new_channel);
     }
     return (NULL);
@@ -24,7 +24,8 @@ Channel*    Server::findChannel(const std::string& channelName)
 
 void Server::sendChannelMessage(const std::string& msg, const std::string& channelName)
 {
-    Channel* channel = findChannel(channelName);
+    Channel*    channel = findChannel(channelName);
+    
     if (channel)
     {
         channel->broadcastMessage(msg);

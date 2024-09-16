@@ -38,8 +38,6 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
-
-
 #define WELCOME_CODE            "001"
 #define MSG_WELCOME             ":server 001 client :Welcome to the IRC server!\r\n"
 #define ERR_PASSWORD_REQUIRED   ":server 461 * :Password required in order to execute this command.\r\n"
@@ -80,10 +78,7 @@ struct t_IRCCommand
 
 extern Server *global_ircserv;
 
-// Parsing
-void                        validate_provided_args(int argc, char **argv);
+void                        validateArguments(int argc, char **argv);
 void                        display_error_message(t_errors code);
-std::vector<t_IRCCommand>   parse_client_commands(const std::string &commands);
-
-//Utils
-void    handleShuttingDown(int sig);
+std::vector<t_IRCCommand>   parseRequests(const std::string &requests);
+void                        handleShuttingDown(int sig);

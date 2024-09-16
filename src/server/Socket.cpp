@@ -5,7 +5,7 @@ Socket::Socket() : _fd(-1), _backlog(5) {}
 
 Socket::~Socket() 
 {
-    close(_fd); // closing socket
+    close(this->_fd);
 }
 
 /**
@@ -146,6 +146,6 @@ std::string Socket::receive(int client_fd)
 
 int Socket::get_fd() const
 {
-    return _fd;
+    return (this->_fd);
 }
 

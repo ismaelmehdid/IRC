@@ -4,26 +4,22 @@ Server  *global_ircserv = NULL;
 
 int main(int argc, char **argv)
 {
-    validate_provided_args(argc, argv);
+    validateArguments(argc, argv);
 
-    global_ircserv = new Server(argv[2]);
-    if (!global_ircserv)
+    try
     {
-        std::cerr << "Server allocation failed." << std::endl;
-        return (1);
-    }
-
-    signal(SIGINT, handleShuttingDown);
-    signal(SIGQUIT, handleShuttingDown);
-
-    try {
+        global_ircserv = new Server(argv[2]);
+        signal(SIGINT, handleShuttingDown);
+        signal(SIGQUIT, handleShuttingDown);
         global_ircserv->runServer(argv);
+        delete (global_ircserv);
     }
-    catch(const std::exception& e) {
+    catch(const std::exception& e)
+    {
         std::cerr << e.what() << std::endl;
+        if (global_ircserv)
+            delete (global_ircserv);
     }
-    
-    delete (global_ircserv);
 
     return (0);
 }

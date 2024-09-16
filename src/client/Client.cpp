@@ -3,25 +3,25 @@
 #include "../../include/server/Server.hpp"
 
 Client::Client(int fd, char	*host)
-    :   _has_set_password(false),
-        _hostMask(host),
+    :   _hostMask(host),
         _nickName(),
         _userName(),
         _fullName(),
         _fd(fd),
-        _role(new RegularRole(this))
+        _role(new RegularRole(this)),
+        _has_set_password(false)
         
 {
     initializeCommandMap();                
 }
 
 Client::Client (const Client& other)
-    :   _has_set_password(other._has_set_password),
-        _nickName(other._nickName),
+    :   _nickName(other._nickName),
         _userName(other._userName),
         _fullName(other._fullName),
         _fd(other.get_fd()),
-        _role(other._role ? other._role->clone() : NULL)
+        _role(other._role ? other._role->clone() : NULL),
+        _has_set_password(other._has_set_password)
 {
     initializeCommandMap();
 }
@@ -69,9 +69,9 @@ void Client::setRole(ARole* newRole)
  *
  * @param message The message containing the client command.
  */
-void Client::execute_command(const std::string &message)
+void Client::executeCommand(const std::string &message)
 {
-    std::vector<t_IRCCommand> parsed_commands = parse_client_commands(message);
+    std::vector<t_IRCCommand> parsed_commands = parseRequests(message);
 
     for (size_t i = 0; i < parsed_commands.size(); i++)
     {
@@ -86,7 +86,6 @@ void Client::execute_command(const std::string &message)
         }
     }
 }
-
 
 /**
  * @brief Initializes the command map for the client.
@@ -160,7 +159,7 @@ std::string Client::getHostMask() const
 
 std::string Client::getPrefix() const
 {
-    return (":" + _nickName + "!" + _userName + "@" + _hostMask);
+    return (":" + this->_nickName + "!" + this->_userName + "@" + this->_hostMask);
 }
 
 //Setters

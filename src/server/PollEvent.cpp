@@ -11,15 +11,15 @@
  */
 void Server::handleClientMessage(size_t i)
 {
-    std::string message = _socket.receive(_fds[i].fd);
+    std::string message = this->_socket.receive(_fds[i].fd);
     if (message.empty())
     {
         handleClientDisconnection(i);
     }
     else
     {
-        std::cout << message << std::endl;
-        global_ircserv->_clients[_fds[i].fd]->execute_command(message);
+        std::cout << message << std::endl; // do not delete until we finish project pls, its useful to see
+        global_ircserv->_clients[_fds[i].fd]->executeCommand(message);
     }
 }
 
@@ -33,7 +33,7 @@ void Server::handleClientMessage(size_t i)
  */
 void Server::handleNewConnection()
 {
-    Client* newClient = _socket.accept();
+    Client* newClient = this->_socket.accept();
 
     if (newClient)
     {
@@ -57,8 +57,8 @@ void Server::handleNewConnection()
  */
 void Server::handleClientDisconnection(size_t i)
 {
-    int     fd      = _fds[i].fd;
-    Client* client  = _clients[fd];
+    int     fd      = this->_fds[i].fd;
+    Client* client  = this->_clients[fd];
 
     if (client)
     {
@@ -85,13 +85,13 @@ void Server::handleClientDisconnection(size_t i)
  */
 void Server::handlePollEvent(size_t i)
 {
-    if (_fds[i].revents & (POLLHUP | POLLOUT))
+    if (this->_fds[i].revents & (POLLHUP | POLLOUT))
     {
         handleClientDisconnection(i);
     }
     else if (_fds[i].revents & POLLIN)
     {
-        if (_fds[i].fd == _socket.get_fd()) // there is smth to read on the server socket (which mean a new connection)
+        if (this->_fds[i].fd == this->_socket.get_fd()) // there is smth to read on the server socket (which mean a new connection)
         {
             handleNewConnection();
         }
