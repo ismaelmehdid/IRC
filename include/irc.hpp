@@ -24,6 +24,7 @@
 
 #define MIN_PORT_VALUE 1024
 #define MAX_PORT_VALUE 65535
+#define SERVER_NAME "server"
 
 #define ARGUMENTS_REQUIRED  3
 #define MAX_CLIENTS_IN_QUEU 5
@@ -37,6 +38,9 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
+
+
+#define WELCOME_CODE            "001"
 #define MSG_WELCOME             ":server 001 client :Welcome to the IRC server!\r\n"
 #define ERR_PASSWORD_REQUIRED   ":server 461 * :Password required in order to execute this command.\r\n"
 #define ERR_PASSWORD_INCORRECT  ":server 464 * PASS :Password incorrect.\r\n"
@@ -47,6 +51,11 @@
 #define ERR_UNKNOWNCOMMAND      ":server 421 * :Unknown command.\r\n"
 #define ERR_NOTREGISTERED       ":server 451 * :You have not registered.\r\n"
 #define ERR_NONICKNAMEGIVEN     ":server 431 * :You need to provide a nickname with /NICK in order to execute this command.\r\n"
+#define ERR_NO_SUCH_CHANNEL     ":server 403 * #channel :No such channel\r\n"
+#define ERR_NO_SUCH_NICK        ":server 401 * target_nick :No such nick/channel\r\n"
+#define ERR_ALREADY_JOINED      "473"
+#define ERR_ALREADY_JOINED_MSG  "You are already joined to the channel\r\n"
+
 
 class Socket;
 class Server;

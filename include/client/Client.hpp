@@ -11,7 +11,7 @@ class ARole;
 class Client
 {
     public:
-        Client(int fd);
+        Client(int fd, char *host);
         Client (const Client& other);
         Client& operator=(const Client& other);
         ~Client();
@@ -24,6 +24,7 @@ class Client
         std::string getNickName();
         std::string getUserName();
         std::string getFullName();
+        std::string getHostMask();
 
         //Setters
         void        setNickName(const std::string &nickName);
@@ -47,9 +48,14 @@ class Client
         void        executeNick     (const t_IRCCommand &);
         void        executeUser     (const t_IRCCommand &);
         void        executeQuit     (const t_IRCCommand &);
+        void        executeJoin     (const t_IRCCommand &);
+        void        executePart     (const t_IRCCommand &);     
+        void        executePrivMsg  (const t_IRCCommand &);
+        void        executePing     (const t_IRCCommand &);
 
         void        setRole         (ARole* newRole);
 
+        std::string                             _hostMask;
         std::string                             _nickName; // the server must check uniqueness
         std::string                             _userName;
         std::string                             _fullName;

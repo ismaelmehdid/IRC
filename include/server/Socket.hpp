@@ -18,7 +18,7 @@ class Socket
         bool        bind(int port);
         bool        create();
         bool        listen();
-        int         accept();
+        Client*     accept();
         bool        send(int client_fd, const std::string &message);
         std::string receive(int client_fd);
         int         get_fd() const;
