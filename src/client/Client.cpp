@@ -116,7 +116,7 @@ void Client::initializeCommandMap()
     _commandMap["INVITE"]  = &Client::executeInvite;
     _commandMap["TOPIC"]   = &Client::executeTopic;
     _commandMap["MODE"]    = &Client::executeMode;
-    _commandMap["CAP"]      = &Client::executeCap;
+   // _commandMap["CAP"]      = &Client::executeCap;
     _commandMap["PASS"]    = &Client::executePass;
     _commandMap["NICK"]    = &Client::executeNick;
     _commandMap["USER"]    = &Client::executeUser;
@@ -138,24 +138,29 @@ bool Client::is_authenticated()
 }
 
 //Getters
-std::string Client::getNickName()
+std::string Client::getNickName() const
 {
     return (this->_nickName);
 }
 
-std::string Client::getUserName()
+std::string Client::getUserName() const
 {
     return (this->_userName);
 }
 
-std::string Client::getFullName()
+std::string Client::getFullName() const
 {
     return (this->_fullName);
 }
 
-std::string Client::getHostMask()
+std::string Client::getHostMask() const
 {
     return (this->_hostMask);
+}
+
+std::string Client::getPrefix() const
+{
+    return (":" + _nickName + "!" + _userName + "@" + _hostMask);
 }
 
 //Setters

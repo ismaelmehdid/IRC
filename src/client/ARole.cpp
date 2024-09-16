@@ -145,10 +145,12 @@ void ARole::user(const t_IRCCommand &command)
 
 void ARole::quit(const t_IRCCommand &command)
 {
-    (void)command;
-    //TODO: Send the trailing part of the command as a message to every channels the client was connected to: ex: QUIT :Gotta leave gn
-    std::cout << YELLOW << _client->getNickName() << " disconnected!" << RESET << std::endl;
-    global_ircserv->removeClient(_client->get_fd());
+	std::string reason = (command.params.empty()) ? "" : (":" + command.params[0]);
+
+	global_ircserv->_socket.send(this->_client->get_fd(), SERVER_NAME " QUIT " + this->_client->getNickName() + " " + reason);
+    global_ircserv->removeClient(this->_client, reason);
+    
+    std::cout << YELLOW << this->_client->getNickName() << " disconnected!" << RESET << std::endl;
 }
 
 

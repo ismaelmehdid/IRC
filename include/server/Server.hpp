@@ -8,6 +8,7 @@
 # include "../exception/ServerCreationException.hpp"
 # include "../exception/ServerListenException.hpp"
 # include "../exception/PollException.hpp"
+# include <list>
 
 /**
  * @brief Main class representing the server.
@@ -34,6 +35,7 @@ class Server
         void                handleClientMessage(size_t i);
 
         void                addClient(Client *client);
+        void                pollRemove(int index);
 
     public:
         Server(const std::string &password);
@@ -43,7 +45,7 @@ class Server
         const std::string   get_password() const;
         bool                isNickNameTaken(const std::string &nickName);
 
-        void                removeClient(int fd);
+        void                removeClient(Client* user, std::string reason);
 
         Channel*            createChannel(const std::string& channelName);
         Channel*            findChannel(const std::string& channelName);

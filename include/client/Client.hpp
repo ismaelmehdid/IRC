@@ -21,10 +21,11 @@ class Client
         bool        is_authenticated();
 
         // Getters
-        std::string getNickName();
-        std::string getUserName();
-        std::string getFullName();
-        std::string getHostMask();
+        std::string getNickName() const;
+        std::string getUserName() const;
+        std::string getFullName() const;
+        std::string getHostMask() const;
+        std::string getPrefix() const;
 
         //Setters
         void        setNickName(const std::string &nickName);

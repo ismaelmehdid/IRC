@@ -18,6 +18,7 @@ void Server::handleClientMessage(size_t i)
     }
     else
     {
+        std::cout << message << std::endl;
         global_ircserv->_clients[_fds[i].fd]->execute_command(message);
     }
 }
@@ -56,10 +57,21 @@ void Server::handleNewConnection()
  */
 void Server::handleClientDisconnection(size_t i)
 {
-    std::cerr << "Client error or hangup on fd " << _fds[i].fd << std::endl;
-    removeClient(_fds[i].fd);
-    _fds.erase(_fds.begin() + i);
+    int     fd      = _fds[i].fd;
+    Client* client  = _clients[fd];
+
+    if (client)
+    {
+        std::cerr << RED << "Client error or hangup on fd " << fd << RESET << std::endl;
+
+        removeClient(client, "disconnected");
+    }
+    else
+    {
+        std::cerr << RED << "Error: Client not found for fd " << fd << RESET <<std::endl;
+    }
 }
+
 
 /**
  * @brief Handles poll events for a specific file descriptor.
@@ -73,7 +85,7 @@ void Server::handleClientDisconnection(size_t i)
  */
 void Server::handlePollEvent(size_t i)
 {
-    if (_fds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
+    if (_fds[i].revents & (POLLHUP | POLLOUT))
     {
         handleClientDisconnection(i);
     }
