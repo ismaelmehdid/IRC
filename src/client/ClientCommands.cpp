@@ -60,3 +60,8 @@ void    Client::executePing (const t_IRCCommand &command)
 {
     this->_role->ping(command);
 }
+
+void    Client::executeQuit (const t_IRCCommand &command)
+{
+    this->_role->quit(command);
+}

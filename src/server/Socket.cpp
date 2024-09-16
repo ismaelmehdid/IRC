@@ -106,7 +106,6 @@ bool    Socket::send(int client_fd, const std::string &message)
     size_t      message_length = message.size();
     const char  *message_cstr  = message.c_str();
 
-    std::cout << "Sending message: " << message << std::endl;
     while (total_sent < message_length)
     {
         ssize_t sent = ::send(client_fd, message_cstr + total_sent, message_length - total_sent, 0);

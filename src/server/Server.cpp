@@ -1,7 +1,14 @@
 #include "../../include/server/Server.hpp"
 
 Server::Server(const std::string &password)
-    : _nbr_clients(0), _password(password), _clients(), _channels(), _socket() {}
+    :   _nbr_clients(0),
+        _password(password),
+        _clients(),
+        _channels(),
+        _fds(),
+        _server_pollfd(),
+        _poll_count(0),
+        _socket() {}
 
 Server::~Server()
 {

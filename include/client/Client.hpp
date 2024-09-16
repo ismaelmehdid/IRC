@@ -48,6 +48,7 @@ class Client
         void        executePass     (const t_IRCCommand &);
         void        executeNick     (const t_IRCCommand &);
         void        executeUser     (const t_IRCCommand &);
+        void        executeQuit     (const t_IRCCommand &);
         void        executeJoin     (const t_IRCCommand &);
         void        executePart     (const t_IRCCommand &);     
         void        executePrivMsg  (const t_IRCCommand &);

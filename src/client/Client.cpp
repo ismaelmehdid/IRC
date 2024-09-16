@@ -87,22 +87,42 @@ void Client::execute_command(const std::string &message)
     }
 }
 
+
 /**
  * @brief Initializes the command map for the client.
  * 
- * This function assigns the appropriate member functions of the Client class to the corresponding commands in the command map.
- * The command map is a std::map that maps command names to member function pointers.
+ * This function assigns the appropriate member function pointers to the corresponding commands in the command map.
+ * The command map is a std::map that maps command names to member function pointers of the Client class.
  * 
  * The following commands are supported:
- * - KICK: Executes the kick command.
- * - INVITE: Executes the invite command.
- * - TOPIC: Executes the topic command.
- * - MODE: Executes the mode command.
- * - PASS: Executes the pass command.
- * - NICK: Executes the nick command.
- * - USER: Executes the user command.
+ * - KICK
+ * - INVITE
+ * - TOPIC
+ * - MODE
+ * - PASS
+ * - NICK
+ * - USER
+ * - JOIN
+ * - PART
+ * - PRIVMSG
+ * - PING
+ * - QUIT
+ * 
+ * @note This function should be called once during the initialization of the client.
  */
 void Client::initializeCommandMap() {
+    _commandMap["KICK"]    = &Client::executeKick;
+    _commandMap["INVITE"]  = &Client::executeInvite;
+    _commandMap["TOPIC"]   = &Client::executeTopic;
+    _commandMap["MODE"]    = &Client::executeMode;
+    _commandMap["PASS"]    = &Client::executePass;
+    _commandMap["NICK"]    = &Client::executeNick;
+    _commandMap["USER"]    = &Client::executeUser;
+    _commandMap["JOIN"]    = &Client::executeJoin;
+    _commandMap["PART"]    = &Client::executePart;
+    _commandMap["PRIVMSG"] = &Client::executePrivMsg;
+    _commandMap["PING"]    = &Client::executePing;
+    _commandMap["QUIT"]    = &Client::executeQuit;
     _commandMap["KICK"]     = &Client::executeKick;
     _commandMap["INVITE"]   = &Client::executeInvite;
     _commandMap["TOPIC"]    = &Client::executeTopic;
