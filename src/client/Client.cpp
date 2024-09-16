@@ -116,7 +116,7 @@ void Client::initializeCommandMap()
     _commandMap["INVITE"]  = &Client::executeInvite;
     _commandMap["TOPIC"]   = &Client::executeTopic;
     _commandMap["MODE"]    = &Client::executeMode;
-   // _commandMap["CAP"]      = &Client::executeCap;
+    //_commandMap["CAP"]      = &Client::executeCap;
     _commandMap["PASS"]    = &Client::executePass;
     _commandMap["NICK"]    = &Client::executeNick;
     _commandMap["USER"]    = &Client::executeUser;
