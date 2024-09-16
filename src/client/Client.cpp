@@ -110,11 +110,13 @@ void Client::execute_command(const std::string &message)
  * 
  * @note This function should be called once during the initialization of the client.
  */
-void Client::initializeCommandMap() {
+void Client::initializeCommandMap()
+{
     _commandMap["KICK"]    = &Client::executeKick;
     _commandMap["INVITE"]  = &Client::executeInvite;
     _commandMap["TOPIC"]   = &Client::executeTopic;
     _commandMap["MODE"]    = &Client::executeMode;
+    _commandMap["CAP"]      = &Client::executeCap;
     _commandMap["PASS"]    = &Client::executePass;
     _commandMap["NICK"]    = &Client::executeNick;
     _commandMap["USER"]    = &Client::executeUser;
@@ -123,25 +125,6 @@ void Client::initializeCommandMap() {
     _commandMap["PRIVMSG"] = &Client::executePrivMsg;
     _commandMap["PING"]    = &Client::executePing;
     _commandMap["QUIT"]    = &Client::executeQuit;
-    _commandMap["KICK"]     = &Client::executeKick;
-    _commandMap["INVITE"]   = &Client::executeInvite;
-    _commandMap["TOPIC"]    = &Client::executeTopic;
-    _commandMap["MODE"]     = &Client::executeMode;
-    _commandMap["PASS"]     = &Client::executePass;
-    _commandMap["NICK"]     = &Client::executeNick;
-    _commandMap["USER"]     = &Client::executeUser;
-    _commandMap["KICK"]     = &Client::executeKick;
-    _commandMap["INVITE"]   = &Client::executeInvite;
-    _commandMap["TOPIC"]    = &Client::executeTopic;
-    _commandMap["MODE"]     = &Client::executeMode;
-    _commandMap["CAP"]      = &Client::executeCap;
-    _commandMap["PASS"]     = &Client::executePass;
-    _commandMap["NICK"]     = &Client::executeNick;
-    _commandMap["USER"]     = &Client::executeUser;
-    _commandMap["JOIN"]     = &Client::executeJoin;
-    _commandMap["PART"]     = &Client::executePart;
-    _commandMap["PRIVMSG"]  = &Client::executePrivMsg;
-    _commandMap["PING"]     = &Client::executePing;
 }
 
 /**
