@@ -44,6 +44,7 @@ class Client
         void        executeInvite   (const t_IRCCommand &);
         void        executeTopic    (const t_IRCCommand &);
         void        executeMode     (const t_IRCCommand &);
+        void        executeCap      (const t_IRCCommand &);
         void        executePass     (const t_IRCCommand &);
         void        executeNick     (const t_IRCCommand &);
         void        executeUser     (const t_IRCCommand &);

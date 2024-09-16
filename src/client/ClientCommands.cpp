@@ -21,6 +21,11 @@ void    Client::executeMode(const t_IRCCommand &command)
     this->_role->mode(command);
 }
 
+void    Client::executeCap(const t_IRCCommand &command)
+{
+    this->_role->cap(command);
+}
+
 void    Client::executePass(const t_IRCCommand &command)
 {
     this->_role->pass(command);

@@ -18,11 +18,12 @@ class ARole
         virtual void    mode    (const t_IRCCommand &) = 0;
 
         // commands without operator rights
-        void            join    (const t_IRCCommand &command);
-        void            part    (const t_IRCCommand &command);
-        void            privMsg (const t_IRCCommand &command);
-        void            ping    (const t_IRCCommand &command);
+        void            join    (const t_IRCCommand &);
+        void            part    (const t_IRCCommand &);
+        void            privMsg (const t_IRCCommand &);
+        void            ping    (const t_IRCCommand &);
 
+        void            cap     (const t_IRCCommand &c);
         void            pass    (const t_IRCCommand &);
         void            user    (const t_IRCCommand &);
         void            nick    (const t_IRCCommand &);

@@ -20,6 +20,18 @@ ARole::~ARole() { }
  *
  * @param command The IRC command to be passed.
  */
+
+void ARole::cap(const t_IRCCommand &command)
+{
+	std::string msg;
+
+	if (command.params[0] == "LS")
+	{
+		msg = (":" SERVER_NAME " CAP * LS :End of CAP LS negotiation");
+        global_ircserv->_socket.send(_client->get_fd(), msg);
+	}
+}
+
 void ARole::pass(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated())
