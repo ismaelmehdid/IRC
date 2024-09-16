@@ -7,18 +7,18 @@ Channel::Channel(const std::string& name)
 
 Channel::~Channel()
 {
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    for (std::map<int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
     {
-        delete it->second;
+        delete (it->second);
     }
-    _clients.clear();
+    this->_clients.clear();
 }
 
-void Channel::addClient(Client* client)
+void    Channel::addClient(Client* client)
 {
-    if (_clients.find(client->get_fd()) == _clients.end())
+    if (this->_clients.find(client->get_fd()) == this->_clients.end())
     {
-        _clients[client->get_fd()] = client;
+        this->_clients[client->get_fd()] = client;
     }
     else
     {
@@ -29,8 +29,9 @@ void Channel::addClient(Client* client)
 
 void    Channel::removeClient(Client* client)
 {
-    std::map<int, Client*>::iterator it = _clients.find(client->get_fd());
-    if (it != _clients.end())
+    std::map<int, Client*>::iterator    it = _clients.find(client->get_fd());
+
+    if (it != this->_clients.end())
     {
         this->_clients.erase(it);
         std::cout << "Client " << client->get_fd() << " removed from channel " << _name << std::endl;
@@ -41,12 +42,12 @@ void    Channel::removeClient(Client* client)
     }
 }
 
-void Channel::broadcastMessage(const std::string& message)
+void    Channel::broadcastMessage(const std::string& message)
 {
     if (message.empty())
     {
         std::cerr << "Attempted to broadcast an empty message in channel " << _name << std::endl;
-        return;
+        return ;
     }
     
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -70,7 +71,7 @@ const std::string&  Channel::getName() const
     return (this->_name);
 }
 
-const std::string& Channel::getTopic() const
+const std::string&  Channel::getTopic() const
 {
     return (this->_topic);
 }

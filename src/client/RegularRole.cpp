@@ -1,15 +1,16 @@
 #include "../../include/client/RegularRole.hpp"
 #include "../../include/server/Server.hpp"
 
-RegularRole::RegularRole() : ARole(NULL) { }
+RegularRole::RegularRole() : ARole(NULL) {}
 
-RegularRole::RegularRole(Client *client) : ARole(client) { }
+RegularRole::RegularRole(Client *client) : ARole(client) {}
 
 RegularRole::RegularRole(const RegularRole& other) : ARole(other._client) {}
 
 RegularRole&    RegularRole::operator=(const RegularRole& other)
 {
-    if (this != &other) {
+    if (this != &other)
+    {
         ARole::operator=(other);
     }
     return (*this);
@@ -19,7 +20,7 @@ RegularRole::~RegularRole() {}
 
 RegularRole* RegularRole::clone() const
 {
-    return new RegularRole();
+    return (new RegularRole());
 }
 
 static void send_permission_denied(int fd, const std::string &nickName)

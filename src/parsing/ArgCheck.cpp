@@ -43,17 +43,17 @@ static bool checkPort(const std::string &port)
  * @param argc The number of command line arguments.
  * @param argv An array of strings containing the command line arguments.
  */
-void validate_provided_args(int argc, char **argv)
+void    validateArguments(int argc, char **argv)
 {
     if (argc != ARGUMENTS_REQUIRED)
     {
         display_error_message(ERR_BAD_ARGUMENTS);
-        exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
 
     if (!checkPort((argv[1])))
     {
         display_error_message(ERR_BAD_PORT);
-        exit(EXIT_FAILURE);
+        std::exit(EXIT_FAILURE);
     }
 }

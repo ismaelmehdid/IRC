@@ -37,28 +37,59 @@ void    Server::addClient(Client *client)
     this->_nbr_clients++;
 }
 
-/**
- * @brief Removes a client from the server.
- * 
- * This function deletes the Client object corresponding to the given file descriptor,
- * removes it from the _clients map, and decrements the total number of clients.
- * 
- * @param fd The file descriptor of the client to be removed.
- */
-void    Server::removeClient(int fd)
+void Server::removeClient(Client* user, std::string reason)
 {
+    std::list<std::string>  empty_channels;
+    int                     fd = user->get_fd();
+
+    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+    {
+        Channel*            channel = it->second;
+        
+        if (channel->isMember(user))
+        {
+            channel->removeClient(user);
+            if (channel->getClients().empty())
+                empty_channels.push_back(channel->getName());
+
+            for (std::map<int, Client*>::const_iterator iter = channel->getClients().begin(); iter != channel->getClients().end(); ++iter)
+            {
+                this->_socket.send(iter->second->get_fd(), user->getPrefix() + " QUIT :" + reason);
+            }
+        }
+    }
+
+    for (std::list<std::string>::const_iterator it = empty_channels.begin(); it != empty_channels.end(); ++it)
+    {
+        delete (this->_channels[*it]);
+        this->_channels.erase(*it);
+    }
+
+    for (int i = 0; i < this->_poll_count; ++i)
+    {
+        if (this->_fds[i].fd == fd)
+        {
+            pollRemove(i);
+            break ;
+        }
+    }
+
     delete (this->_clients[fd]);
     this->_clients.erase(fd);
     this->_nbr_clients--;
 }
 
-/**
- * @brief Retrieves the server's password.
- * 
- * This function returns the password required to connect to the server.
- * 
- * @return The server password as a const string.
- */
+
+void Server::pollRemove(int index)
+{
+	close(this->_fds[index].fd);
+	this->_fds[index].fd = this->_fds[this->_poll_count - 1].fd;
+	this->_fds[index].events = POLLIN;
+	this->_fds[this->_poll_count - 1].fd = -1;
+
+	--this->_poll_count;
+}
+
 const   std::string Server::get_password() const
 {
     return (this->_password);
@@ -86,9 +117,9 @@ void    Server::serverLoop()
 {
     while (true)
     {
-        _poll_count = poll(_fds.data(), _fds.size(), -1);
+        this->_poll_count = poll(_fds.data(), _fds.size(), -1);
 
-        if (_poll_count == -1)
+        if (this->_poll_count == -1)
             throw PollException();
 
         for (size_t i = 0; i < _fds.size(); i++)

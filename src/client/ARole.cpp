@@ -3,25 +3,13 @@
 #include "../../include/client/ARole.hpp"
 #include "../../include/server/Server.hpp"
 
-ARole::ARole() : _client(NULL) { }
+ARole::ARole() : _client(NULL) {}
 
-ARole::ARole(Client *client) : _client(client) { }
+ARole::ARole(Client *client) : _client(client) {}
 
-ARole::~ARole() { }
+ARole::~ARole() {}
 
-/**
- * @brief Passes a command to the ARole object.
- *
- * This function is responsible for handling the pass command received by the ARole object.
- * It checks if the client is authenticated and performs the necessary actions based on the command parameters.
- * If the client is not authenticated, it checks if the command parameters are empty or if the password is incorrect.
- * If the password is correct, it sets the _has_set_password flag to true.
- * If the client is already registered, it sends an error message to the client.
- *
- * @param command The IRC command to be passed.
- */
-
-void ARole::cap(const t_IRCCommand &command)
+void    ARole::cap(const t_IRCCommand &command)
 {
 
 	if (command.params[0] == "LS")
@@ -31,7 +19,7 @@ void ARole::cap(const t_IRCCommand &command)
 	}
 }
 
-void ARole::pass(const t_IRCCommand &command)
+void    ARole::pass(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated())
     {
@@ -91,7 +79,7 @@ static bool is_nickname_valid(const std::string &nick)
     return true;
 }
 
-void ARole::nick(const t_IRCCommand &command)
+void    ARole::nick(const t_IRCCommand &command)
 {
     if (!_client->_has_set_password)
     {
@@ -133,7 +121,7 @@ void ARole::nick(const t_IRCCommand &command)
  * 
  * @param command The IRC command received from the client.
  */
-void ARole::user(const t_IRCCommand &command)
+void    ARole::user(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated() && _client->getUserName().empty() && _client->getFullName().empty()) {
         if (!_client->_has_set_password)
@@ -163,25 +151,27 @@ void ARole::user(const t_IRCCommand &command)
     }
 }
 
-void ARole::quit(const t_IRCCommand &command)
+void    ARole::quit(const t_IRCCommand &command)
 {
-    (void)command;
-    //TODO: Send the trailing part of the command as a message to every channels the client was connected to: ex: QUIT :Gotta leave gn
-    std::cout << YELLOW << _client->getNickName() << " disconnected!" << RESET << std::endl;
-    global_ircserv->removeClient(_client->get_fd());
+	std::string reason = (command.params.empty()) ? "" : (":" + command.params[0]);
+
+	global_ircserv->_socket.send(this->_client->get_fd(), SERVER_NAME " QUIT " + this->_client->getNickName() + " " + reason);
+    global_ircserv->removeClient(this->_client, reason);
+    
+    std::cout << YELLOW << this->_client->getNickName() << " disconnected!" << RESET << std::endl;
 }
 
 
-void ARole::join(const t_IRCCommand &command)
+void    ARole::join(const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
         global_ircserv->_socket.send(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
-        return;
+        return ;
     }
 
-    const std::string &channelName = command.params[0];
-    Channel *channel = global_ircserv->findChannel(channelName);
+    const std::string   &channelName = command.params[0];
+    Channel             *channel = global_ircserv->findChannel(channelName);
 
     if (!channel)
     {

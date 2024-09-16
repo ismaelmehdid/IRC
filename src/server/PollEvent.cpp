@@ -11,14 +11,15 @@
  */
 void Server::handleClientMessage(size_t i)
 {
-    std::string message = _socket.receive(_fds[i].fd);
+    std::string message = this->_socket.receive(_fds[i].fd);
     if (message.empty())
     {
         handleClientDisconnection(i);
     }
     else
     {
-        global_ircserv->_clients[_fds[i].fd]->execute_command(message);
+        std::cout << message << std::endl; // do not delete until we finish project pls, its useful to see
+        global_ircserv->_clients[_fds[i].fd]->executeCommand(message);
     }
 }
 
@@ -32,7 +33,7 @@ void Server::handleClientMessage(size_t i)
  */
 void Server::handleNewConnection()
 {
-    Client* newClient = _socket.accept();
+    Client* newClient = this->_socket.accept();
 
     if (newClient)
     {
@@ -56,10 +57,21 @@ void Server::handleNewConnection()
  */
 void Server::handleClientDisconnection(size_t i)
 {
-    std::cerr << "Client error or hangup on fd " << _fds[i].fd << std::endl;
-    removeClient(_fds[i].fd);
-    _fds.erase(_fds.begin() + i);
+    int     fd      = this->_fds[i].fd;
+    Client* client  = this->_clients[fd];
+
+    if (client)
+    {
+        std::cerr << RED << "Client error or hangup on fd " << fd << RESET << std::endl;
+
+        removeClient(client, "disconnected");
+    }
+    else
+    {
+        std::cerr << RED << "Error: Client not found for fd " << fd << RESET <<std::endl;
+    }
 }
+
 
 /**
  * @brief Handles poll events for a specific file descriptor.
@@ -73,13 +85,13 @@ void Server::handleClientDisconnection(size_t i)
  */
 void Server::handlePollEvent(size_t i)
 {
-    if (_fds[i].revents & (POLLERR | POLLHUP | POLLNVAL))
+    if (this->_fds[i].revents & (POLLHUP | POLLOUT))
     {
         handleClientDisconnection(i);
     }
     else if (_fds[i].revents & POLLIN)
     {
-        if (_fds[i].fd == _socket.get_fd()) // there is smth to read on the server socket (which mean a new connection)
+        if (this->_fds[i].fd == this->_socket.get_fd()) // there is smth to read on the server socket (which mean a new connection)
         {
             handleNewConnection();
         }
