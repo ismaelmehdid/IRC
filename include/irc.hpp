@@ -20,6 +20,7 @@
 #include <sys/stat.h>    // fstat
 #include <cerrno>        // errno
 #include <vector>
+#include <set>
 #include <exception>
 
 #define MIN_PORT_VALUE 1024

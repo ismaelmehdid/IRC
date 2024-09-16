@@ -23,12 +23,11 @@ ARole::~ARole() { }
 
 void ARole::cap(const t_IRCCommand &command)
 {
-	std::string msg;
 
 	if (command.params[0] == "LS")
 	{
-		msg = (":" SERVER_NAME " CAP * LS :End of CAP LS negotiation");
-        global_ircserv->_socket.send(_client->get_fd(), msg);
+        std::string empty_list_response = ":server CAP " + _client->getNickName() + "LS :\r\n"; // server doesn't have any special features
+        global_ircserv->_socket.send(_client->get_fd(), empty_list_response);
 	}
 }
 
@@ -71,34 +70,55 @@ void ARole::pass(const t_IRCCommand &command)
  * 
  * @param command The IRC command containing the new nickname.
  */
+
+static bool is_nickname_valid(const std::string &nick)
+{
+    if (std::isdigit(nick[0]) || nick[0] == '#' || nick[0] == '&')
+        return false;
+    for (size_t i = 1; i < nick.size(); i++) {
+        if (!std::isalnum(nick[0]) &&
+            nick[0] != '-' &&
+            nick[0] != '[' &&
+            nick[0] != ']' &&
+            nick[0] != '\\' &&
+            nick[0] != '^' &&
+            nick[0] != '_' &&
+            nick[0] != '{' &&
+            nick[0] != '}'
+            )
+            return false;
+    }
+    return true;
+}
+
 void ARole::nick(const t_IRCCommand &command)
 {
-    if (!_client->is_authenticated())
+    if (!_client->_has_set_password)
     {
-        if (!_client->_has_set_password)
-        {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_REQUIRED);
-        } 
-        else if (command.params.empty())
-        {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
-        }
-        else
-        {
-            std::string newNick = command.params[0];
-            if (global_ircserv->isNickNameTaken(newNick))
-            {
-                global_ircserv->_socket.send(_client->get_fd(), ERR_NICKNAME_IN_USE);
-            }
-            else
-            {
-                _client->setNickName(newNick);
-            }
-        }
+        global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_REQUIRED);
+    } 
+    else if (command.params.empty())
+    {
+        global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
     }
     else
     {
-        global_ircserv->_socket.send(_client->get_fd(), ERR_ALREADY_REGISTERED);
+        std::string newNick = command.params[0];
+        if (_client->getNickName() == newNick)
+            return ;
+        if (!is_nickname_valid(newNick))
+        {
+            global_ircserv->_socket.send(_client->get_fd(), ":server 432 * " + newNick + " :Erroneous nickname\r\n");
+        }
+        else if (global_ircserv->isNickNameTaken(newNick))
+        {
+            global_ircserv->_socket.send(_client->get_fd(), ERR_NICKNAME_IN_USE);
+        }
+        else
+        {
+            // TODO: broadcast new nickname to all users in channel
+            _client->setNickName(newNick);
+        }
     }
 }
 
@@ -133,7 +153,7 @@ void ARole::user(const t_IRCCommand &command)
             _client->setUserName(command.params[0]);
             _client->setFullName(command.trailing);
             std::cout << GREEN << "Client connected!" << RESET << std::endl;
-            
+
             global_ircserv->_socket.send(_client->get_fd(), ":server 001 " + this->_client->getNickName() + " :Welcome to the Internet Relay Network " + this->_client->getNickName() + "!" + this->_client->getUserName() + "@" + this->_client->getHostMask() + "\r\n");
         }
     }
@@ -262,7 +282,7 @@ void    ARole::privMsg(const t_IRCCommand &command)
 
     if (target[0] == '#')
     {
-        Channel         *channel = global_ircserv->findChannel(target);
+        Channel *channel = global_ircserv->findChannel(target);
         if (!channel)
         {
             global_ircserv->_socket.send(this->_client->get_fd(), ERR_NO_SUCH_CHANNEL);
@@ -280,7 +300,6 @@ void    ARole::privMsg(const t_IRCCommand &command)
             global_ircserv->_socket.send(this->_client->get_fd(), ERR_NO_SUCH_NICK);
             return;
         }
-
         std::string privmsg = ":" + this->_client->getNickName() + " PRIVMSG " + target + " :" + message + "\r\n";
         global_ircserv->_socket.send(target_client->get_fd(), privmsg);
     }
