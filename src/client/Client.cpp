@@ -100,6 +100,11 @@ void Client::executeUser(const t_IRCCommand &command)
     this->_role->user(command);
 }
 
+void Client::executeQuit(const t_IRCCommand &command)
+{
+    this->_role->quit(command);
+}
+
 void Client::setRole(ARole* newRole)
 {
     delete (this->_role);
@@ -143,6 +148,7 @@ void Client::execute_command(const std::string &message)
  * - PASS: Executes the pass command.
  * - NICK: Executes the nick command.
  * - USER: Executes the user command.
+ * - QUIT: Executes the quit command.
  */
 void Client::initializeCommandMap() {
     _commandMap["KICK"]  = &Client::executeKick;
@@ -152,6 +158,7 @@ void Client::initializeCommandMap() {
     _commandMap["PASS"] = &Client::executePass;
     _commandMap["NICK"] = &Client::executeNick;
     _commandMap["USER"] = &Client::executeUser;
+    _commandMap["QUIT"] = &Client::executeQuit;
 }
 
 /**

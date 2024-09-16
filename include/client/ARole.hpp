@@ -19,6 +19,7 @@ class ARole
         void    pass    (const t_IRCCommand &);
         void    user    (const t_IRCCommand &);
         void    nick    (const t_IRCCommand &);
+        void    quit    (const t_IRCCommand &);
 
         virtual ARole*  clone() const = 0;
     

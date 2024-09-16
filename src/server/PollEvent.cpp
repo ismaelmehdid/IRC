@@ -40,6 +40,7 @@ void Server::handleNewConnection()
 
         client_pollfd.fd = client_fd;
         client_pollfd.events = POLLIN;
+        client_pollfd.revents = 0;
         _fds.push_back(client_pollfd);
         addClient(new Client(client_fd));
     }
@@ -78,7 +79,7 @@ void Server::handlePollEvent(size_t i)
     }
     else if (_fds[i].revents & POLLIN)
     {
-        if (_fds[i].fd == _socket.get_fd())
+        if (_fds[i].fd == _socket.get_fd()) // there is smth to read on the server socket (which mean a new connection)
         {
             handleNewConnection();
         }

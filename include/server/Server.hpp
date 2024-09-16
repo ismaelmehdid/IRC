@@ -34,13 +34,13 @@ class Server
         void                    handleClientMessage(size_t i);
 
         void                    addClient(Client *client);
-        void                    removeClient(int fd);
 
     public:
         Server(const std::string &password);
         ~Server();
 
         void                    runServer(char **argv);
+        void                    removeClient(int fd);
         const std::string       get_password() const;
         bool                    isNickNameTaken(const std::string &nickName);
 

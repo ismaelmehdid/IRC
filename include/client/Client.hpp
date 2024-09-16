@@ -46,6 +46,7 @@ class Client
         void        executePass     (const t_IRCCommand &);
         void        executeNick     (const t_IRCCommand &);
         void        executeUser     (const t_IRCCommand &);
+        void        executeQuit     (const t_IRCCommand &);
 
         void        setRole         (ARole* newRole);
 

@@ -2,7 +2,7 @@ NAME = ircserv
 
 SRCS =	src/main.cpp \
         src/utils/error_messages.cpp \
-        src/utils/cleanup_and_exit.cpp \
+        src/utils/signal_handling.cpp \
         src/server/Server.cpp \
         src/server/PollEvent.cpp \
         src/server/Socket.cpp \
@@ -11,7 +11,7 @@ SRCS =	src/main.cpp \
         src/client/OperatorRole.cpp \
         src/client/RegularRole.cpp \
         src/channel/Channel.cpp \
-        src/parsing/parsing.cpp \
+        src/parsing/arguments_checking.cpp \
         src/parsing/commands.cpp \
         src/exception/ServerBindException.cpp \
         src/exception/ServerListenException.cpp \

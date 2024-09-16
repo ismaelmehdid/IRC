@@ -29,6 +29,7 @@ void ARole::pass(const t_IRCCommand &command)
             global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_INCORRECT);
         } else {
             _client->_has_set_password = true;
+            //TODO: Notify that the client have put the right password
         }
     } else {
         global_ircserv->_socket.send(_client->get_fd(), ERR_ALREADY_REGISTERED);
@@ -54,7 +55,7 @@ void ARole::nick(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated()) {
         if (!_client->_has_set_password) {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_INCORRECT);
+            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_REQUIRED);
         }  else if (command.params.empty()) {
             global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
         } else {
@@ -85,9 +86,9 @@ void ARole::user(const t_IRCCommand &command)
 {
     if (!_client->is_authenticated() && _client->getUserName().empty() && _client->getFullName().empty()) {
         if (!_client->_has_set_password) {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_INCORRECT);
+            global_ircserv->_socket.send(_client->get_fd(), ERR_PASSWORD_REQUIRED);
         } else if (_client->getNickName().empty()) {
-            global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
+            global_ircserv->_socket.send(_client->get_fd(), ERR_NONICKNAMEGIVEN);
         } else if (command.params.size() < 3 || command.trailing.empty()) {
             global_ircserv->_socket.send(_client->get_fd(), ERR_NEED_MORE_PARAMS);
         } else {
@@ -99,4 +100,12 @@ void ARole::user(const t_IRCCommand &command)
     } else {
         global_ircserv->_socket.send(_client->get_fd(), ERR_ALREADY_REGISTERED);
     }
+}
+
+void ARole::quit(const t_IRCCommand &command)
+{
+    (void)command;
+    //TODO: Send the trailing part of the command as a message to every channels the client was connected to: ex: QUIT :Gotta leave gn
+    std::cout << YELLOW << _client->getNickName() << " disconnected!" << RESET << std::endl;
+    global_ircserv->removeClient(_client->get_fd());
 }

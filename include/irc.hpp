@@ -38,13 +38,15 @@
 #define WHITE   "\033[37m"
 
 #define MSG_WELCOME             ":server 001 client :Welcome to the IRC server!\r\n"
-#define ERR_PASSWORD_REQUIRED   ":server 461 * PASS :Password required\r\n"
-#define ERR_PASSWORD_INCORRECT  ":server 464 * PASS :Password incorrect\r\n"
-#define ERR_NO_NICKNAME_GIVEN   ":server 431 * :No nickname given\r\n"
-#define ERR_NEED_MORE_PARAMS    ":server 461 * :Not enough parameters\r\n"
-#define ERR_ALREADY_REGISTERED  ":server 462 * :You may not reregister\r\n"
-#define ERR_NICKNAME_IN_USE     ":server 433 * NICK :Nickname already used by another user\r\n"
-#define ERR_UNKNOWNCOMMAND      ":server 421 * :Unknown command\r\n"
+#define ERR_PASSWORD_REQUIRED   ":server 461 * :Password required in order to execute this command.\r\n"
+#define ERR_PASSWORD_INCORRECT  ":server 464 * PASS :Password incorrect.\r\n"
+#define ERR_NO_NICKNAME_GIVEN   ":server 431 * :No nickname given.\r\n"
+#define ERR_NEED_MORE_PARAMS    ":server 461 * :Not enough parameters.\r\n"
+#define ERR_ALREADY_REGISTERED  ":server 462 * :You may not reregister.\r\n"
+#define ERR_NICKNAME_IN_USE     ":server 433 * NICK :Nickname already used by another user.\r\n"
+#define ERR_UNKNOWNCOMMAND      ":server 421 * :Unknown command.\r\n"
+#define ERR_NOTREGISTERED       ":server 451 * :You have not registered.\r\n"
+#define ERR_NONICKNAMEGIVEN     ":server 431 * :You need to provide a nickname with /NICK in order to execute this command.\r\n"
 
 class Socket;
 class Server;
@@ -70,7 +72,9 @@ struct t_IRCCommand
 extern Server *global_ircserv;
 
 // Parsing
+void                        validate_provided_args(int argc, char **argv);
 void                        display_error_message(t_errors code);
-void                        irc_exit(int exit_code);
-void                        parsing(int argc, char **argv);
 std::vector<t_IRCCommand>   parse_client_commands(const std::string &commands);
+
+//Utils
+void    handleShuttingDown(int sig);

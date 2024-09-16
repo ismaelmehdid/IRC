@@ -2,43 +2,28 @@
 
 Server  *global_ircserv = NULL;
 
-static void handleShuttingDown(int sig)
-{
-    std::cout << "Caught signal " << sig 
-              << ", shutting down server..." << std::endl;
-
-    if (global_ircserv != NULL)
-    {
-        delete (global_ircserv);
-    }
-    std::exit(0);
-}
-
 int main(int argc, char **argv)
 {
-    parsing(argc, argv);
+    validate_provided_args(argc, argv);
 
-    Server *ircserv = new Server(argv[2]);
-    if (!ircserv)
+    global_ircserv = new Server(argv[2]);
+    if (!global_ircserv)
     {
         std::cerr << "Server allocation failed." << std::endl;
         return (1);
     }
 
-    global_ircserv = ircserv;
     signal(SIGINT, handleShuttingDown);
     signal(SIGQUIT, handleShuttingDown);
 
-    try
-    {
-        ircserv->runServer(argv);
+    try {
+        global_ircserv->runServer(argv);
     }
-    catch(const std::exception& e)
-    {
+    catch(const std::exception& e) {
         std::cerr << e.what() << std::endl;
     }
     
-    delete (ircserv);
+    delete (global_ircserv);
 
     return (0);
 }
