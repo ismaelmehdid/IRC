@@ -39,6 +39,7 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
+
 #define WELCOME_CODE            " 001 "
 #define MSG_WELCOME             " :Welcome to the Internet Relay Network\r\n"
 #define ERR_PASSWORD_REQUIRED   ":server 461 * :Password required in order to execute this command.\r\n"
@@ -67,6 +68,17 @@ enum t_errors
 {
     ERR_BAD_ARGUMENTS,
     ERR_BAD_PORT
+};
+
+enum t_msgs
+{
+    JOIN,
+    TOPIC,
+    NO_TOPIC,
+    NAMES_REPLY,
+    END_OF_NAMES,
+    MODE,
+    ALREADY_JOINED_ERROR
 };
 
 struct t_IRCCommand

@@ -2,7 +2,8 @@
 
 #include "../irc.hpp"
 
-struct t_IRCCommand;
+struct  t_IRCCommand;
+class   Channel;
 
 class ARole
 {
@@ -33,4 +34,6 @@ class ARole
     
     protected:
         Client  *_client;
+
+        std::string     getMessage(t_msgs message, Channel* channel);
 };

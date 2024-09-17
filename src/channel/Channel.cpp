@@ -3,17 +3,43 @@
 #include "../../include/server/Server.hpp"
 
 Channel::Channel(const std::string& name)
-    : _name(name), _topic(""), _clients() {}
+    : _name(name), 
+      _topic(""), 
+      _clients(),
+      _operators(),
+      _invited(),
+      _inviteOnly(false), 
+      _topicLocked(false), 
+      _password(""),
+      _userLimit(-1) {}
 
 Channel::~Channel()
 {
-    for (std::map<int, Client*>::iterator it = this->_clients.begin(); it != this->_clients.end(); ++it)
-    {
-        delete (it->second);
-    }
-    this->_clients.clear();
+    _clients.clear();
+    _operators.clear();
+    _invited.clear();
 }
 
+
+void    Channel::broadcastMessage(const std::string& message)
+{
+    if (message.empty())
+    {
+        std::cerr << "Attempted to broadcast an empty message in channel " << _name << std::endl;
+        return ;
+    }
+    
+    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    {
+        std::cout << "Sending message: " << message << " to client " << it->first << std::endl;
+        if (!global_ircserv->socketSend(it->second->get_fd(), message))
+        {
+            std::cerr << "Failed to send message to client " << it->first << std::endl;
+        }
+    }
+}
+
+//------Client Management
 void    Channel::addClient(Client* client)
 {
     if (this->_clients.find(client->get_fd()) == this->_clients.end())
@@ -42,28 +68,22 @@ void    Channel::removeClient(Client* client)
     }
 }
 
-void    Channel::broadcastMessage(const std::string& message)
+void    Channel::addOperator(Client* client)
 {
-    if (message.empty())
-    {
-        std::cerr << "Attempted to broadcast an empty message in channel " << _name << std::endl;
-        return ;
-    }
-    
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-    {
-        std::cout << "Sending message: " << message << " to client " << it->first << std::endl;
-        if (!global_ircserv->socketSend(it->second->get_fd(), message))
-        {
-            std::cerr << "Failed to send message to client " << it->first << std::endl;
-        }
-    }
+    if (isMember(client))
+        this->_operators.insert(client->get_fd());
 }
 
-void    Channel::setTopic(const std::string& topic)
+void    Channel::removeOperator(Client* client)
 {
-    this->_topic = topic;
-    std::cout << "Topic for channel " << _name << " set to: " << _topic << std::endl;
+    if (isMember(client))
+        this->_operators.erase(client->get_fd());
+}
+
+//------Getters
+int Channel::getUserLimit() const
+{
+    return (this->_userLimit);
 }
 
 const std::string&  Channel::getName() const
@@ -84,4 +104,58 @@ const std::map<int, Client*>&   Channel::getClients() const
 bool    Channel::isMember(Client* client) const
 {
     return (this->_clients.find(client->get_fd()) != this->_clients.end());
+}
+
+bool    Channel::isInviteOnly() const
+{
+    return (this->_inviteOnly);
+}
+
+bool    Channel::hasPassword() const
+{
+    if (this->_password.empty())
+        return (false);
+    else
+        return (true);
+}
+
+bool    Channel::checkPassword(const std::string& key) const
+{
+    return (this->_password == key);
+}
+
+bool    Channel::isOperator(Client* client) const
+{
+    return (this->_operators.find(client->get_fd()) != _operators.end());
+}
+
+bool    Channel::isInvited(Client* client) const
+{
+    return (this->_invited.find(client->get_fd()) != _invited.end());
+}
+
+//------Setters
+void    Channel::setTopicLocked(bool mode)
+{
+    this->_topicLocked = mode;
+}
+
+void    Channel::setInviteOnly(bool mode)
+{
+    this->_inviteOnly = mode;
+}
+
+void    Channel::setPassword(const std::string& key)
+{
+    this->_password = key;
+}
+
+void    Channel::setUserLimit(int limit)
+{
+    this->_userLimit = limit;
+}
+
+void    Channel::setTopic(const std::string& topic)
+{
+    this->_topic = topic;
 }

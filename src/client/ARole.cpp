@@ -16,7 +16,7 @@ void    ARole::quit(const t_IRCCommand &command)
     global_ircserv->removeClient(this->_client, reason);
 }
 
-void    ARole::join(const t_IRCCommand &command)
+void    ARole::ping(const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
@@ -24,72 +24,99 @@ void    ARole::join(const t_IRCCommand &command)
         return ;
     }
 
-    const std::string   &channelName = command.params[0];
-    Channel             *channel = global_ircserv->findChannel(channelName);
+    const std::string   &server_name = command.params[0];
+    std::string         pong_message = ":" + server_name + " PONG " + server_name + "\r\n";
+
+    global_ircserv->socketSend(this->_client->get_fd(), pong_message);
+}
+
+std::string ARole::getMessage(t_msgs message, Channel *channel)
+{
+    std::ostringstream  msg;
+    const std::map<int, Client*> &clients = channel->getClients();
+
+    switch (message)
+    {
+        case JOIN:
+            msg << this->_client->getPrefix() << " JOIN " << channel->getName() << "\r\n";
+            break;
+        case NO_TOPIC:
+            msg << ":" << SERVER_NAME << " 331 " << this->_client->getNickName() << " "
+                << channel->getName() << " :No topic is set\r\n";
+            break;
+        case TOPIC:
+            msg << ":" << SERVER_NAME << " 332 " << this->_client->getNickName() << " "
+                << channel->getName() << " :" << channel->getTopic() << "\r\n";
+            break;
+        case NAMES_REPLY:
+            msg << ":" << SERVER_NAME << " 353 " << this->_client->getNickName() << " = "
+                << channel->getName() << " :";
+            for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
+            {
+                if (it != clients.begin())
+                    msg << " ";
+                msg << it->second->getNickName();
+            }
+            msg << "\r\n";
+            break;
+        case END_OF_NAMES:
+            msg << ":" << SERVER_NAME << " 366 " << this->_client->getNickName() << " "
+                << channel->getName() << " :End of NAMES list\r\n";
+            break;
+        case MODE:
+            msg << "lol"; // Mode message
+            break;
+        case ALREADY_JOINED_ERROR:
+            msg << ":" << SERVER_NAME << " " << ERR_ALREADY_JOINED << " "
+                << this->_client->getNickName() << " " << channel->getName() << " :"
+                << ERR_ALREADY_JOINED_MSG;
+            break;
+    }
+    return (msg.str());
+}
+
+void    ARole::join(const t_IRCCommand &command)
+{
+    int     fd = this->_client->get_fd();
+
+    if (command.params.empty())
+    {
+        global_ircserv->socketSend(this->_client->get_fd(), ERR_NEED_MORE_PARAMS);
+        return ;
+    }
+
+    Channel *channel = global_ircserv->findChannel(command.params[0]);
 
     if (!channel)
     {
-        channel = global_ircserv->createChannel(channelName);
+        channel = global_ircserv->createChannel(command.params[0]);
     }
 
+    // checks for invite only password etc
     if (!channel->isMember(this->_client))
     {
         channel->addClient(this->_client);
+        channel->broadcastMessage(getMessage(JOIN, channel));
 
-        std::string joinMessage;
-        joinMessage.append(":").append(this->_client->getNickName()).append("!")
-                   .append(this->_client->getUserName()).append("@:")
-                   .append(SERVER_NAME).append(" JOIN ")
-                   .append(channelName).append("\r\n");
-        channel->broadcastMessage(joinMessage);
-
-        std::string topicMessage;
         if (!channel->getTopic().empty())
         {
-            topicMessage.append(":").append(SERVER_NAME).append(" 332 ")
-                        .append(this->_client->getNickName()).append(" ")
-                        .append(channelName).append(" :")
-                        .append(channel->getTopic()).append("\r\n");
+            global_ircserv->socketSend(fd, getMessage(TOPIC, channel));
         }
         else
         {
-            topicMessage.append(":").append(SERVER_NAME).append(" 331 ")
-                        .append(this->_client->getNickName()).append(" ")
-                        .append(channelName).append(" :No topic is set\r\n");
+            global_ircserv->socketSend(fd, getMessage(NO_TOPIC, channel));
         }
-        global_ircserv->socketSend(this->_client->get_fd(), topicMessage);
 
-        std::string namesReply;
-        namesReply.append(":").append(SERVER_NAME).append(" 353 ")
-                  .append(this->_client->getNickName()).append(" = ")
-                  .append(channelName).append(" :");
-        const std::map<int, Client*> &clients = channel->getClients();
-        for (std::map<int, Client*>::const_iterator it = clients.begin(); it != clients.end(); ++it)
-        {
-            if (it != clients.begin())
-                namesReply.append(" ");
-            namesReply.append(it->second->getNickName());
-        }
-        namesReply.append("\r\n");
-        global_ircserv->socketSend(this->_client->get_fd(), namesReply);
-
-        std::string endOfNames;
-        endOfNames.append(":").append(SERVER_NAME).append(" 366 ")
-                  .append(this->_client->getNickName()).append(" ")
-                  .append(channelName).append(" :End of NAMES list\r\n");
-        global_ircserv->socketSend(this->_client->get_fd(), endOfNames);
+        global_ircserv->socketSend(fd, getMessage(NAMES_REPLY, channel));
+        global_ircserv->socketSend(fd, getMessage(END_OF_NAMES, channel));
+        // mode msg
     }
     else
     {
-        std::string errorMsg;
-        errorMsg.append(":").append(SERVER_NAME).append(" ")
-                .append(ERR_ALREADY_JOINED).append(" ")
-                .append(this->_client->getNickName()).append(" ")
-                .append(channelName).append(" :")
-                .append(ERR_ALREADY_JOINED_MSG);
-        global_ircserv->socketSend(this->_client->get_fd(), errorMsg);
+        global_ircserv->socketSend(fd, getMessage(ALREADY_JOINED_ERROR, channel));
     }
 }
+
 
 void    ARole::part(const t_IRCCommand &command)
 {
@@ -148,22 +175,3 @@ void    ARole::privMsg(const t_IRCCommand &command)
         global_ircserv->socketSend(target_client->get_fd(), privmsg);
     }
 }
-
-void    ARole::ping(const t_IRCCommand &command)
-{
-    if (command.params.empty())
-    {
-        global_ircserv->socketSend(this->_client->get_fd(), ":server 461 * PING :Not enough parameters\r\n");
-        return ;
-    }
-
-    const std::string   &server_name = command.params[0];
-    std::string         pong_message = ":" + server_name + " PONG " + server_name + "\r\n";
-
-    global_ircserv->socketSend(this->_client->get_fd(), pong_message);
-}
-
-
-
-
-
