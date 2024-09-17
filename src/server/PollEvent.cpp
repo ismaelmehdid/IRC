@@ -72,7 +72,6 @@ void Server::handleClientDisconnection(size_t i)
     }
 }
 
-
 /**
  * @brief Handles poll events for a specific file descriptor.
  * 

@@ -17,77 +17,15 @@ Server::~Server()
         delete (it->second);
     }
 
-    for (std::vector<pollfd>::iterator it = _fds.begin(); it != _fds.end(); ++it)
-    {
-        close (it->fd);
-    }
-}
-
-/**
- * @brief Adds a new client to the server.
- * 
- * This function stores the client in the _clients map, 
- * using the client's file descriptor as the key, and increments the total number of clients.
- * 
- * @param client A pointer to the Client object to be added.
- */
-void    Server::addClient(Client *client) 
-{
-    this->_clients[client->get_fd()] = client;
-    this->_nbr_clients++;
-}
-
-void Server::removeClient(Client* user, std::string reason)
-{
-    std::list<std::string>  empty_channels;
-    int                     fd = user->get_fd();
-
     for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
     {
-        Channel*            channel = it->second;
-        
-        if (channel->isMember(user))
-        {
-            channel->removeClient(user);
-            if (channel->getClients().empty())
-                empty_channels.push_back(channel->getName());
-
-            for (std::map<int, Client*>::const_iterator iter = channel->getClients().begin(); iter != channel->getClients().end(); ++iter)
-            {
-                this->_socket.send(iter->second->get_fd(), user->getPrefix() + " QUIT :" + reason);
-            }
-        }
+        delete (it->second);
     }
 
-    for (std::list<std::string>::const_iterator it = empty_channels.begin(); it != empty_channels.end(); ++it)
+    for (int i = _poll_count - 1; i >= 0; --i)
     {
-        delete (this->_channels[*it]);
-        this->_channels.erase(*it);
+        pollRemove(i);
     }
-
-    for (int i = 0; i < this->_poll_count; ++i)
-    {
-        if (this->_fds[i].fd == fd)
-        {
-            pollRemove(i);
-            break ;
-        }
-    }
-
-    delete (this->_clients[fd]);
-    this->_clients.erase(fd);
-    this->_nbr_clients--;
-}
-
-
-void Server::pollRemove(int index)
-{
-	close(this->_fds[index].fd);
-	this->_fds[index].fd = this->_fds[this->_poll_count - 1].fd;
-	this->_fds[index].events = POLLIN;
-	this->_fds[this->_poll_count - 1].fd = -1;
-
-	--this->_poll_count;
 }
 
 const std::string   Server::get_password() const
@@ -113,6 +51,7 @@ bool    Server::socketSend(int fd, const std::string& message)
     
     return (res);
 }
+
 /**
  * @brief The main server loop for handling connections and events.
  * 

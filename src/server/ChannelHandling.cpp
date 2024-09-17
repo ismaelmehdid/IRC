@@ -1,6 +1,6 @@
 #include "../../include/server/Server.hpp"
 
-Channel* Server::createChannel(const std::string& channelName)
+Channel*    Server::createChannel(const std::string& channelName)
 {
     if (_channels.find(channelName) == _channels.end())
     {
@@ -22,7 +22,7 @@ Channel*    Server::findChannel(const std::string& channelName)
 }
 
 
-void Server::sendChannelMessage(const std::string& msg, const std::string& channelName)
+void    Server::sendChannelMessage(const std::string& msg, const std::string& channelName)
 {
     Channel*    channel = findChannel(channelName);
     

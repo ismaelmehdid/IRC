@@ -9,11 +9,13 @@ SRCS =	src/main.cpp \
 		src/client/ARole.cpp \
         src/client/OperatorRole.cpp \
         src/client/RegularRole.cpp \
-        src/client/ClientCommands.cpp \
+        src/client/ClientExecution.cpp \
+        src/client/AuthenticationCommands.cpp \
         src/server/Server.cpp \
         src/server/PollEvent.cpp \
         src/server/Socket.cpp \
         src/server/ChannelHandling.cpp \
+        src/server/ClientHandling.cpp \
         src/channel/Channel.cpp \
         src/exception/ServerBindException.cpp \
         src/exception/ServerListenException.cpp \

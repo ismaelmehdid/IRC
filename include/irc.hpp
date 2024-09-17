@@ -39,8 +39,8 @@
 #define CYAN    "\033[36m"
 #define WHITE   "\033[37m"
 
-#define WELCOME_CODE            "001"
-#define MSG_WELCOME             ":server 001 client :Welcome to the IRC server!\r\n"
+#define WELCOME_CODE            " 001 "
+#define MSG_WELCOME             " :Welcome to the Internet Relay Network\r\n"
 #define ERR_PASSWORD_REQUIRED   ":server 461 * :Password required in order to execute this command.\r\n"
 #define ERR_PASSWORD_INCORRECT  ":server 464 * PASS :Password incorrect.\r\n"
 #define ERR_NO_NICKNAME_GIVEN   ":server 431 * :No nickname given.\r\n"
