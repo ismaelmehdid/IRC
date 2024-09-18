@@ -97,7 +97,12 @@ void    ARole::nick(const t_IRCCommand &command)
         else
         {
             // TODO: broadcast new nickname to all users in channel
+            bool wasEmpty = _client->getNickName().empty();
             _client->setNickName(newNick);
+            if (wasEmpty && _client->is_authenticated()) {
+                global_ircserv->socketSend(_client->get_fd(),
+                    _client->getPrefix() + WELCOME_CODE + _client->getNickName() + MSG_WELCOME);
+            }
         }
     }
 }
@@ -121,10 +126,6 @@ void    ARole::user(const t_IRCCommand &command)
         {
             global_ircserv->socketSend(_client->get_fd(), ERR_PASSWORD_REQUIRED);
         }
-        else if (_client->getNickName().empty())
-        {
-            global_ircserv->socketSend(_client->get_fd(), ERR_NONICKNAMEGIVEN);
-        }
         else if (command.params.size() < 3 || command.trailing.empty())
         {
             global_ircserv->socketSend(_client->get_fd(), ERR_NEED_MORE_PARAMS);
@@ -135,9 +136,10 @@ void    ARole::user(const t_IRCCommand &command)
             _client->setFullName(command.trailing);
             std::cout << GREEN << "Client connected!" << RESET << std::endl;
 
-            global_ircserv->socketSend(_client->get_fd(),
-                _client->getPrefix() + WELCOME_CODE + _client->getNickName() + MSG_WELCOME);
-
+            if (_client->is_authenticated()) {
+                global_ircserv->socketSend(_client->get_fd(),
+                    _client->getPrefix() + WELCOME_CODE + _client->getNickName() + MSG_WELCOME);
+            }
         }
     }
     else
