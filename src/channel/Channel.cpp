@@ -29,12 +29,12 @@ void    Channel::broadcastMessage(const std::string& message)
         return ;
     }
     
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
+    for (std::set<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
     {
-        std::cout << "Sending message: " << message << " to client " << it->first << std::endl;
-        if (!global_ircserv->socketSend(it->second->get_fd(), message))
+        std::cout << "Sending message: " << message << " to client " << (*it)->get_fd() << std::endl;
+        if (!global_ircserv->socketSend((*it)->get_fd(), message))
         {
-            std::cerr << "Failed to send message to client " << it->first << std::endl;
+            std::cerr << "Failed to send message to client " <<(*it)->get_fd() << std::endl;
         }
     }
 }
@@ -42,9 +42,9 @@ void    Channel::broadcastMessage(const std::string& message)
 //------Client Management
 void    Channel::addClient(Client* client)
 {
-    if (this->_clients.find(client->get_fd()) == this->_clients.end())
+    if (this->_clients.find(client) == this->_clients.end())
     {
-        this->_clients[client->get_fd()] = client;
+        this->_clients.insert(client);
     }
     else
     {
@@ -52,10 +52,9 @@ void    Channel::addClient(Client* client)
     }
 }
 
-
 void    Channel::removeClient(Client* client)
 {
-    std::map<int, Client*>::iterator    it = _clients.find(client->get_fd());
+    std::set<Client *>::iterator it = _clients.find(client);
 
     if (it != this->_clients.end())
     {
@@ -71,13 +70,13 @@ void    Channel::removeClient(Client* client)
 void    Channel::addOperator(Client* client)
 {
     if (isMember(client))
-        this->_operators.insert(client->get_fd());
+        this->_operators.insert(client);
 }
 
 void    Channel::removeOperator(Client* client)
 {
     if (isMember(client))
-        this->_operators.erase(client->get_fd());
+        this->_operators.erase(client);
 }
 
 //------Getters
@@ -96,14 +95,14 @@ const std::string&  Channel::getTopic() const
     return (this->_topic);
 }
 
-const std::map<int, Client*>&   Channel::getClients() const
+const std::set<Client *>&   Channel::getClients() const
 {
     return (this->_clients);
 }
 
 bool    Channel::isMember(Client* client) const
 {
-    return (this->_clients.find(client->get_fd()) != this->_clients.end());
+    return (this->_clients.find(client) != this->_clients.end());
 }
 
 bool    Channel::isInviteOnly() const
@@ -126,12 +125,12 @@ bool    Channel::checkPassword(const std::string& key) const
 
 bool    Channel::isOperator(Client* client) const
 {
-    return (this->_operators.find(client->get_fd()) != _operators.end());
+    return (this->_operators.find(client) != _operators.end());
 }
 
 bool    Channel::isInvited(Client* client) const
 {
-    return (this->_invited.find(client->get_fd()) != _invited.end());
+    return (this->_invited.find(client) != _invited.end());
 }
 
 //------Setters

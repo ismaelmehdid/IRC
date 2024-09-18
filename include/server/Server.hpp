@@ -22,7 +22,7 @@ class Server
         unsigned int                    _nbr_clients;      ///< Number of connected clients
         const std::string               _password;         ///< Server password for client authentication
         std::map<int, Client*>          _clients;          ///< Map of connected clients, key is client file descriptor
-        std::map<std::string,Channel*>  _channels;         ///< Map of channels for managing group communications
+        std::map<std::string, Channel*> _channels;         ///< Map of channels for managing group communications
         std::vector<pollfd>             _fds;              ///< Poll file descriptors for client sockets
         pollfd                          _server_pollfd;    ///< Pollfd structure for the server socket
         int                             _poll_count;       ///< Number of poll events
@@ -37,6 +37,8 @@ class Server
 
         void                addClient(Client *client);
         void                pollRemove(int index);
+
+
 
     public:
         Server(const std::string &password);
@@ -54,4 +56,24 @@ class Server
         Channel*            findChannel(const std::string& channelName);
         Client*             findClientByNick(const std::string& target);
         void                sendChannelMessage(const std::string& msg, const std::string& channelName);
+
+        // commands with operator rights 
+        void                kick    (Client *, const t_IRCCommand &);
+        void                invite  (Client *, const t_IRCCommand &);
+        void                topic   (Client *, const t_IRCCommand &);
+        void                mode    (Client *, const t_IRCCommand &);
+
+        // commands without operator rights
+        void                join    (Client *, const t_IRCCommand &);
+        void                part    (Client *, const t_IRCCommand &);
+        void                privMsg (Client *, const t_IRCCommand &);
+        void                ping    (Client *, const t_IRCCommand &);
+
+        void                cap     (Client *, const t_IRCCommand &);
+        void                pass    (Client *, const t_IRCCommand &);
+        void                user    (Client *, const t_IRCCommand &);
+        void                nick    (Client *, const t_IRCCommand &);
+        void                quit    (Client *, const t_IRCCommand &);
+
+        std::string         getMessage(Client *client, t_msgs message, Channel *channel);
 };

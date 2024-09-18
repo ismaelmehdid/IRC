@@ -21,7 +21,6 @@ Channel*    Server::findChannel(const std::string& channelName)
     return (NULL);
 }
 
-
 void    Server::sendChannelMessage(const std::string& msg, const std::string& channelName)
 {
     Channel*    channel = findChannel(channelName);

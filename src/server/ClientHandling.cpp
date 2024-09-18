@@ -22,9 +22,9 @@ void    Server::removeClient(Client* user, std::string reason)
             if (channel->getClients().empty())
                 empty_channels.push_back(channel->getName());
 
-            for (std::map<int, Client*>::const_iterator iter = channel->getClients().begin(); iter != channel->getClients().end(); ++iter)
+            for (std::set<Client *>::const_iterator iter = channel->getClients().begin(); iter != channel->getClients().end(); ++iter)
             {
-                this->_socket.send(iter->second->get_fd(), user->getPrefix() + " QUIT :" + reason);
+                this->_socket.send((*iter)->get_fd(), user->getPrefix() + " QUIT :" + reason);
             }
         }
     }

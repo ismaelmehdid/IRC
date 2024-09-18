@@ -1,70 +1,5 @@
 #include "../../include/server/Server.hpp"
 
-void    Client::executeKick(const t_IRCCommand &command)
-{
-    this->_role->kick(command);
-}
-
-void    Client::executeInvite(const t_IRCCommand &command)
-{
-    this->_role->invite(command);
-}
-
-void    Client::executeTopic(const t_IRCCommand &command)
-{
-    this->_role->topic(command);
-}
-
-void    Client::executeMode(const t_IRCCommand &command)
-{
-    this->_role->mode(command);
-}
-
-void    Client::executeCap(const t_IRCCommand &command)
-{
-    this->_role->cap(command);
-}
-
-void    Client::executePass(const t_IRCCommand &command)
-{
-    this->_role->pass(command);
-}
-
-void    Client::executeNick(const t_IRCCommand &command)
-{
-    this->_role->nick(command);
-}
-
-void    Client::executeUser(const t_IRCCommand &command)
-{
-    this->_role->user(command);
-}
-
-void    Client::executeJoin(const t_IRCCommand &command)
-{
-    this->_role->join(command);
-}
-
-void    Client::executePart(const t_IRCCommand &command)
-{
-    this->_role->part(command);
-}
-
-void    Client::executePrivMsg(const t_IRCCommand &command)
-{
-    this->_role->privMsg(command);
-}
-
-void    Client::executePing (const t_IRCCommand &command)
-{
-    this->_role->ping(command);
-}
-
-void    Client::executeQuit (const t_IRCCommand &command)
-{
-    this->_role->quit(command);
-}
-
 /**
  * Executes the given client command.
  *
@@ -90,4 +25,69 @@ void    Client::executeCommand(const std::string &message)
             global_ircserv->socketSend(_fd, ERR_UNKNOWNCOMMAND);
         }
     }
+}
+
+void    Client::executeKick(const t_IRCCommand &command)
+{
+    global_ircserv->kick(this, command);
+}
+
+void    Client::executeInvite(const t_IRCCommand &command)
+{
+    global_ircserv->invite(this, command);
+}
+
+void    Client::executeTopic(const t_IRCCommand &command)
+{
+    global_ircserv->topic(this, command);
+}
+
+void    Client::executeMode(const t_IRCCommand &command)
+{
+    global_ircserv->mode(this, command);
+}
+
+void    Client::executeCap(const t_IRCCommand &command)
+{
+    global_ircserv->cap(this, command);
+}
+
+void    Client::executePass(const t_IRCCommand &command)
+{
+    global_ircserv->pass(this, command);
+}
+
+void    Client::executeNick(const t_IRCCommand &command)
+{
+    global_ircserv->nick(this, command);
+}
+
+void    Client::executeUser(const t_IRCCommand &command)
+{
+    global_ircserv->user(this, command);
+}
+
+void    Client::executeJoin(const t_IRCCommand &command)
+{
+    global_ircserv->join(this, command);
+}
+
+void    Client::executePart(const t_IRCCommand &command)
+{
+    global_ircserv->part(this, command);
+}
+
+void    Client::executePrivMsg(const t_IRCCommand &command)
+{
+    global_ircserv->privMsg(this, command);
+}
+
+void    Client::executePing (const t_IRCCommand &command)
+{
+    global_ircserv->ping(this, command);
+}
+
+void    Client::executeQuit (const t_IRCCommand &command)
+{
+    global_ircserv->quit(this, command);
 }

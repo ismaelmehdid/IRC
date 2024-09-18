@@ -1,31 +1,26 @@
 #include "../../include/server/Server.hpp"
 
 Client::Client(int fd, char	*host)
-    :   _hostMask(host),
+    :   _fd(fd),
+        _hostMask(host),
         _nickName(),
         _userName(),
         _fullName(),
-        _fd(fd),
-        _role(new RegularRole(this)),
         _has_set_password(false) { initializeCommandMap(); }
 
 Client::Client (const Client& other)
-    :   _nickName(other._nickName),
+    :   _fd(other.get_fd()),
+        _nickName(other._nickName),
         _userName(other._userName),
         _fullName(other._fullName),
-        _fd(other.get_fd()),
-        _role(other._role ? other._role->clone() : NULL),
         _has_set_password(other._has_set_password) { initializeCommandMap(); }
 
 Client& Client::operator=(const Client& other)
 {
     if (this != &other)
     {
-        if (this->_role)
-            delete (this->_role);
         close (this->_fd);
         this->_fd = other.get_fd();
-        this->_role = other._role ? other._role->clone() : NULL;
         this->_nickName = other._nickName;
         this->_userName = other._userName;
         this->_fullName = other._fullName;
@@ -37,9 +32,6 @@ Client& Client::operator=(const Client& other)
 Client::~Client()
 {
     std::cout << GREEN <<"Client destroyed." << RESET << std::endl;
-    
-    if (this->_role)
-        delete (this->_role);
     close (this->_fd);
 }
 
@@ -110,11 +102,4 @@ void    Client::setUserName(const std::string &userName)
 void    Client::setFullName(const std::string &fullName)
 {
     this->_fullName = fullName;
-}
-
-void    Client::setRole(ARole* newRole)
-{
-    if (this->_role)
-        delete (this->_role);
-    this->_role = newRole;
 }

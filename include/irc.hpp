@@ -30,6 +30,9 @@
 #define ARGUMENTS_REQUIRED  3
 #define MAX_CLIENTS_IN_QUEU 5
 
+#define MAX_NICKNAME_LENGTH 20
+#define MAX_CHANNEL_NAME_LENGTH 50
+
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
 #define GREEN   "\033[32m"

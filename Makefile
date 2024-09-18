@@ -6,11 +6,7 @@ SRCS =	src/main.cpp \
         src/parsing/ParseRequests.cpp \
         src/parsing/ArgCheck.cpp \
         src/client/Client.cpp \
-		src/client/ARole.cpp \
-        src/client/OperatorRole.cpp \
-        src/client/RegularRole.cpp \
         src/client/ClientExecution.cpp \
-        src/client/AuthenticationCommands.cpp \
         src/server/Server.cpp \
         src/server/PollEvent.cpp \
         src/server/Socket.cpp \
