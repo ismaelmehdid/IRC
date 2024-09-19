@@ -6,23 +6,39 @@ void    Server::addClient(Client *client)
     this->_nbr_clients++;
 }
 
-void    Server::removeClient(Client* user, std::string reason)
+void Server::removeClient(Client* user, std::string reason)
 {
-    std::list<std::string>  empty_channels;
-    int                     fd = user->get_fd();
+    std::list<std::string> empty_channels;
+    int fd = user->get_fd();
 
 //--remove user from every channel
     for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
     {
-        Channel*            channel = it->second;
-        
+        Channel* channel = it->second;
+
+        if (channel->isInvited(user))
+        {
+            channel->removeInvited(user);
+        }
         if (channel->isMember(user))
         {
+            // Remove user from the channel
             channel->removeClient(user);
-            if (channel->getClients().empty())
-                empty_channels.push_back(channel->getName());
 
-            for (std::set<Client *>::const_iterator iter = channel->getClients().begin(); iter != channel->getClients().end(); ++iter)
+            // Remove user from operators and invited lists if they exist there
+            if (channel->isOperator(user))
+            {
+                channel->removeOperator(user);
+            }
+
+            // Check if the channel is empty and should be deleted
+            if (channel->getClients().empty())
+            {
+                empty_channels.push_back(channel->getName());
+            }
+
+            // Broadcast the QUIT message to all remaining clients in the channel
+            for (std::set<Client*>::const_iterator iter = channel->getClients().begin(); iter != channel->getClients().end(); ++iter)
             {
                 this->_socket.send((*iter)->get_fd(), user->getPrefix() + " QUIT :" + reason);
             }
@@ -42,7 +58,7 @@ void    Server::removeClient(Client* user, std::string reason)
         if (this->_fds[i].fd == fd)
         {
             pollRemove(i);
-            break ;
+            break;
         }
     }
 

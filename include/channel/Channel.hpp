@@ -47,6 +47,6 @@ class Channel
         void                            removeClient(Client* client);
         void                            addOperator(Client* client);
         void                            removeOperator(Client* client);
-        //void                          addInvited(Client* client); // idk if its needed
-        //void                          removeInvited(Client* client); // idk if its needed
+        void                            addInvited(Client* client);
+        void                            removeInvited(Client* client);
 };

@@ -50,14 +50,34 @@ void    Channel::removeClient(Client* client)
 
 void    Channel::addOperator(Client* client)
 {
-    if (isMember(client))
-        this->_operators.insert(client);
+    if (!isMember(client) || (isMember(client) && isOperator(client)))
+        return ;
+    
+    this->_operators.insert(client);
 }
 
 void    Channel::removeOperator(Client* client)
 {
-    if (isMember(client))
-        this->_operators.erase(client);
+    if (!isMember(client) || (isMember(client) && !isOperator(client)))
+        return ;
+
+    this->_operators.erase(client);
+}
+
+void    Channel::addInvited(Client* client)
+{
+    if (!isMember(client) || (isMember(client) && isInvited(client)))
+        return ;
+    
+    this->_invited.insert(client);
+}
+
+void    Channel::removeInvited(Client* client)
+{
+    if (!isMember(client) || (isMember(client) && !isInvited(client)))
+        return ;
+
+    this->_invited.erase(client);
 }
 
 //------Getters
