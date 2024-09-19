@@ -2,19 +2,14 @@
 
 #include "../irc.hpp"
 
-# include <string>
-# include <map>
-
-class ARole;
-
 class Client
 {
     private:
-        int                                     _fd;
-        std::string                             _hostMask;
-        std::string                             _nickName;
-        std::string                             _userName;
-        std::string                             _fullName;
+        int             _fd;
+        std::string     _hostMask;
+        std::string     _nickName;
+        std::string     _userName;
+        std::string     _fullName;
 
     public:
         Client(int fd, char *host);
