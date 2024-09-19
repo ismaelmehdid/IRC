@@ -6,14 +6,14 @@ Client::Client(int fd, char	*host)
         _nickName(),
         _userName(),
         _fullName(),
-        _has_set_password(false) { initializeCommandMap(); }
+        _has_set_password(false) {}
 
 Client::Client (const Client& other)
     :   _fd(other.get_fd()),
         _nickName(other._nickName),
         _userName(other._userName),
         _fullName(other._fullName),
-        _has_set_password(other._has_set_password) { initializeCommandMap(); }
+        _has_set_password(other._has_set_password) {}
 
 Client& Client::operator=(const Client& other)
 {
@@ -31,30 +31,8 @@ Client& Client::operator=(const Client& other)
 
 Client::~Client()
 {
-    std::cout << GREEN <<"Client destroyed." << RESET << std::endl;
+    std::cout << GREEN << "Client " << this->_nickName <<  " destroyed." << RESET << std::endl;
     close (this->_fd);
-}
-
-void    Client::initializeCommandMap()
-{
-    _commandMap["KICK"]    = &Client::executeKick;
-    _commandMap["INVITE"]  = &Client::executeInvite;
-    _commandMap["TOPIC"]   = &Client::executeTopic;
-    _commandMap["MODE"]    = &Client::executeMode;
-    _commandMap["CAP"]     = &Client::executeCap;
-    _commandMap["PASS"]    = &Client::executePass;
-    _commandMap["NICK"]    = &Client::executeNick;
-    _commandMap["USER"]    = &Client::executeUser;
-    _commandMap["JOIN"]    = &Client::executeJoin;
-    _commandMap["PART"]    = &Client::executePart;
-    _commandMap["PRIVMSG"] = &Client::executePrivMsg;
-    _commandMap["PING"]    = &Client::executePing;
-    _commandMap["QUIT"]    = &Client::executeQuit;
-}
-
-bool    Client::is_authenticated()
-{
-    return (_has_set_password && !_nickName.empty() && !_userName.empty() && !_fullName.empty());
 }
 
 //----------Getters
@@ -86,6 +64,11 @@ std::string Client::getPrefix() const
 int Client::get_fd() const
 {
     return (this->_fd);
+}
+
+bool    Client::is_authenticated()
+{
+    return (_has_set_password && !_nickName.empty() && !_userName.empty() && !_fullName.empty());
 }
 
 //------Setters

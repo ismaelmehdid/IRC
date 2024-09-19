@@ -63,9 +63,6 @@
 class Socket;
 class Server;
 class Client;
-class ARole;
-class OperatorRole; // inherit from IRole
-class RegularRole;  // inherit from IRole
 
 enum t_errors
 {

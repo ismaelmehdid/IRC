@@ -16,36 +16,11 @@ class Client
         std::string                             _userName;
         std::string                             _fullName;
 
-        typedef void (Client::*CommandFunction)(const t_IRCCommand &);
-        void        initializeCommandMap();
-        std::map<std::string, CommandFunction>  _commandMap;
-
-
-        
-//----------Commands
-        void        executeKick     (const t_IRCCommand &);
-        void        executeInvite   (const t_IRCCommand &);
-        void        executeTopic    (const t_IRCCommand &);
-        void        executeMode     (const t_IRCCommand &);
-        void        executeCap      (const t_IRCCommand &);
-        void        executePass     (const t_IRCCommand &);
-        void        executeNick     (const t_IRCCommand &);
-        void        executeUser     (const t_IRCCommand &);
-        void        executeQuit     (const t_IRCCommand &);
-        void        executeJoin     (const t_IRCCommand &);
-        void        executePart     (const t_IRCCommand &);     
-        void        executePrivMsg  (const t_IRCCommand &);
-        void        executePing     (const t_IRCCommand &);
-
     public:
         Client(int fd, char *host);
         Client (const Client& other);
         Client& operator=(const Client& other);
         ~Client();
-
-        int         get_fd() const;
-        void        executeCommand(const std::string &message);
-        bool        is_authenticated();
 
 //----------Getters
         std::string getNickName() const;
@@ -53,10 +28,14 @@ class Client
         std::string getFullName() const;
         std::string getHostMask() const;
         std::string getPrefix() const;
+        int         get_fd() const;
+        bool        is_authenticated();
+
 //----------Setters
         void        setNickName(const std::string &nickName);
         void        setUserName(const std::string &username);
-        void        setFullName(const std::string &fullname);        
+        void        setFullName(const std::string &fullname);
+           
 //----------Auth
         bool        _has_set_password;
 };

@@ -11,7 +11,7 @@ class Channel
         std::string             _topic;
 
         std::set<Client *>      _clients;
-        std::set<Client *>      _operators;   // For channel operators (by fd)
+        std::set<Client *>      _operators;   // For channel operators
         std::set<Client *>      _invited;     // For invited clients
 
         bool                    _inviteOnly;  // Invite-only mode flag
@@ -22,8 +22,6 @@ class Channel
     public:
         Channel(const std::string& name);
         ~Channel();
-
-        void                            broadcastMessage(const std::string& message);
 
 //------Getters
         const std::string&              getName() const;

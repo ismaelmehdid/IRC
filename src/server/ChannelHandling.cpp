@@ -21,13 +21,23 @@ Channel*    Server::findChannel(const std::string& channelName)
     return (NULL);
 }
 
-void    Server::sendChannelMessage(const std::string& msg, const std::string& channelName)
+void    Server::broadcastMessage(const std::string& msg, Channel* channel)
 {
-    Channel*    channel = findChannel(channelName);
-    
-    if (channel)
+    if (msg.empty())
     {
-        channel->broadcastMessage(msg);
+        std::cerr << "Attempted to broadcast an empty message in channel " << channel->getName() << std::endl;
+        return ;
+    }
+    
+    const std::set<Client*>& clients = channel->getClients();
+
+    for (std::set<Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
+    {
+        std::cout << "Sending message: " << msg << " to client " << (*it)->get_fd() << std::endl;
+        if (!this->_socket.send((*it)->get_fd(), msg))
+        {
+            std::cerr << "Failed to send message to client " << (*it)->get_fd() << std::endl;
+        }
     }
 }
 

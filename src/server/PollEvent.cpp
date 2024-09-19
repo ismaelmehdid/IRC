@@ -9,7 +9,7 @@
  * 
  * @param i Index of the client in the _fds array.
  */
-void Server::handleClientMessage(size_t i)
+void    Server::handleClientMessage(size_t i)
 {
     std::string message = this->_socket.receive(_fds[i].fd);
     if (message.empty())
@@ -19,7 +19,8 @@ void Server::handleClientMessage(size_t i)
     else
     {
         std::cout << message << std::endl; // do not delete until we finish project pls, its useful to see
-        global_ircserv->_clients[_fds[i].fd]->executeCommand(message);
+
+        this->executeCommand(_clients[_fds[i].fd], message);
     }
 }
 
@@ -31,7 +32,7 @@ void Server::handleClientMessage(size_t i)
  * adds the client to the server's list of clients, sends a welcome message to the client,
  * and prints a message indicating that a client has connected.
  */
-void Server::handleNewConnection()
+void    Server::handleNewConnection()
 {
     Client* newClient = this->_socket.accept();
 
@@ -55,7 +56,7 @@ void Server::handleNewConnection()
  * 
  * @param i Index of the client in the _fds array.
  */
-void Server::handleClientDisconnection(size_t i)
+void    Server::handleClientDisconnection(size_t i)
 {
     int     fd      = this->_fds[i].fd;
     Client* client  = this->_clients[fd];
@@ -82,7 +83,7 @@ void Server::handleClientDisconnection(size_t i)
  * 
  * @param i Index of the client in the _fds array.
  */
-void Server::handlePollEvent(size_t i)
+void    Server::handlePollEvent(size_t i)
 {
     if (this->_fds[i].revents & (POLLHUP | POLLOUT))
     {

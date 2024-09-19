@@ -6,12 +6,25 @@ SRCS =	src/main.cpp \
         src/parsing/ParseRequests.cpp \
         src/parsing/ArgCheck.cpp \
         src/client/Client.cpp \
-        src/client/ClientExecution.cpp \
         src/server/Server.cpp \
         src/server/PollEvent.cpp \
         src/server/Socket.cpp \
         src/server/ChannelHandling.cpp \
         src/server/ClientHandling.cpp \
+        src/server/CommandExecution/cap.cpp \
+        src/server/CommandExecution/Execution.cpp \
+        src/server/CommandExecution/invite.cpp \
+        src/server/CommandExecution/join.cpp \
+        src/server/CommandExecution/kick.cpp \
+        src/server/CommandExecution/mode.cpp \
+        src/server/CommandExecution/nick.cpp \
+        src/server/CommandExecution/part.cpp \
+        src/server/CommandExecution/pass.cpp \
+        src/server/CommandExecution/ping.cpp \
+        src/server/CommandExecution/privmsg.cpp \
+        src/server/CommandExecution/quit.cpp \
+        src/server/CommandExecution/topic.cpp \
+        src/server/CommandExecution/user.cpp \
         src/channel/Channel.cpp \
         src/exception/ServerBindException.cpp \
         src/exception/ServerListenException.cpp \

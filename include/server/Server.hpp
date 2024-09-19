@@ -28,52 +28,52 @@ class Server
         int                             _poll_count;       ///< Number of poll events
         Socket                          _socket;           ///< Socket instance for network operations
 
+//---------------------MAIN CORE---------------------------------------------------------
         void                serverLoop();
-
         void                handlePollEvent(size_t i);
         void                handleClientDisconnection(size_t i);
         void                handleNewConnection();
         void                handleClientMessage(size_t i);
 
+//---------------------CLIENT HANDLING---------------------------------------------------
         void                addClient(Client *client);
+        void                removeClient(Client* user, std::string reason);
         void                pollRemove(int index);
 
+//---------------------CHANNEL HANDLING--------------------------------------------------
+        Channel*            createChannel(const std::string& channelName);
+        Channel*            findChannel(const std::string& channelName);
+        Client*             findClientByNick(const std::string& target);
+        void                broadcastMessage(const std::string& msg, Channel* channel);
 
+//---------------------EXECUTION---------------------------------------------------------
+        void                executeCommand(Client* client, const std::string &message);
+        std::string         getMessage(Client *client, t_msgs message, Channel *channel);
+
+        typedef void (Server::*CommandFunction)(Client*, const t_IRCCommand &);
+        void                initializeCommandMap();
+        std::map<std::string, CommandFunction>  _commandMap;
+
+        void                kick    (Client *, const t_IRCCommand &);
+        void                invite  (Client *, const t_IRCCommand &);
+        void                topic   (Client *, const t_IRCCommand &);
+        void                mode    (Client *, const t_IRCCommand &);
+        void                join    (Client *, const t_IRCCommand &);
+        void                part    (Client *, const t_IRCCommand &);
+        void                privMsg (Client *, const t_IRCCommand &);
+        void                ping    (Client *, const t_IRCCommand &);
+        void                cap     (Client *, const t_IRCCommand &);
+        void                pass    (Client *, const t_IRCCommand &);
+        void                user    (Client *, const t_IRCCommand &);
+        void                nick    (Client *, const t_IRCCommand &);
+        void                quit    (Client *, const t_IRCCommand &);
+//---------------------------------------------------------------------------------------
+
+        bool                isNickNameTaken(const std::string &nickName);
 
     public:
         Server(const std::string &password);
         ~Server();
 
         void                runServer(char **argv);
-
-        bool                socketSend(int fd, const std::string &message);
-        const std::string   get_password() const;
-        bool                isNickNameTaken(const std::string &nickName);
-
-        void                removeClient(Client* user, std::string reason);
-
-        Channel*            createChannel(const std::string& channelName);
-        Channel*            findChannel(const std::string& channelName);
-        Client*             findClientByNick(const std::string& target);
-        void                sendChannelMessage(const std::string& msg, const std::string& channelName);
-
-        // commands with operator rights 
-        void                kick    (Client *, const t_IRCCommand &);
-        void                invite  (Client *, const t_IRCCommand &);
-        void                topic   (Client *, const t_IRCCommand &);
-        void                mode    (Client *, const t_IRCCommand &);
-
-        // commands without operator rights
-        void                join    (Client *, const t_IRCCommand &);
-        void                part    (Client *, const t_IRCCommand &);
-        void                privMsg (Client *, const t_IRCCommand &);
-        void                ping    (Client *, const t_IRCCommand &);
-
-        void                cap     (Client *, const t_IRCCommand &);
-        void                pass    (Client *, const t_IRCCommand &);
-        void                user    (Client *, const t_IRCCommand &);
-        void                nick    (Client *, const t_IRCCommand &);
-        void                quit    (Client *, const t_IRCCommand &);
-
-        std::string         getMessage(Client *client, t_msgs message, Channel *channel);
 };

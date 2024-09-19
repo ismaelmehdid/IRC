@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../client/Client.hpp"
-#include <map>
 
 class Socket
 {
@@ -11,8 +10,6 @@ class Socket
 
     public:
         Socket();
-        // Socket (const Socket& other);
-        // Socket& operator=(const Socket& other);
         ~Socket();
 
         bool        bind(int port);

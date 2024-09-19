@@ -20,25 +20,6 @@ Channel::~Channel()
     _invited.clear();
 }
 
-
-void    Channel::broadcastMessage(const std::string& message)
-{
-    if (message.empty())
-    {
-        std::cerr << "Attempted to broadcast an empty message in channel " << _name << std::endl;
-        return ;
-    }
-    
-    for (std::set<Client *>::iterator it = _clients.begin(); it != _clients.end(); ++it)
-    {
-        std::cout << "Sending message: " << message << " to client " << (*it)->get_fd() << std::endl;
-        if (!global_ircserv->socketSend((*it)->get_fd(), message))
-        {
-            std::cerr << "Failed to send message to client " <<(*it)->get_fd() << std::endl;
-        }
-    }
-}
-
 //------Client Management
 void    Channel::addClient(Client* client)
 {
