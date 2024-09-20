@@ -3,7 +3,8 @@
 #include "../../include/server/Server.hpp"
 
 Channel::Channel(const std::string& name)
-    : _name(name), 
+    : _name(name),
+      _nbr_users(0),
       _topic(""), 
       _clients(),
       _operators(),
@@ -21,60 +22,76 @@ Channel::~Channel()
 }
 
 //------Client Management
-void    Channel::addClient(Client* client)
+void    Channel::addClient(Client* user)
 {
-    if (this->_clients.find(client) == this->_clients.end())
-    {
-        this->_clients.insert(client);
-    }
-    else
-    {
-        std::cerr << "Client " << client->get_fd() << " is already in channel " << _name << std::endl;
-    }
-}
-
-void    Channel::removeClient(Client* client)
-{
-    std::set<Client *>::iterator it = _clients.find(client);
-
-    if (it != this->_clients.end())
-    {
-        this->_clients.erase(it);
-        std::cout << "Client " << client->get_fd() << " removed from channel " << _name << std::endl;
-    }
-    else
-    {
-        std::cerr << "Client " << client->get_fd() << " not found in channel " << _name << std::endl;
-    }
-}
-
-void    Channel::addOperator(Client* client)
-{
-    if (!isMember(client) || (isMember(client) && isOperator(client)))
+    if (isMember(user))
         return ;
     
+    this->_clients.insert(user);
+    this->_nbr_users++;
+}
+
+void    Channel::removeClient(Client* user)
+{
+    if (!isMember(user))
+        return ;
+
+    if (isOperator(user))
+        this->_operators.erase(user);
+    
+    if (isInvited(user))
+        this->_invited.erase(user);
+
+    this->_clients.erase(user);
+    this->_nbr_users--;
+}
+
+void Channel::addOperator(Client* client)
+{
+    if (!isMember(client))
+    {
+        std::cout << "im here" << std::endl;
+        return;
+    }
+
+    if (isOperator(client))
+    {
+        std::cout << "im here 2" << std::endl;
+        return;
+    }
+
     this->_operators.insert(client);
 }
 
+
 void    Channel::removeOperator(Client* client)
 {
-    if (!isMember(client) || (isMember(client) && !isOperator(client)))
+    if (!isMember(client))
         return ;
+
+    if (!isOperator(client))
+        return;
 
     this->_operators.erase(client);
 }
 
 void    Channel::addInvited(Client* client)
 {
-    if (!isMember(client) || (isMember(client) && isInvited(client)))
+    if (!isMember(client))
         return ;
     
+    if (isInvited(client))
+        return ;
+
     this->_invited.insert(client);
 }
 
 void    Channel::removeInvited(Client* client)
 {
-    if (!isMember(client) || (isMember(client) && !isInvited(client)))
+    if (!isMember(client))
+        return ;
+
+    if (!isInvited(client))
         return ;
 
     this->_invited.erase(client);
@@ -84,6 +101,11 @@ void    Channel::removeInvited(Client* client)
 int Channel::getUserLimit() const
 {
     return (this->_userLimit);
+}
+
+int Channel::getNbrUsers() const
+{
+    return (this->_nbr_users);
 }
 
 const std::string&  Channel::getName() const
@@ -99,6 +121,10 @@ const std::string&  Channel::getTopic() const
 const std::set<Client *>&   Channel::getClients() const
 {
     return (this->_clients);
+}
+const std::set<Client *>&  Channel::getOperators() const
+{
+    return (this->_operators);
 }
 
 bool    Channel::isMember(Client* client) const

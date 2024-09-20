@@ -8,6 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <cctype> 
+#include <algorithm>
 #include <sys/socket.h>  // socket, bind, listen, accept, setsockopt, send, recv
 #include <netinet/in.h>  // htons, htonl, ntohs, ntohl
 #include <arpa/inet.h>   // inet_addr, inet_ntoa
@@ -53,8 +54,8 @@
 #define ERR_NICKNAME_IN_USE     ":server 433 * NICK :Nickname already used by another user.\r\n"
 #define ERR_UNKNOWNCOMMAND      ":server 421 * :Unknown command.\r\n"
 #define ERR_NOTREGISTERED       ":server 451 * :You have not registered.\r\n"
-#define ERR_NONICKNAMEGIVEN     ":server 431 * :You need to provide a nickname with /NICK in order to execute this command.\r\n"
 #define ERR_NO_SUCH_CHANNEL     ":server 403 * #channel :No such channel\r\n"
+#define ERR_NONICKNAMEGIVEN     ":server 431 * :You need to provide a nickname with /NICK in order to execute this command.\r\n"
 #define ERR_NO_SUCH_NICK        ":server 401 * target_nick :No such nick/channel\r\n"
 #define ERR_ALREADY_JOINED      "473"
 #define ERR_ALREADY_JOINED_MSG  "You are already joined to the channel\r\n"
@@ -78,7 +79,10 @@ enum t_msgs
     NAMES_REPLY,
     END_OF_NAMES,
     MODE,
-    ALREADY_JOINED_ERROR
+    ALREADY_JOINED_ERROR,
+    ERR_MODE_I,
+    ERR_MODE_L,
+    ERR_MODE_K
 };
 
 struct t_IRCCommand

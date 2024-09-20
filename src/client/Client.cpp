@@ -31,7 +31,6 @@ Client& Client::operator=(const Client& other)
 
 Client::~Client()
 {
-    std::cout << GREEN << "Client " << this->_nickName <<  " destroyed." << RESET << std::endl;
     close (this->_fd);
 }
 

@@ -8,6 +8,7 @@ class Channel
 {
     private:
         const std::string       _name;
+        int                     _nbr_users;
         std::string             _topic;
 
         std::set<Client *>      _clients;
@@ -28,12 +29,14 @@ class Channel
         const std::string&              getTopic() const;
         int                             getUserLimit() const;
         const std::set<Client*>&        getClients() const;
+        const std::set<Client *>&       getOperators() const;
         bool                            isMember(Client* client) const;
         bool                            isOperator(Client* client) const;
         bool                            isInvited(Client* client) const;
         bool                            isInviteOnly() const;
         bool                            hasPassword() const;
         bool                            checkPassword(const std::string& key) const;
+        int                             getNbrUsers() const;
 
 //------Setters
         void                            setTopic(const std::string& topic);

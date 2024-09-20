@@ -49,22 +49,42 @@ std::string Server::getMessage(Client *client, t_msgs message, Channel *channel)
             {
                 if (it != clients.begin())
                     msg << " ";
-                msg << (*it)->getNickName();
+                if (channel->isOperator(*it))
+                    msg << "@" << (*it)->getNickName(); 
+                else
+                    msg << (*it)->getNickName();
             }
             msg << "\r\n";
             break;
         case END_OF_NAMES:
-            msg << ":" << SERVER_NAME << " 366 " << client->getNickName() << " "
-                << channel->getName() << " :End of NAMES list\r\n";
+            msg << ":" << SERVER_NAME << " 366 " << client->getNickName() << " " << channel->getName()
+                << " :End of /NAMES list. Operators: " << channel->getOperators().size()
+                << ", Users: " << channel->getNbrUsers() << "\r\n";
             break;
         case MODE:
-            msg << "lol"; // Mode message
+            msg << ":" << SERVER_NAME << " MODE " << channel->getName() << " +";
+            if (channel->isInviteOnly()) msg << "i";
+            if (channel->hasPassword()) msg << "k";
+            if (channel->getUserLimit() != -1) msg << "l";
+            msg << "\r\n";
             break;
         case ALREADY_JOINED_ERROR:
             msg << ":" << SERVER_NAME << " " << ERR_ALREADY_JOINED << " "
                 << client->getNickName() << " " << channel->getName() << " :"
                 << ERR_ALREADY_JOINED_MSG;
             break;
+        case ERR_MODE_I:
+            msg << ":" << SERVER_NAME << " 473 "
+                << client->getNickName() << " " << channel->getName() << " :Cannot join channel (+i) - Invite-only\r\n";
+            break ;
+        case ERR_MODE_L:
+            msg << ":" << SERVER_NAME << " 471 "
+                << client->getNickName() << " " << channel->getName() << " :Cannot join channel (+l) - Channel is full\r\n";
+            break ;
+        case ERR_MODE_K:
+            msg << ":" << SERVER_NAME << " 475 "
+                << client->getNickName() << " " << channel->getName() << " :Cannot join channel (+k) - Password required\r\n";
+            break ;
     }
     return (msg.str());
 }

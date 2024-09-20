@@ -16,25 +16,13 @@ void Server::removeClient(Client* user, std::string reason)
     {
         Channel*            channel = it->second;
 
-        if (channel->isInvited(user))
-        {
-            channel->removeInvited(user);
-        }
-
         if (channel->isMember(user))
         {
             channel->removeClient(user);
 
-            if (channel->isOperator(user))
-            {
-                channel->removeOperator(user);
-            }
-
             // Check if the channel is empty and should be deleted
-            if (channel->getClients().empty())
-            {
+            if (channel->getNbrUsers() == 0)
                 empty_channels.push_back(channel->getName());
-            }
 
             this->broadcastMessage(user->getPrefix() + " QUIT :" + reason, channel);
         }

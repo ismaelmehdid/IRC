@@ -1,49 +1,124 @@
 #include "../../../include/server/Server.hpp"
 
-/*static bool IsChannelNameValid(const std::string &name)
+static bool IsChannelNameValid(const std::string &name)
 {
-    (void)name;
-    return (true);
-}*/
+    if (name.empty() || name[0] != '#' || name.size() < 2 || name.size() > MAX_CHANNEL_NAME_LENGTH)
+        return (false);
 
-void    Server::join(Client *client, const t_IRCCommand &command)
+    std::string channelName = name.substr(1);
+    
+    for (size_t i = 0; i < channelName.size(); ++i)
+    {
+        char c = channelName[i];
+        if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || 
+              (c >= '0' && c <= '9') || c == '-' || c == '_' || c == '.'))
+        {
+            return (false);
+        }
+    }
+    return (true);
+}
+
+static void splitByComma(const std::string &str, std::vector<std::string> &result)
 {
-    int     fd = client->get_fd();
+    std::stringstream   ss(str);
+    std::string         item;
+
+    while (std::getline(ss, item, ','))
+    {
+        result.push_back(item);
+    }
+}
+
+
+void Server::join(Client *client, const t_IRCCommand &command)
+{
+    int fd = client->get_fd();
+
+    if (!client->is_authenticated())
+    {
+        this->_socket.send(fd, ERR_NOTREGISTERED);
+    }
 
     if (command.params.empty())
     {
-        this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
-        return ;
+        this->_socket.send(fd, ERR_NEED_MORE_PARAMS);
+        return;
     }
 
-    Channel *channel = this->findChannel(command.params[0]);
+    std::string channelNames = command.params[0];
+    std::transform(channelNames.begin(), channelNames.end(), channelNames.begin(), ::tolower);
+    
+    std::string passwords = (command.params.size() > 1) ? command.params[1] : "";
 
-    if (!channel)
+    std::vector<std::string>    channels;
+    std::vector<std::string>    passList;
+    splitByComma(channelNames,  channels);
+    splitByComma(passwords,     passList);
+
+    for (size_t i = 0; i < channels.size(); ++i)
     {
-        channel = this->createChannel(command.params[0]);
-    }
+        std::string channelName = channels[i];
+        std::string password = (i < passList.size()) ? passList[i] : "";
 
-    // checks for invite only password etc
-    if (!channel->isMember(client))
-    {
-        channel->addClient(client);
-        this->broadcastMessage(getMessage(client, JOIN, channel), channel);
-
-        if (!channel->getTopic().empty())
+        if (!IsChannelNameValid(channelName))
         {
-            this->_socket.send(fd, getMessage(client, TOPIC, channel));
+            this->_socket.send(fd, ERR_NO_SUCH_CHANNEL);
+            continue ;
+        }
+
+        Channel *channel = this->findChannel(channelName);
+
+        if (channel && channel->isMember(client))
+        {
+            this->_socket.send(fd, getMessage(client, ALREADY_JOINED_ERROR, channel));
+            continue ;
+        }
+
+        if (!channel)
+        {
+            channel = this->createChannel(channelName);
+            channel->addClient(client);
+            channel->addOperator(client);
+            if (!password.empty())
+                channel->setPassword(password);
         }
         else
         {
-            this->_socket.send(fd, getMessage(client, NO_TOPIC, channel));
+            if (channel->isInviteOnly() && !channel->isInvited(client))
+            {
+                this->_socket.send(fd, getMessage(client, ERR_MODE_I, channel));
+                continue ;
+            }
+
+            if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
+            {
+                this->_socket.send(fd, getMessage(client, ERR_MODE_L, channel));
+                continue ;
+            }
+
+            if (channel->hasPassword())
+            {
+                if (password.empty() || !channel->checkPassword(password))
+                {
+                    this->_socket.send(fd, getMessage(client, ERR_MODE_K, channel));
+                    continue ;
+                }
+            }
+
+            channel->addClient(client);
         }
+
+        this->broadcastMessage(getMessage(client, JOIN, channel), channel);
+
+        if (!channel->getTopic().empty())
+            this->_socket.send(fd, getMessage(client, TOPIC, channel));
+        else
+            this->_socket.send(fd, getMessage(client, NO_TOPIC, channel));
 
         this->_socket.send(fd, getMessage(client, NAMES_REPLY, channel));
         this->_socket.send(fd, getMessage(client, END_OF_NAMES, channel));
-        // mode msg
-    }
-    else
-    {
-        this->_socket.send(fd, getMessage(client, ALREADY_JOINED_ERROR, channel));
+        this->_socket.send(fd, getMessage(client, MODE, channel));
     }
 }
+
