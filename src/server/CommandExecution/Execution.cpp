@@ -85,6 +85,14 @@ std::string Server::getMessage(Client *client, t_msgs message, Channel *channel)
             msg << ":" << SERVER_NAME << " 475 "
                 << client->getNickName() << " " << channel->getName() << " :Cannot join channel (+k) - Password required\r\n";
             break ;
+        case ERR_CHANOPRIVSNEEDED:
+            msg << ":" << SERVER_NAME << " 482 " << client->getNickName() << " " << channel->getName() << " :You're not channel operator\r\n";
+        case ERR_NOSUCHNICK:
+            msg << ":" << SERVER_NAME << " 401 " << client->getNickName() << " bobo " << ":No such nick/channel\r\n"; // TODO: Rework the function as we can't get target to put it in the message (mby create a custom struct ?)
+            //:server IRC 401 <user> <target> :No such nick/channel
+        case ERR_USERNOTINCHANNEL:
+            msg << ":" << SERVER_NAME << " 441 " << client->getNickName() << " target " << channel->getName() << " :They aren't on that channel\r\n";
+            //:server_name 441 <requesting_user> <target_user> <channel> :They aren't on that channel
     }
     return (msg.str());
 }

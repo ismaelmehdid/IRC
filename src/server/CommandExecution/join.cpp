@@ -38,6 +38,7 @@ void Server::join(Client *client, const t_IRCCommand &command)
     if (!client->is_authenticated())
     {
         this->_socket.send(fd, ERR_NOTREGISTERED);
+        return;
     }
 
     if (command.params.empty())
