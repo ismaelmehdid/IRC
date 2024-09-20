@@ -85,10 +85,15 @@ void Server::join(Client *client, const t_IRCCommand &command)
         }
         else
         {
-            if (channel->isInviteOnly() && !channel->isInvited(client))
+            if (channel->isInviteOnly())
             {
-                this->_socket.send(fd, getMessage(client, ERR_MODE_I, channel));
-                continue ;
+                if (!channel->isInvited(client))
+                {
+                    this->_socket.send(fd, getMessage(client, ERR_MODE_I, channel));
+                    continue ;
+                }
+                else
+                    channel->removeInvited(client);
             }
 
             if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
