@@ -57,7 +57,6 @@ void Channel::addOperator(Client* client)
     this->_operators.insert(client);
 }
 
-
 void    Channel::removeOperator(Client* client)
 {
     if (!isMember(client))
