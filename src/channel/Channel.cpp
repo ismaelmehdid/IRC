@@ -49,16 +49,10 @@ void    Channel::removeClient(Client* user)
 void Channel::addOperator(Client* client)
 {
     if (!isMember(client))
-    {
-        std::cout << "im here" << std::endl;
-        return;
-    }
+        return ;
 
     if (isOperator(client))
-    {
-        std::cout << "im here 2" << std::endl;
-        return;
-    }
+        return ;
 
     this->_operators.insert(client);
 }

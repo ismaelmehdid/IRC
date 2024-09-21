@@ -42,6 +42,7 @@ class Server
 
 //---------------------CHANNEL HANDLING--------------------------------------------------
         Channel*            createChannel(const std::string& channelName);
+        void                removeChannel(Channel *channel);
         Channel*            findChannel(const std::string& channelName);
         Client*             findClientByNick(const std::string& target);
         void                broadcastMessage(const std::string& msg, Channel* channel);

@@ -53,9 +53,10 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
 
     size_t  parameter_index = 2;
     bool    addMode = true; // toogle to check if we are adding or removing a mode
+    Client *targetToChange = NULL;
 
     //472 for unknown mode ERR_UNKNOWNMODE
-    for (int i = 0; i != modesToChange.size(); i++) {
+    for (size_t i = 0; i != modesToChange.size(); i++) {
         switch (modesToChange[i])
         {
         case '+':
@@ -91,7 +92,7 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
                 // need more params
                 break;
             }
-            Client *targetToChange = this->findClientByNick(command.params[parameter_index]);
+            targetToChange = this->findClientByNick(command.params[parameter_index]);
             if (!targetToChange) {
                 this->_socket.send(fd, getMessage(client, ERR_NOSUCHNICK, channelToModify)); // TO CLEAN
                 break;

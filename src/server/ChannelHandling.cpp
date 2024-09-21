@@ -21,6 +21,17 @@ Channel*    Server::findChannel(const std::string& channelName)
     return (NULL);
 }
 
+void    Server::removeChannel(Channel* channel)
+{
+    std::map<std::string, Channel*>::iterator it = this->_channels.find(channel->getName());
+    
+    if (it != this->_channels.end())
+    {
+        delete (it->second);
+        this->_channels.erase(it);
+    }
+}
+
 void    Server::broadcastMessage(const std::string& msg, Channel* channel)
 {
     if (msg.empty())
