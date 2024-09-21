@@ -1,9 +1,29 @@
 #include "../../include/irc.hpp"
 
+static bool isValidChar(char c)
+{
+    return (std::isalnum(c) || c == '!' || c == '#' || c == '$' || c == '%' || 
+           c == '&' || c == '\'' || c == '*' || c == '+' || c == '/' ||
+           c == '=' || c == '?' || c == '^' || c == '_' || c == '{' ||
+           c == '|' || c == '}' || c == '~' || c == '-' || c == '.' ||
+           c == ':' || c == '@');
+}
+
 static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
 {
     t_IRCCommand    request;
     size_t          pos = 0;
+
+    for (size_t i = 0; i < rawRequest.size(); ++i)
+    {
+        char    c = rawRequest[i];
+        
+        if (!isValidChar(c) && c != ' ' && c != '\r' && c != '\n')
+        {
+            std::cerr << "Invalid character detected: " << c << std::endl;
+            throw std::runtime_error("Invalid character in command");
+        }
+    }
 
     if (rawRequest[0] == ':')
     {
@@ -12,7 +32,7 @@ static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
         pos++;
     }
 
-    size_t space_pos = rawRequest.find(' ', pos);
+    size_t  space_pos = rawRequest.find(' ', pos);
     request.command = rawRequest.substr(pos, space_pos - pos);
     pos = space_pos + 1;
 
@@ -48,15 +68,14 @@ static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
  */
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests)
 {
-
     std::vector<t_IRCCommand>   extracted;
     size_t                      start = 0;
     size_t                      end;
 
     while ((end = requests.find("\r\n", start)) != std::string::npos)
     {
-        std::string     request         = requests.substr(start, end - start);
-        t_IRCCommand    parsedRequest   = parseSingleRequest(request);
+        std::string             request = requests.substr(start, end - start);
+        t_IRCCommand            parsedRequest = parseSingleRequest(request);
 
         extracted.push_back(parsedRequest);
         start = end + 2;

@@ -7,20 +7,28 @@
 
 void    Server::executeCommand(Client* client, const std::string &message)
 {
-    std::vector<t_IRCCommand> parsed_commands = parseRequests(message);
-
-    for (size_t i = 0; i < parsed_commands.size(); i++)
+    try
     {
-        std::map<std::string, CommandFunction>::iterator it = _commandMap.find(parsed_commands[i].command);
-        if (it != _commandMap.end())
+        std::vector<t_IRCCommand>   parsed_commands = parseRequests(message);
+
+        for (size_t i = 0; i < parsed_commands.size(); i++)
         {
-            // Call the command function, passing the client and the parsed command
-            (this->*(it->second))(client, parsed_commands[i]);
+            std::map<std::string, CommandFunction>::iterator it = _commandMap.find(parsed_commands[i].command);
+            
+            if (it != _commandMap.end())
+            {
+                (this->*(it->second))(client, parsed_commands[i]);
+            }
+            else
+            {
+                this->_socket.send(client->get_fd(), ERR_UNKNOWNCOMMAND);
+            }
         }
-        else
-        {
-            this->_socket.send(client->get_fd(), ERR_UNKNOWNCOMMAND);
-        }
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        this->_socket.send(client->get_fd(), ERR_UNKNOWNCOMMAND);
     }
 }
 

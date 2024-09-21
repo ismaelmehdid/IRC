@@ -135,9 +135,10 @@ std::string Socket::receive(int client_fd)
     std::memset(buffer, 0, sizeof(buffer));
     bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
     
-    if (bytes_received == -1)
+    if (bytes_received == -1 || bytes_received > 512)
     {
-        std::cerr << "Receive failed" << std::endl;
+        std::cerr << "Receive failed or message is too long." << std::endl;
+        this->send(client_fd, ERR_UNKNOWNCOMMAND);
         return ("");
     }
 

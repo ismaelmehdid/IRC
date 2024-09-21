@@ -2,22 +2,47 @@
 
 void    Server::part(Client *client, const t_IRCCommand &command)
 {
-    if (command.params.empty())
+    int fd = client->get_fd();
+
+    if (!client->is_authenticated())
     {
-        this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
-        return;
+        this->_socket.send(fd, ERR_NOTREGISTERED);
+        return ;
     }
 
-    const std::string   &channel_name = command.params[0];
-    Channel             *channel = this->findChannel(channel_name);
+    if (command.params.empty())
+    {
+        this->_socket.send(fd, ERR_NEED_MORE_PARAMS);
+        return ;
+    }
+
+    const std::string   &channelName = command.params[0];
+    Channel             *channel = this->findChannel(channelName);
     
     if (!channel)
     {
-        this->_socket.send(client->get_fd(), ERR_NO_SUCH_CHANNEL);
-        return;
+        this->_socket.send(fd, ERR_NO_SUCH_CHANNEL);
+        return ;
     }
 
-    channel->removeClient(client);
-    std::string         part_message = ":" + client->getNickName() + " PART " + channel_name + "\r\n";
+    if (!channel->isMember(client))
+    {
+        this->_socket.send(fd, getMessage(client, ERR_USERNOTINCHANNEL, channel));
+        return ;
+    }
+
+    std::string         part_message = ":" + client->getPrefix() + " PART " + channelName;
+    if (!command.trailing.empty())
+    {
+        part_message += " :" + command.trailing;
+    }
+    part_message += "\r\n";
+
     this->broadcastMessage(part_message, channel);
+    channel->removeClient(client);
+
+    if (channel->getNbrUsers() == 0)
+    {
+        this->removeChannel(channel);
+    }
 }
