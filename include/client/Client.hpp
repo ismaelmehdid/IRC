@@ -10,6 +10,7 @@ class Client
         std::string     _nickName;
         std::string     _userName;
         std::string     _fullName;
+        std::string     _buffer;
 
     public:
         Client(int fd, char *host);
@@ -18,18 +19,19 @@ class Client
         ~Client();
 
 //----------Getters
-        std::string getNickName() const;
-        std::string getUserName() const;
-        std::string getFullName() const;
-        std::string getHostMask() const;
-        std::string getPrefix() const;
-        int         get_fd() const;
-        bool        is_authenticated();
+        std::string&    getNickName();
+        std::string&    getUserName();
+        std::string&    getFullName();
+        std::string&    getHostMask();
+        std::string     getPrefix() const;
+        std::string&    getBuffer();
+        int             get_fd() const;
+        bool            is_authenticated();
 
 //----------Setters
-        void        setNickName(const std::string &nickName);
-        void        setUserName(const std::string &username);
-        void        setFullName(const std::string &fullname);
+        void            setNickName(const std::string &nickName);
+        void            setUserName(const std::string &username);
+        void            setFullName(const std::string &fullname);
            
 //----------Auth
         bool        _has_set_password;

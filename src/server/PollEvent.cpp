@@ -9,18 +9,29 @@
  * 
  * @param i Index of the client in the _fds array.
  */
-void    Server::handleClientMessage(size_t i)
+void Server::handleClientMessage(size_t i)
 {
+    Client*     client  = _clients[_fds[i].fd];
     std::string message = this->_socket.receive(_fds[i].fd);
-    if (message.empty())
+    
+    if (message.empty()) 
     {
         handleClientDisconnection(i);
-    }
-    else
+    } 
+    else 
     {
-        std::cout << message << std::endl; // do not delete until we finish project pls, its useful to see
+        client->getBuffer() += message;
 
-        this->executeCommand(_clients[_fds[i].fd], message);
+        size_t pos;
+        while ((pos = client->getBuffer().find('\n')) != std::string::npos) 
+        {
+            std::string command = client->getBuffer().substr(0, pos);
+            client->getBuffer().erase(0, pos + 1);
+
+            std::cout << "Command received: " << command << std::endl;
+
+            this->executeCommand(client, command);
+        }
     }
 }
 
