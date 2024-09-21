@@ -6,13 +6,13 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, ERR_NOTREGISTERED); // i don't recieve this message
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NOTREGISTERED)); // i don't recieve this message
         return ;
     }
 
     if (command.params.size() < 2)
     {
-        this->_socket.send(fd, ERR_NEED_MORE_PARAMS); // i don't recieve this message
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NEEDMOREPARAMS)); // i don't recieve this message
         return ;
     }
 
@@ -23,26 +23,26 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
     
     if (!channelToKickFrom)
     {
-        this->_socket.send(fd, ERR_NO_SUCH_CHANNEL);
+        this->_socket.send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL));
         return ;
     }
 
     if (!channelToKickFrom->isOperator(client))
     {
-        this->_socket.send(fd, getMessage(client, ERR_CHANOPRIVSNEEDED, channelToKickFrom));
+        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, "KICK", ERR_CHANOPRIVSNEEDED));
         return ;
     }
 
     Client      *clientToKick = this->findClientByNick(clientName);
     if (!clientToKick)
     {
-        this->_socket.send(fd, getMessage(client, ERR_USERNOTINCHANNEL, channelToKickFrom)); // i don't recieve this message
+        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, clientName, ERR_NOSUCHNICK)); // i don't recieve this message
         return ;
     }
 
     if (!channelToKickFrom->isMember(clientToKick))
     {
-        this->_socket.send(fd, getMessage(client, ERR_USERNOTINCHANNEL, channelToKickFrom));
+        this->_socket.send(fd, getMessage(client, clientToKick, channelToKickFrom, "KICK", ERR_USERNOTINCHANNEL));
         return ;
     }
 

@@ -4,7 +4,7 @@ void    Server::privMsg(Client *client, const t_IRCCommand &command)
 {
     if (command.params.empty() || command.trailing.empty())
     {
-        this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PRIVMSG", ERR_NEEDMOREPARAMS));
         return ;
     }
 
@@ -16,7 +16,7 @@ void    Server::privMsg(Client *client, const t_IRCCommand &command)
         Channel *channel = this->findChannel(target);
         if (!channel)
         {
-            this->_socket.send(client->get_fd(), ERR_NO_SUCH_CHANNEL);
+            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, target, ERR_NOSUCHCHANNEL));
             return ;
         }
 
@@ -28,7 +28,7 @@ void    Server::privMsg(Client *client, const t_IRCCommand &command)
         Client *target_client = this->findClientByNick(target);
         if (!target_client)
         {
-            this->_socket.send(client->get_fd(), ERR_NO_SUCH_NICK);
+            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, target, ERR_NOSUCHNICK));
             return;
         }
         std::string privmsg = ":" + client->getNickName() + " PRIVMSG " + target + " :" + message + "\r\n";

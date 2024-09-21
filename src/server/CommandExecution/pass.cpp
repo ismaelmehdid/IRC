@@ -6,11 +6,11 @@ void    Server::pass(Client *client, const t_IRCCommand &command)
     {
         if (command.params.empty())
         {
-            this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
+            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_NEEDMOREPARAMS));
         }
         else if (command.params[0] != this->_password)
         {
-            this->_socket.send(client->get_fd(), ERR_PASSWORD_INCORRECT);
+            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_PASSWDMISMATCH));
         }
         else
         {
@@ -20,6 +20,6 @@ void    Server::pass(Client *client, const t_IRCCommand &command)
     }
     else
     {
-        this->_socket.send(client->get_fd(), ERR_ALREADY_REGISTERED);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_ALREADYREGISTERED));
     }
 }

@@ -30,11 +30,11 @@ void    Server::nick(Client *client, const t_IRCCommand &command)
 {
     if (!client->_has_set_password)
     {
-        this->_socket.send(client->get_fd(), ERR_PASSWORD_REQUIRED);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", ERR_PASSWDMISMATCH));
     } 
     else if (command.params.empty())
     {
-        this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", ERR_NEEDMOREPARAMS));
     }
     else
     {
@@ -43,21 +43,19 @@ void    Server::nick(Client *client, const t_IRCCommand &command)
             return ;
         if (!is_nickname_valid(newNick))
         {
-            this->_socket.send(client->get_fd(), ":server 432 * " + newNick + " :Erroneous nickname\r\n");
+            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_ERRONEUSNICKNAME));
         }
         else if (this->isNickNameTaken(newNick))
         {
-            this->_socket.send(client->get_fd(), ERR_NICKNAME_IN_USE);
+            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_NICKNAMEINUSE));
         }
         else
         {
-            // TODO: broadcast new nickname to all users in channel
             bool wasEmpty = client->getNickName().empty();
             client->setNickName(newNick);
             if (wasEmpty && client->is_authenticated())
             {
-                this->_socket.send(client->get_fd(),
-                    client->getPrefix() + WELCOME_CODE + client->getNickName() + MSG_WELCOME);
+                this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", RPL_WELCOME));
             }
         }
     }

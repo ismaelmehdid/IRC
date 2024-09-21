@@ -25,6 +25,7 @@ SRCS =	src/main.cpp \
         src/server/CommandExecution/quit.cpp \
         src/server/CommandExecution/topic.cpp \
         src/server/CommandExecution/user.cpp \
+		src/server/CommandExecution/serverMessages.cpp \
         src/channel/Channel.cpp \
         src/exception/ServerBindException.cpp \
         src/exception/ServerListenException.cpp \

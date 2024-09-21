@@ -4,7 +4,7 @@ void    Server::ping(Client *client, const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
-        this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PING", ERR_NEEDMOREPARAMS));
         return ;
     }
 

@@ -4,20 +4,21 @@ void    Server::part(Client *client, const t_IRCCommand &command)
 {
     if (command.params.empty())
     {
-        this->_socket.send(client->get_fd(), ERR_NEED_MORE_PARAMS);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PART", ERR_NEEDMOREPARAMS));
         return;
     }
 
+    const std::string   &message = command.trailing;
     const std::string   &channel_name = command.params[0];
     Channel             *channel = this->findChannel(channel_name);
     
+
     if (!channel)
     {
-        this->_socket.send(client->get_fd(), ERR_NO_SUCH_CHANNEL);
+        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, channel_name, ERR_NOSUCHCHANNEL));
         return;
     }
 
     channel->removeClient(client);
-    std::string         part_message = ":" + client->getNickName() + " PART " + channel_name + "\r\n";
-    this->broadcastMessage(part_message, channel);
+    this->broadcastMessage(getMessage(client, NULL, channel, message, RAW_PART), channel);
 }

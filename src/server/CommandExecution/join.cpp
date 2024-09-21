@@ -37,13 +37,13 @@ void Server::join(Client *client, const t_IRCCommand &command)
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, ERR_NOTREGISTERED);
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "JOIN", ERR_NOTREGISTERED));
         return;
     }
 
     if (command.params.empty())
     {
-        this->_socket.send(fd, ERR_NEED_MORE_PARAMS);
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "JOIN", ERR_NEEDMOREPARAMS));
         return;
     }
 
@@ -64,17 +64,14 @@ void Server::join(Client *client, const t_IRCCommand &command)
 
         if (!IsChannelNameValid(channelName))
         {
-            this->_socket.send(fd, ERR_NO_SUCH_CHANNEL);
+            this->_socket.send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL));
             continue ;
         }
 
         Channel *channel = this->findChannel(channelName);
 
         if (channel && channel->isMember(client))
-        {
-            this->_socket.send(fd, getMessage(client, ALREADY_JOINED_ERROR, channel));
             continue ;
-        }
 
         if (!channel)
         {
@@ -90,7 +87,7 @@ void Server::join(Client *client, const t_IRCCommand &command)
             {
                 if (!channel->isInvited(client))
                 {
-                    this->_socket.send(fd, getMessage(client, ERR_MODE_I, channel));
+                    this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_INVITEONLYCHAN));
                     continue ;
                 }
                 else
@@ -99,7 +96,7 @@ void Server::join(Client *client, const t_IRCCommand &command)
 
             if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
             {
-                this->_socket.send(fd, getMessage(client, ERR_MODE_L, channel));
+                this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_CHANNELISFULL));
                 continue ;
             }
 
@@ -107,7 +104,7 @@ void Server::join(Client *client, const t_IRCCommand &command)
             {
                 if (password.empty() || !channel->checkPassword(password))
                 {
-                    this->_socket.send(fd, getMessage(client, ERR_MODE_K, channel));
+                    this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_BADCHANNELKEY));
                     continue ;
                 }
             }
@@ -115,16 +112,17 @@ void Server::join(Client *client, const t_IRCCommand &command)
             channel->addClient(client);
         }
 
-        this->broadcastMessage(getMessage(client, JOIN, channel), channel);
+        this->broadcastMessage(getMessage(client, NULL, channel, "JOIN", RAW_JOIN), channel);
 
         if (!channel->getTopic().empty())
-            this->_socket.send(fd, getMessage(client, TOPIC, channel));
+            this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_TOPIC));
         else
-            this->_socket.send(fd, getMessage(client, NO_TOPIC, channel));
+            this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NOTOPIC));
 
-        this->_socket.send(fd, getMessage(client, NAMES_REPLY, channel));
-        this->_socket.send(fd, getMessage(client, END_OF_NAMES, channel));
-        this->_socket.send(fd, getMessage(client, MODE, channel));
+        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NAMREPLY));
+        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_ENDOFNAMES));
+
+        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RAW_MODE));
     }
 }
 

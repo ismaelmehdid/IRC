@@ -49,7 +49,7 @@ class Server
 
 //---------------------EXECUTION---------------------------------------------------------
         void                executeCommand(Client* client, const std::string &message);
-        std::string         getMessage(Client *client, t_msgs message, Channel *channel);
+        std::string         getMessage(Client *client, Client *target, Channel *channel, const std::string &command, size_t code);
 
         typedef void (Server::*CommandFunction)(Client*, const t_IRCCommand &);
         void                initializeCommandMap();
