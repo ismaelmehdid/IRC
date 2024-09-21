@@ -70,7 +70,7 @@ void    Channel::removeOperator(Client* client)
 
 void    Channel::addInvited(Client* client)
 {
-    if (!isMember(client))
+    if (isMember(client))
         return ;
     
     if (isInvited(client))

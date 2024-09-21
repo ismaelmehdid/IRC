@@ -86,6 +86,12 @@ void Server::join(Client *client, const t_IRCCommand &command)
         }
         else
         {
+            if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
+            {
+                this->_socket.send(fd, getMessage(client, ERR_MODE_L, channel));
+                continue ;
+            }
+
             if (channel->isInviteOnly())
             {
                 if (!channel->isInvited(client))
@@ -93,17 +99,8 @@ void Server::join(Client *client, const t_IRCCommand &command)
                     this->_socket.send(fd, getMessage(client, ERR_MODE_I, channel));
                     continue ;
                 }
-                else
-                    channel->removeInvited(client);
             }
-
-            if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
-            {
-                this->_socket.send(fd, getMessage(client, ERR_MODE_L, channel));
-                continue ;
-            }
-
-            if (channel->hasPassword())
+            else if (channel->hasPassword())
             {
                 if (password.empty() || !channel->checkPassword(password))
                 {
@@ -113,6 +110,7 @@ void Server::join(Client *client, const t_IRCCommand &command)
             }
 
             channel->addClient(client);
+            channel->removeInvited(client);
         }
 
         this->broadcastMessage(getMessage(client, JOIN, channel), channel);
