@@ -33,19 +33,20 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
         return;
     }
 
-    if (!this->isNickNameTaken(clientName))
+    Client *clientToKick = this->findClientByNick(clientName);
+    if (!clientToKick)
     {
         this->_socket.send(fd, getMessage(client, ERR_NOSUCHNICK, channelToKickFrom));
         return;
     }
 
-    Client *clientToKick = this->findClientByNick(clientName);
-    if (!clientToKick)
+    if (!channelToKickFrom->isMember(clientToKick))
     {
         this->_socket.send(fd, getMessage(client, ERR_USERNOTINCHANNEL, channelToKickFrom));
         return;
     }
 
     this->broadcastMessage(client->getPrefix() + " KICK " + channelName + " " + clientName + " :" + kickMessage + "\r\n", channelToKickFrom); // raw🤮
+    channelToKickFrom->removeClient(clientToKick);
     // ABOVE KICK EXAMPLE: ":dan!d@localhost KICK #Melbourne alice :dan"
 }
