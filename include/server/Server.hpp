@@ -50,6 +50,7 @@ class Server
 //---------------------EXECUTION---------------------------------------------------------
         void                executeCommand(Client* client, const std::string &message);
         std::string         getMessage(Client *client, Client *target, Channel *channel, const std::string &command, size_t code);
+        void                privMsgBroadcast(const std::string& msg, Channel* channel, int sender_fd);
 
         typedef void (Server::*CommandFunction)(Client*, const t_IRCCommand &);
         void                initializeCommandMap();

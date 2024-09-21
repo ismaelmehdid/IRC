@@ -6,6 +6,7 @@ Client::Client(int fd, char	*host)
         _nickName(),
         _userName(),
         _fullName(),
+        _buffer(""),
         _has_set_password(false) {}
 
 Client::Client (const Client& other)
@@ -13,6 +14,7 @@ Client::Client (const Client& other)
         _nickName(other._nickName),
         _userName(other._userName),
         _fullName(other._fullName),
+        _buffer(other._buffer),
         _has_set_password(other._has_set_password) {}
 
 Client& Client::operator=(const Client& other)
@@ -24,6 +26,7 @@ Client& Client::operator=(const Client& other)
         this->_nickName = other._nickName;
         this->_userName = other._userName;
         this->_fullName = other._fullName;
+        this->_buffer = other._buffer;
         this->_has_set_password = other._has_set_password;
     }
     return (*this);
@@ -35,29 +38,34 @@ Client::~Client()
 }
 
 //----------Getters
-std::string Client::getNickName() const
+std::string&    Client::getNickName()
 {
     return (this->_nickName);
 }
 
-std::string Client::getUserName() const
+std::string&    Client::getUserName()
 {
     return (this->_userName);
 }
 
-std::string Client::getFullName() const
+std::string&    Client::getFullName()
 {
     return (this->_fullName);
 }
 
-std::string Client::getHostMask() const
+std::string&    Client::getHostMask()
 {
     return (this->_hostMask);
 }
 
-std::string Client::getPrefix() const
+std::string    Client::getPrefix() const
 {
     return (":" + this->_nickName + "!" + this->_userName + "@" + this->_hostMask);
+}
+
+std::string&    Client::getBuffer()
+{
+    return (this->_buffer);
 }
 
 int Client::get_fd() const

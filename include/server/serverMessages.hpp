@@ -78,6 +78,10 @@
 #define ERR_USERNOTINCHANNEL_T      " :They aren't on that channel\r\n"
 // :server 441 <user> <target_user> <channel> :They aren't on that channel
 
+#define ERR_USERONCHANNEL           443
+#define ERR_USERONCHANNEL_T         " :is already on channel\r\n"
+//:server 443 <user> <target_user> <channel> :is already on channel
+
 #define RPL_NOTOPIC                 331
 #define RPL_NOTOPIC_T               " :No topic is set\r\n"
 // :server 331 <nick> <channel> :No topic is set

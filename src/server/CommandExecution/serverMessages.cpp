@@ -93,6 +93,10 @@ switch (code) {
             msg << SERVER_PREFIX << getFormatedCode(code) << client->getNickName() << " " << channel->getName() << ERR_KEYSET_T;
             break;
 
+        case ERR_USERONCHANNEL:
+            msg << SERVER_PREFIX << getFormatedCode(code) << client->getNickName() << " " << target->getNickName() << " " << channel->getName() << ERR_USERONCHANNEL_T;
+            break;
+
         case RPL_NOTOPIC:
             msg << SERVER_PREFIX << getFormatedCode(code) << client->getNickName() << " " << channel->getName() << RPL_NOTOPIC_T;
             break;

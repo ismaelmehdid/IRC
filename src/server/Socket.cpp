@@ -9,16 +9,40 @@ Socket::~Socket()
 }
 
 /**
- * @brief Creates a socket.
+ * @brief Creates a socket and sets it to non-blocking mode.
  * 
- * AF_INET      for the socket to use IPv4 address
- * SOCK_STREAM  for the socket to use TCP protocol
+ * For Linux:
+ * - AF_INET: Uses IPv4 addresses.
+ * - SOCK_STREAM: Uses the TCP protocol.
+ * - SOCK_NONBLOCK: Sets the socket to non-blocking mode at creation.
  * 
- * @return true if the socket is successfully created, false otherwise.
+ * For macOS:
+ * - AF_INET: Uses IPv4 addresses.
+ * - SOCK_STREAM: Uses the TCP protocol.
+ * - fcntl is used to set the socket to non-blocking mode after creation.
+ * 
+ * @return true if the socket is successfully created and set to non-blocking mode, false otherwise.
  */
-bool Socket::create()
+bool    Socket::create()
 {
-    this->_fd = socket(AF_INET, SOCK_STREAM, 0); // this->_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+#ifdef __linux__
+    this->_fd = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+#elif __APPLE__
+    this->_fd = socket(AF_INET, SOCK_STREAM, 0);
+    
+    if (this->_fd == -1)
+    {
+        std::cerr << "Socket creation failed" << std::endl;
+        return (false);
+    }
+
+    if (fcntl(this->_fd, F_SETFL, O_NONBLOCK) == -1)
+    {
+        std::cerr << "Failed to set socket to non-blocking mode" << std::endl;
+        return (false);
+    }
+#endif
+
     if (this->_fd == -1)
     {
         std::cerr << "Socket creation failed" << std::endl;
@@ -129,19 +153,24 @@ bool    Socket::send(int client_fd, const std::string &message)
  */
 std::string Socket::receive(int client_fd)
 {
-    char    buffer[1024];
-    int     bytes_received;
+    char        buffer[512];
+    std::string result;
+    ssize_t     bytes_received;
 
-    std::memset(buffer, 0, sizeof(buffer));
-    bytes_received = ::recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-    
-    if (bytes_received == -1)
+    while ((bytes_received = recv(client_fd, buffer, sizeof(buffer), 0)) > 0)
     {
-        std::cerr << "Receive failed" << std::endl;
+        result.append(buffer, bytes_received);
+        if (bytes_received < static_cast<ssize_t>(sizeof(buffer)))
+            break ;
+    }
+
+    if (bytes_received == -1 && errno != EWOULDBLOCK) // EWOULDBLOCK not possible to read
+    {
+        std::cerr << "Receive failed: " << strerror(errno) << std::endl;
         return ("");
     }
 
-    return (std::string(buffer));
+    return (result);
 }
 
 int Socket::get_fd() const
