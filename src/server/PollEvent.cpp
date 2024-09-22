@@ -9,7 +9,7 @@
  * 
  * @param i Index of the client in the _fds array.
  */
-void Server::handleClientMessage(size_t i)
+void    Server::handleClientMessage(size_t i)
 {
     Client*     client  = _clients[_fds[i].fd];
     std::string message = this->_socket.receive(_fds[i].fd);
@@ -25,11 +25,9 @@ void Server::handleClientMessage(size_t i)
         size_t pos;
         while ((pos = client->getBuffer().find('\n')) != std::string::npos) 
         {
-            std::string command = client->getBuffer().substr(0, pos);
-            client->getBuffer().erase(0, pos + 1);
-
-            std::cout << "Command received: " << command << std::endl;
-
+            std::string command = client->getBuffer().substr(0, pos + 2);
+            std::cout << "Received message: " << command << std::endl;
+            client->getBuffer().erase(0, pos + 2);
             this->executeCommand(client, command);
         }
     }
