@@ -20,7 +20,7 @@
 
 #define ERR_NOTREGISTERED           451
 #define ERR_NOTREGISTERED_T         " :You have not registered\r\n"
-// :server 451 <nick> :You have not registered TODO:
+// :server 451 <nick> :You have not registered
 
 #define ERR_NEEDMOREPARAMS          461
 #define ERR_NEEDMOREPARAMS_T        " :Not enough parameters\r\n"
@@ -28,11 +28,11 @@
 
 #define ERR_ALREADYREGISTERED       462
 #define ERR_ALREADYREGISTERED_T     " :You may not reregister\r\n"
-// :server 462 <nick> :You may not reregister TODO:
+// :server 462 <nick> :You may not reregister
 
 #define ERR_PASSWDMISMATCH          464
 #define ERR_PASSWDMISMATCH_T        " :Password incorrect..\r\n"
-// :server 464 <nick> :Password incorrect.. TODO:
+// :server 464 <nick> :Password incorrect..
 
 #define ERR_KEYSET                  467
 #define ERR_KEYSET_T                " :Channel key already set\r\n"
@@ -113,3 +113,6 @@
 
 #define RAW_QUIT                    1003
 // :username QUIT [<message>]
+
+#define RAW_TOPIC                   1004
+// :username TOPIC <channel> :<topic>

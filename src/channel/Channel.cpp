@@ -125,6 +125,11 @@ bool    Channel::isMember(Client* client) const
     return (this->_clients.find(client) != this->_clients.end());
 }
 
+bool    Channel::isTopicLocked() const
+{
+    return (this->_topicLocked);
+}
+
 bool    Channel::isInviteOnly() const
 {
     return (this->_inviteOnly);

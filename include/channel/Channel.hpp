@@ -34,6 +34,7 @@ class Channel
         bool                            isOperator(Client* client) const;
         bool                            isInvited(Client* client) const;
         bool                            isInviteOnly() const;
+        bool                            isTopicLocked() const;
         bool                            hasPassword() const;
         bool                            checkPassword(const std::string& key) const;
         int                             getNbrUsers() const;

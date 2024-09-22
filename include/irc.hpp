@@ -35,6 +35,7 @@
 
 #define MAX_NICKNAME_LENGTH 20
 #define MAX_CHANNEL_NAME_LENGTH 50
+#define MAX_TOPIC_LENGTH 300
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"

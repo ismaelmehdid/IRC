@@ -150,6 +150,10 @@ switch (code) {
         case RAW_QUIT:
             msg << client->getPrefix() << " QUIT " << " :" << command << "\r\n";
             break;
+        
+        case RAW_TOPIC:
+            msg << client->getPrefix() << " TOPIC " << channel->getName() << " :" << channel->getTopic() << "\r\n";
+            break;
 
         case ERR_UNKNOWNMODE:
             msg << client->getPrefix() << command << ERR_UNKNOWNMODE_T;
