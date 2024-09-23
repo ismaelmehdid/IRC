@@ -44,11 +44,7 @@ void    Server::broadcastMessage(const std::string& msg, Channel* channel)
 
     for (std::set<Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
     {
-        std::cout << "Sending message: " << msg << " to client " << (*it)->get_fd() << std::endl;
-        if (!this->_socket.send((*it)->get_fd(), msg))
-        {
-            std::cerr << "Failed to send message to client " << (*it)->get_fd() << std::endl;
-        }
+        this->_socket.send((*it)->get_fd(), msg);
     }
 }
 

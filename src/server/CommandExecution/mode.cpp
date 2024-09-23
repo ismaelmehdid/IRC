@@ -15,128 +15,172 @@
 
 void    Server::mode(Client *client, const t_IRCCommand &command)
 {
-    int fd = client->get_fd();
+    int         fd = client->get_fd();
 
     if (!client->is_authenticated())
     {
         this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NOTREGISTERED));
-        return;
+        return ;
     }
 
-    if (command.params.size() < 2)
+    if (command.params.size() < 1)
     {
         this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
-        return;
+        return ;
     }
 
     std::string channelName = command.params[0];
-    std::string modesToChange = command.params[1];
+    Channel     *channelToModify = this->findChannel(channelName);
 
-    Channel *channelToModify = this->findChannel(channelName);
     if (!channelToModify)
     {
         this->_socket.send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL));
-        return;
+        return ;
     }
+
+    if (command.params.size() == 1)
+    {
+        this->_socket.send(fd, getMessage(client, NULL, channelToModify, "JOIN", RAW_MODE));
+        return ;
+    }
+    else if (command.params.size() < 2)
+    {
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
+        return ;
+    }
+
+    std::string modesToChange = command.params[1];
 
     if (!channelToModify->isOperator(client))
     {
         this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_CHANOPRIVSNEEDED));
-        return;
+        return ;
     }
 
     if (!channelToModify->isMember(client))
     {
         this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NOTONCHANNEL));
-        return;
+        return ;
     }
 
     size_t  parameter_index = 2;
-    bool    addMode = true; // toogle to check if we are adding or removing a mode
-    Client *targetToChange = NULL;
+    bool    addMode         = true; // toogle to check if we are adding or removing a mode
+    Client  *targetToChange = NULL;
 
     //472 for unknown mode ERR_UNKNOWNMODE
-    for (size_t i = 0; i != modesToChange.size(); i++) {
+    for (size_t i = 0; i != modesToChange.size(); i++)
+    {
         switch (modesToChange[i])
         {
         case '+':
             addMode = true;
-            break;
+            break ;
+
         case '-':
             addMode = false;
-            break;
+            break ;
+
         case 'i':
             channelToModify->setInviteOnly(addMode);
-            break;
+            break ;
+
         case 't':
             channelToModify->setTopicLocked(addMode);
-            break;
+            break ;
+
         case 'k':
-            if (addMode) {
-                if (channelToModify->hasPassword()) {
+
+            if (addMode)
+            {
+                if (channelToModify->hasPassword())
+                {
                     this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_KEYSET));
-                } else if (parameter_index >= command.params.size()) {
+                }
+                else if (parameter_index >= command.params.size())
+                {
                     this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS));
-                } else {
+                }
+                else
+                {
                     channelToModify->setPassword(command.params[parameter_index]);
                     broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +k " + command.params[parameter_index] + "\r\n"), channelToModify);
                     parameter_index++;
                 }
-            } else {
+            }
+            else
+            {
                 channelToModify->setPassword("");
                 broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -k *\r\n"), channelToModify);
             }
-            break;
+            break ;
+
         case 'o':
-            if (parameter_index >= command.params.size()) {
+            if (parameter_index >= command.params.size())
+            {
                 this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS));
-                break;
+                break ;
             }
+
             targetToChange = this->findClientByNick(command.params[parameter_index]);
-            if (!targetToChange) {
+
+            if (!targetToChange)
+            {
                 this->_socket.send(fd, getMessage(client, NULL, NULL, command.params[parameter_index], ERR_NOSUCHNICK)); // TO CLEAN
-                break;
+                break ;
             }
 
-            if (!channelToModify->isMember(targetToChange)) {
+            if (!channelToModify->isMember(targetToChange))
+            {
                 this->_socket.send(fd, getMessage(client, targetToChange, channelToModify, "MODE", ERR_USERNOTINCHANNEL));
-                break;
+                break ;
             }
 
-            if (addMode) {
+            if (addMode)
+            {
                 channelToModify->addOperator(targetToChange);
                 broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +o " + targetToChange->getNickName() + "\r\n"), channelToModify);
-            } else {
+            }
+            else
+            {
                 channelToModify->removeOperator(targetToChange);
                 broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -o " + targetToChange->getNickName() + "\r\n"), channelToModify);
             }
             parameter_index++;
-            break;
+            break ;
+
         case 'l':
-            if (addMode) {
-                if (parameter_index >= command.params.size()) {
+            if (addMode)
+            {
+                if (parameter_index >= command.params.size())
+                {
                     this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
-                } else {
-                    int newLimit;
-                    std::stringstream ss(command.params[parameter_index]);
+                }
+                else
+                {
+                    int                 newLimit;
+                    std::stringstream   ss(command.params[parameter_index]);
                     ss >> newLimit;
 
-                    if (ss.fail() || !ss.eof()) {
-                    } else {
+                    if (ss.fail() || !ss.eof()) {}
+                    else
+                    {
                         channelToModify->setUserLimit(newLimit);
                         parameter_index++;
                         broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +l " + command.params[parameter_index] + "\r\n"), channelToModify);
                     }
                 }
-            } else {
+            }
+            else
+            {
                 channelToModify->setUserLimit(-1);
                 broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -l\r\n"), channelToModify);
             }
-            break;
+            break ;
+        
         default:
             std::string unknownChar(1, modesToChange[i]);
             this->_socket.send(fd, getMessage(client, targetToChange, channelToModify, unknownChar, ERR_UNKNOWNMODE));
-            break;
+            break ;
         }
     }
 }

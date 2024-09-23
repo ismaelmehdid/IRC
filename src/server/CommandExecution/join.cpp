@@ -83,12 +83,6 @@ void Server::join(Client *client, const t_IRCCommand &command)
         }
         else
         {
-            if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
-            {
-                this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_CHANNELISFULL));
-                continue ;
-            }
-
             if (channel->isInviteOnly())
             {
                 if (!channel->isInvited(client))
@@ -97,11 +91,20 @@ void Server::join(Client *client, const t_IRCCommand &command)
                     continue ;
                 }
             }
-            else if (channel->hasPassword())
+            else
             {
-                if (password.empty() || !channel->checkPassword(password))
+                if (channel->hasPassword())
                 {
-                    this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_BADCHANNELKEY));
+                    if (password.empty() || !channel->checkPassword(password))
+                    {
+                        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_BADCHANNELKEY));
+                        continue ;
+                    }
+                }
+                
+                if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
+                {
+                    this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_CHANNELISFULL));
                     continue ;
                 }
             }
@@ -119,8 +122,6 @@ void Server::join(Client *client, const t_IRCCommand &command)
 
         this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NAMREPLY));
         this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_ENDOFNAMES));
-
-        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RAW_MODE));
     }
 }
 

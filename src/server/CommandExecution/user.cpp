@@ -16,11 +16,12 @@ void    Server::user(Client *client, const t_IRCCommand &command)
         {
             client->setUserName(command.params[0]);
             client->setFullName(command.trailing);
-            std::cout << GREEN << "Client connected!" << RESET << std::endl;
 
             if (client->is_authenticated())
             {
                 this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", RPL_WELCOME));
+                std::cout << GREEN << "Client on fd " << client->get_fd()
+                          << " authenticated " << client->getPrefix() << RESET << std::endl;
             }
         }
     }

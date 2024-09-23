@@ -2,25 +2,24 @@
 
 // as I store the codes as int, if it's an 1 digit number we have to fill the previous 2 digits to 0
 // in order to conform with the IRC protocol. I put space as well at the begining and at the end of it
-static std::string getFormatedCode(size_t code)
+static std::string  getFormatedCode(size_t code)
 {
     std::ostringstream ss;
+    
     ss << " " << std::setw(3) << std::setfill('0') << code << " ";
-    return ss.str();
+    
+    return (ss.str());
 }
 
 // command string store either the name of a command or a custom message like a nickname or a channelname we couldn't create an object with
-std::string Server::getMessage(
-    Client *client,
-    Client *target,
-    Channel *channel,
-    const std::string &command,
-    size_t code)
+std::string Server::getMessage(Client *client, Client *target,
+                        Channel *channel, const std::string &command, size_t code)
 {
     std::ostringstream      msg;
     const std::set<Client*> &clients = channel->getClients();
 
-switch (code) {
+    switch (code)
+    {
         case RPL_WELCOME:
             msg << SERVER_PREFIX << getFormatedCode(code) << client->getNickName() << RPL_WELCOME_T;
             break;
@@ -148,7 +147,7 @@ switch (code) {
             break;
 
         case RAW_QUIT:
-            msg << client->getPrefix() << " QUIT " << " :" << command << "\r\n";
+            msg << client->getPrefix() << " QUIT " << " :" << command;
             break;
         
         case RAW_TOPIC:

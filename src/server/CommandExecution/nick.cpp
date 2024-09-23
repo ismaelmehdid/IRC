@@ -41,6 +41,7 @@ void    Server::nick(Client *client, const t_IRCCommand &command)
         std::string newNick = command.params[0];
         if (client->getNickName() == newNick)
             return ;
+        
         if (!is_nickname_valid(newNick))
         {
             this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_ERRONEUSNICKNAME));
@@ -53,9 +54,12 @@ void    Server::nick(Client *client, const t_IRCCommand &command)
         {
             bool wasEmpty = client->getNickName().empty();
             client->setNickName(newNick);
+            
             if (wasEmpty && client->is_authenticated())
             {
                 this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", RPL_WELCOME));
+                std::cout << GREEN << "Client on fd " << client->get_fd()
+                          << " authenticated " << client->getPrefix() << RESET << std::endl;
             }
         }
     }

@@ -6,7 +6,7 @@ void    Server::addClient(Client *client)
     this->_nbr_clients++;
 }
 
-void Server::removeClient(Client* user, std::string reason)
+void    Server::removeClient(Client* user, std::string reason)
 {
     std::list<std::string>  empty_channels;
     int                     fd = user->get_fd();

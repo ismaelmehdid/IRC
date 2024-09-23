@@ -28,7 +28,7 @@ void    Server::part(Client *client, const t_IRCCommand &command)
 
     if (!channel->isMember(client))
     {
-        this->_socket.send(fd, getMessage(client, NULL, channel, "PART", ERR_USERNOTINCHANNEL));
+        this->_socket.send(fd, getMessage(client, NULL, channel, "PART", ERR_NOTONCHANNEL));
         return ;
     }
 

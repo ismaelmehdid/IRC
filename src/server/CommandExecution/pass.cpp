@@ -15,7 +15,6 @@ void    Server::pass(Client *client, const t_IRCCommand &command)
         else
         {
             client->_has_set_password = true;
-            //TODO: Notify that the client have put the right password
         }
     }
     else

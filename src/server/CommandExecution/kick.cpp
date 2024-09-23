@@ -42,7 +42,7 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
 
     if (!channelToKickFrom->isMember(clientToKick))
     {
-        this->_socket.send(fd, getMessage(client, clientToKick, channelToKickFrom, "KICK", ERR_USERNOTINCHANNEL));
+        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, "KICK", ERR_NOTONCHANNEL));
         return ;
     }
 

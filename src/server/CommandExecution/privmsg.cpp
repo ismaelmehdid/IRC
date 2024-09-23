@@ -50,7 +50,7 @@ void    Server::privMsg(Client *client, const t_IRCCommand &command)
 
         if (!channel->isMember(client))
         {
-            this->_socket.send(fd, getMessage(client, NULL, channel, target, ERR_USERNOTINCHANNEL));
+            this->_socket.send(fd, getMessage(client, NULL, channel, target, ERR_NOTONCHANNEL));
             return ;
         }
 

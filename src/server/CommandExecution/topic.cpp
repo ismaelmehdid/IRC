@@ -4,20 +4,24 @@ void    Server::topic(Client *client, const t_IRCCommand &command)
 {
     int fd = client->get_fd();
 
-    if (!client->is_authenticated()) {
+    if (!client->is_authenticated())
+    {
         this->_socket.send(fd, getMessage(client, NULL, NULL, "TOPIC", ERR_NOTREGISTERED));
-        return;
+        return ;
     }
 
-    if (command.params.size() < 1) {
+    if (command.params.size() < 1)
+    {
         this->_socket.send(fd, getMessage(client, NULL, NULL, "TOPIC", ERR_NEEDMOREPARAMS));
-        return;
+        return ;
     }
 
     Channel *channel = global_ircserv->findChannel(command.params[0]);
-    if (!channel) {
+    
+    if (!channel)
+    {
         this->_socket.send(fd, getMessage(client, NULL, NULL, command.params[0], ERR_NOSUCHCHANNEL));
-        return;
+        return ;
     }
 
     if (!channel->isMember(client))
@@ -26,23 +30,35 @@ void    Server::topic(Client *client, const t_IRCCommand &command)
         return ;
     }
 
-    const std::string &newTopic = command.trailing;
+    const std::string   &newTopic = command.trailing;
 
-    if (newTopic.empty()) { // display the topic
-        if (channel->getTopic().empty()) {
+    if (newTopic.empty()) // display the topic
+    {
+        if (channel->getTopic().empty())
+        {
             this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", RPL_NOTOPIC));
-        } else {
+        }
+        else
+        {
             this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", RPL_TOPIC));
         }
-    } else { // change the topic
-        if (channel->isTopicLocked() && !channel->isOperator(client)) {
+    }
+    else // change the topic
+    {
+        if (channel->isTopicLocked() && !channel->isOperator(client))
+        {
             this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", ERR_CHANOPRIVSNEEDED));
-        } else {
-            if (newTopic.size() > MAX_TOPIC_LENGTH) {
-                return;
-            } else {
+        }
+        else
+        {
+            if (newTopic.size() > MAX_TOPIC_LENGTH)
+            {
+                return ;
+            }
+            else
+            {
                 channel->setTopic(newTopic);
-                broadcastMessage(getMessage(client, NULL, channel, "TOPIC", RAW_TOPIC) ,channel);
+                this->broadcastMessage(getMessage(client, NULL, channel, "TOPIC", RAW_TOPIC), channel);
             }
         }
     }

@@ -9,9 +9,9 @@
  * 
  * @param i Index of the client in the _fds array.
  */
-void    Server::handleClientMessage(size_t i)
+void Server::handleClientMessage(size_t i)
 {
-    Client*     client  = _clients[_fds[i].fd];
+    Client*     client = _clients[_fds[i].fd];
     std::string message = this->_socket.receive(_fds[i].fd);
     
     if (message.empty()) 
@@ -23,15 +23,15 @@ void    Server::handleClientMessage(size_t i)
         client->getBuffer() += message;
 
         size_t pos;
-        while ((pos = client->getBuffer().find('\n')) != std::string::npos) 
+        while ((pos = client->getBuffer().find("\r\n")) != std::string::npos) 
         {
             std::string command = client->getBuffer().substr(0, pos + 2);
-            std::cout << "Received message: " << command << std::endl;
             client->getBuffer().erase(0, pos + 2);
             this->executeCommand(client, command);
         }
     }
 }
+
 
 /**
  * Handles a new client connection.
@@ -49,6 +49,8 @@ void    Server::handleNewConnection()
     {
         pollfd  client_pollfd;
 
+        std::cout << MAGENTA << "New connection on fd " << newClient->get_fd() << RESET << std::endl;
+        
         client_pollfd.fd = newClient->get_fd();
         client_pollfd.events = POLLIN;
         client_pollfd.revents = 0;
@@ -72,9 +74,9 @@ void    Server::handleClientDisconnection(size_t i)
 
     if (client)
     {
-        std::cerr << RED << "Client error or hangup on fd " << fd << RESET << std::endl;
+        std::cerr << RED << "Client error on fd " << fd << RESET << std::endl;
 
-        removeClient(client, "disconnected");
+        removeClient(client, "disconnected\r\n");
     }
     else
     {
