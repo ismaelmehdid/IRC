@@ -17,7 +17,7 @@ class Socket
         bool        listen();
         Client*     accept();
         bool        send(int client_fd, const std::string &message);
-        std::string receive(int client_fd);
+        std::string receive(int client_fd, bool &tempErr);
         int         get_fd() const;
 
 };

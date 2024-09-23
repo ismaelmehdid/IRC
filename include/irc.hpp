@@ -31,20 +31,21 @@
 #define MAX_PORT_VALUE 65535
 
 #define ARGUMENTS_REQUIRED  3
-#define MAX_CLIENTS_IN_QUEU 5
 
 #define MAX_NICKNAME_LENGTH 20
 #define MAX_CHANNEL_NAME_LENGTH 50
 #define MAX_TOPIC_LENGTH 300
 
+#ifndef MAX_CLIENTS
+#define MAX_CLIENTS 25
+#endif
+
+
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
 #define GREEN   "\033[32m"
 #define YELLOW  "\033[33m"
-#define BLUE    "\033[34m"
 #define MAGENTA "\033[35m"
-#define CYAN    "\033[36m"
-#define WHITE   "\033[37m"
 
 class Socket;
 class Server;

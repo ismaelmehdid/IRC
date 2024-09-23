@@ -12,13 +12,17 @@
 void Server::handleClientMessage(size_t i)
 {
     Client*     client = _clients[_fds[i].fd];
-    std::string message = this->_socket.receive(_fds[i].fd);
+    bool        tempErr = false;
+    std::string message = this->_socket.receive(_fds[i].fd, tempErr);
     
+    if (tempErr == true)
+        return ;
+
     if (message.empty()) 
     {
         handleClientDisconnection(i);
     } 
-    else 
+    else
     {
         client->getBuffer() += message;
 
@@ -43,6 +47,20 @@ void Server::handleClientMessage(size_t i)
  */
 void    Server::handleNewConnection()
 {
+    if (this->_nbr_clients >= MAX_CLIENTS)
+    {
+        Client* rejectedClient = this->_socket.accept();
+        
+        if (rejectedClient)
+        {
+            std::string rejectMsg = "ERROR :Server is full, try again later.\r\n";
+            this->_socket.send(rejectedClient->get_fd(), rejectMsg);
+            std::cerr << RED << "Connection rejected: server is full (fd " << rejectedClient->get_fd() << ")" << RESET << std::endl;
+            delete (rejectedClient);
+        }
+        return ;
+    }
+
     Client* newClient = this->_socket.accept();
 
     if (newClient)

@@ -6,13 +6,13 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NOTREGISTERED)); // i don't recieve this message
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NOTREGISTERED));
         return ;
     }
 
     if (command.params.size() < 2)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NEEDMOREPARAMS)); // i don't recieve this message
+        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NEEDMOREPARAMS));
         return ;
     }
 
@@ -36,7 +36,7 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
     Client      *clientToKick = this->findClientByNick(clientName);
     if (!clientToKick)
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, clientName, ERR_NOSUCHNICK)); // i don't recieve this message
+        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, clientName, ERR_NOSUCHNICK));
         return ;
     }
 

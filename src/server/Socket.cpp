@@ -1,7 +1,7 @@
 #include "../../include/server/Socket.hpp"
 #include "../../include/irc.hpp"
 
-Socket::Socket() : _fd(-1), _backlog(5) {}
+Socket::Socket() : _fd(-1), _backlog(MAX_CLIENTS) {}
 
 Socket::~Socket() 
 {
@@ -48,6 +48,15 @@ bool    Socket::create()
         std::cerr << "Socket creation failed" << std::endl;
         return (false);
     }
+    
+    int opt = 1;
+    // allows to connect no port while its on TIME_WAIT status
+    if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+    {
+        std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
+        return (false);
+    }
+
     return (true);
 }
 
@@ -135,8 +144,15 @@ bool    Socket::send(int client_fd, const std::string &message)
         ssize_t sent = ::send(client_fd, message_cstr + total_sent, message_length - total_sent, 0);
         if (sent == -1)
         {
-            std::cerr << "Send failed: " << strerror(errno) << std::endl;
-            return (false);
+            if (errno == EAGAIN || errno == EWOULDBLOCK)
+            {
+                return (true);
+            }
+            else
+            {
+                std::cerr << "Send failed: " << strerror(errno) << std::endl;
+                return (false);
+            }
         }
         total_sent += sent;
     }
@@ -151,27 +167,37 @@ bool    Socket::send(int client_fd, const std::string &message)
  * @param client_fd The file descriptor of the client socket.
  * @return The received data as a string.
  */
-std::string Socket::receive(int client_fd)
+std::string Socket::receive(int client_fd, bool& tempErr)
 {
     char        buffer[512];
     std::string result;
     ssize_t     bytes_received;
+
+    std::memset(buffer, 0, sizeof(buffer));
 
     while ((bytes_received = recv(client_fd, buffer, sizeof(buffer), 0)) > 0)
     {
         result.append(buffer, bytes_received);
         if (bytes_received < static_cast<ssize_t>(sizeof(buffer)))
             break ;
+        
+        std::memset(buffer, 0, sizeof(buffer));
     }
 
-    if (bytes_received == -1 && errno != EWOULDBLOCK) // EWOULDBLOCK not possible to read
+    if (bytes_received == -1)
     {
-        std::cerr << "Receive failed: " << strerror(errno) << std::endl;
+        if (errno == EAGAIN || errno == EWOULDBLOCK) // temporary error, should try later
+            tempErr = true;
+        else
+            std::cerr << "Receive failed: " << strerror(errno) << std::endl;
+
         return ("");
     }
 
+    tempErr = false;
     return (result);
 }
+
 
 int Socket::get_fd() const
 {

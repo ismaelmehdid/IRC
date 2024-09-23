@@ -51,18 +51,19 @@ void    Server::removeClient(Client* user, std::string reason)
     this->_nbr_clients--;
 }
 
-
 void    Server::pollRemove(int index)
 {
-    close (this->_fds[index].fd);
-
-    if (index != this->_poll_count - 1)
+    if (index >= 0 && index < this->_poll_count)
     {
-        this->_fds[index].fd = this->_fds[this->_poll_count - 1].fd;
-        this->_fds[index].events = this->_fds[this->_poll_count - 1].events;
-    }
+        close(this->_fds[index].fd);
 
-    --this->_poll_count;
-    
-    this->_fds.pop_back();
+        if (index != this->_poll_count - 1)
+        {
+            this->_fds[index].fd = this->_fds[this->_poll_count - 1].fd;
+            this->_fds[index].events = this->_fds[this->_poll_count - 1].events;
+        }
+
+        --this->_poll_count;
+        this->_fds.pop_back();
+    }
 }
