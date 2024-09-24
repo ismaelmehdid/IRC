@@ -1,0 +1,85 @@
+#include "../../include/smartboi.hpp"
+
+static bool isValidChar(char c)
+{
+    return (c < 32 || std::isalnum(c) || c == '!' || c == '#' || c == '$' || c == '%' || 
+           c == '&' || c == '\'' || c == '*' || c == '+' || c == '/' ||
+           c == '=' || c == '?' || c == '^' || c == '_' || c == '{' ||
+           c == '|' || c == '}' || c == '~' || c == '-' || c == '.' ||
+           c == ':' || c == '@');
+}
+
+static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
+{
+    t_IRCCommand    request;
+    size_t          pos = 0;
+
+    for (size_t i = 0; i < rawRequest.size(); ++i)
+    {
+        char    c = rawRequest[i];
+        
+        if (!isValidChar(c) && c != ' ' && c != '\r' && c != '\n')
+        {
+            std::cerr << "Invalid character detected: " << c << std::endl;
+            throw std::runtime_error("Invalid character in command");
+        }
+    }
+
+    if (rawRequest[0] == ':')
+    {
+        pos = rawRequest.find(' ');
+        request.prefix = rawRequest.substr(1, pos - 1);
+        pos++;
+    }
+
+    size_t  space_pos = rawRequest.find(' ', pos);
+    request.command = rawRequest.substr(pos, space_pos - pos);
+    pos = space_pos + 1;
+
+    while (pos < rawRequest.length())
+    {
+        if (rawRequest[pos] == ':')
+        {
+            request.trailing = rawRequest.substr(pos + 1);
+            break ;
+        }
+
+        space_pos = rawRequest.find(' ', pos);
+        if (space_pos == std::string::npos)
+        {
+            request.params.push_back(rawRequest.substr(pos));
+            break ;
+        }
+        else
+        {
+            request.params.push_back(rawRequest.substr(pos, space_pos - pos));
+            pos = space_pos + 1;
+        }
+    }
+
+    return (request);
+}
+
+/**
+ * Parses a string of client commands and extracts individual commands into a vector of t_IRCCommand.
+ *
+ * @param commands The string of client commands to be parsed.
+ * @return A vector of t_IRCCommand containing the extracted commands.
+ */
+std::vector<t_IRCCommand>   parseRequests(const std::string &requests)
+{
+    std::vector<t_IRCCommand>   extracted;
+    size_t                      start = 0;
+    size_t                      end;
+
+    while ((end = requests.find("\r\n", start)) != std::string::npos)
+    {
+        std::string             request = requests.substr(start, end - start);
+        t_IRCCommand            parsedRequest = parseSingleRequest(request);
+
+        extracted.push_back(parsedRequest);
+        start = end + 2;
+    }
+
+    return (extracted);
+}
