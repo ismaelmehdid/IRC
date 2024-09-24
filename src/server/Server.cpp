@@ -30,19 +30,19 @@ Server::~Server()
 
 void    Server::initializeCommandMap()
 {
-    _commandMap["KICK"]    = &Server::kick;
-    _commandMap["INVITE"]  = &Server::invite;
-    _commandMap["TOPIC"]   = &Server::topic;
-    _commandMap["MODE"]    = &Server::mode;
-    _commandMap["JOIN"]    = &Server::join;
-    _commandMap["PART"]    = &Server::part;
-    _commandMap["PRIVMSG"] = &Server::privMsg;
-    _commandMap["PING"]    = &Server::ping;
-    _commandMap["CAP"]     = &Server::cap;
-    _commandMap["PASS"]    = &Server::pass;
-    _commandMap["NICK"]    = &Server::nick;
-    _commandMap["USER"]    = &Server::user;
-    _commandMap["QUIT"]    = &Server::quit;
+    _commandMap["KICK"]     = &Server::kick;
+    _commandMap["INVITE"]   = &Server::invite;
+    _commandMap["TOPIC"]    = &Server::topic;
+    _commandMap["MODE"]     = &Server::mode;
+    _commandMap["JOIN"]     = &Server::join;
+    _commandMap["PART"]     = &Server::part;
+    _commandMap["PRIVMSG"]  = &Server::privMsg;
+    _commandMap["PING"]     = &Server::ping;
+    _commandMap["CAP"]      = &Server::cap;
+    _commandMap["PASS"]     = &Server::pass;
+    _commandMap["NICK"]     = &Server::nick;
+    _commandMap["USER"]     = &Server::user;
+    _commandMap["QUIT"]     = &Server::quit;
 }
 
 bool    Server::isNickNameTaken(const std::string &nickName)
