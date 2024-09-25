@@ -1,29 +1,9 @@
 #include "../../include/smartboi.hpp"
 
-static bool isValidChar(char c)
-{
-    return (c < 32 || std::isalnum(c) || c == '!' || c == '#' || c == '$' || c == '%' || 
-           c == '&' || c == '\'' || c == '*' || c == '+' || c == '/' ||
-           c == '=' || c == '?' || c == '^' || c == '_' || c == '{' ||
-           c == '|' || c == '}' || c == '~' || c == '-' || c == '.' ||
-           c == ':' || c == '@');
-}
-
 static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
 {
     t_IRCCommand    request;
     size_t          pos = 0;
-
-    for (size_t i = 0; i < rawRequest.size(); ++i)
-    {
-        char    c = rawRequest[i];
-        
-        if (!isValidChar(c) && c != ' ' && c != '\r' && c != '\n')
-        {
-            std::cerr << "Invalid character detected: " << c << std::endl;
-            throw std::runtime_error("Invalid character in command");
-        }
-    }
 
     if (rawRequest[0] == ':')
     {

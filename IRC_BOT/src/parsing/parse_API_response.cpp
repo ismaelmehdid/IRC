@@ -44,10 +44,10 @@ std::string parse_weather_api_response(const std::string &raw, const std::string
     weather.temperature = get_element("temp", raw);
     weather.humidity = get_element("humidity", raw);
 
-    parsed += "In " + location;
-    parsed += " Conditions: " + weather.conditions;
-    parsed += " Temperature: " + weather.temperature + (weather.temperature != "No data" ? "°C" : "");
-    parsed += " Humidity: " + weather.humidity + (weather.humidity != "No data" ? "%" : "");
+    parsed += "In " + location + ", ";
+    parsed += "Conditions: " + weather.conditions + ", ";
+    parsed += "Temperature: " + weather.temperature + (weather.temperature != "No data" ? "°C" : "") + ", ";
+    parsed += "Humidity: " + weather.humidity + (weather.humidity != "No data" ? "%" : "");
 
     return parsed;
 }
