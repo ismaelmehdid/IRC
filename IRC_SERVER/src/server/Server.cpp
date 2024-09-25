@@ -28,6 +28,32 @@ Server::~Server()
     }
 }
 
+Server::Server(const Server &server) // shallow copy
+    :   _nbr_clients(server._nbr_clients),
+        _password(server._password),
+        _clients(server._clients),
+        _channels(server._channels),
+        _fds(server._fds),
+        _server_pollfd(server._server_pollfd),
+        _poll_count(server._poll_count),
+        _socket() {}
+
+Server &Server::operator=(const Server &server) // shallow copy
+{
+    if (this != &server) {
+        _nbr_clients = server._nbr_clients;
+        _password = server._password;
+        _clients = server._clients;
+        _channels = server._channels;
+        _fds = server._fds;
+        _server_pollfd = server._server_pollfd;
+        _poll_count = server._poll_count;
+        // _socket default constructor called
+    }
+    return *this;
+}
+
+
 void    Server::initializeCommandMap()
 {
     _commandMap["KICK"]     = &Server::kick;

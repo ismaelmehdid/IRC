@@ -7,7 +7,10 @@
 class Channel
 {
     private:
-        const std::string       _name;
+        Channel(const Channel &channel);
+        Channel &operator=(const Channel &channel);
+
+        std::string             _name;
         int                     _nbr_users;
         std::string             _topic;
 

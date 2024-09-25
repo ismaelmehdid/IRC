@@ -8,6 +8,18 @@ Socket::~Socket()
     close(this->_fd);
 }
 
+Socket::Socket(const Socket &socket) : _fd(socket._fd), _backlog(socket._backlog) {}
+
+Socket &Socket::operator=(const Socket &socket)
+{
+    if (this != &socket) {
+        _fd = socket._fd;
+        _backlog = socket._backlog;
+    }
+    return *this;
+}
+
+
 /**
  * @brief Creates a socket and sets it to non-blocking mode.
  * 

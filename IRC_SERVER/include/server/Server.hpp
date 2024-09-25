@@ -19,8 +19,11 @@
 class Server
 {
     private:
+        Server(const Server &server);
+        Server &operator=(const Server &server);
+
         unsigned int                    _nbr_clients;      ///< Number of connected clients
-        const std::string               _password;         ///< Server password for client authentication
+        std::string                     _password;         ///< Server password for client authentication
         std::map<int, Client*>          _clients;          ///< Map of connected clients, key is client file descriptor
         std::map<std::string, Channel*> _channels;         ///< Map of channels for managing group communications
         std::vector<pollfd>             _fds;              ///< Poll file descriptors for client sockets

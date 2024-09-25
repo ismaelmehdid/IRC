@@ -5,9 +5,12 @@
 class Socket
 {
     private:
+        Socket(const Socket &socket);
+        Socket &operator=(const Socket &socket);
+
         int                     _fd;
         int                     _backlog; // max clients in queu
-
+        
     public:
         Socket();
         ~Socket();

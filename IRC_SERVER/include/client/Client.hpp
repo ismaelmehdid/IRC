@@ -5,6 +5,9 @@
 class Client
 {
     private:
+        Client (const Client& other);
+        Client& operator=(const Client& other);
+
         int             _fd;
         std::string     _hostMask;
         std::string     _nickName;
@@ -14,8 +17,7 @@ class Client
 
     public:
         Client(int fd, char *host);
-        Client (const Client& other);
-        Client& operator=(const Client& other);
+
         ~Client();
 
 //----------Getters

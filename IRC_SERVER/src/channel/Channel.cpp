@@ -21,6 +21,35 @@ Channel::~Channel()
     _invited.clear();
 }
 
+Channel::Channel(const Channel &channel) // shallow copy
+    :   _name(channel._name),
+        _nbr_users(channel._nbr_users),
+        _topic(channel._topic),
+        _clients(channel._clients),
+        _operators(channel._operators),
+        _invited(channel._invited),
+        _inviteOnly(channel._inviteOnly),
+        _topicLocked(channel._topicLocked),
+        _password(channel._password),
+        _userLimit(channel._userLimit) {}
+
+Channel &Channel::operator=(const Channel &channel) // shallow copy
+{
+    if (this != &channel) {
+        _name = channel._name;
+        _nbr_users = channel._nbr_users;
+        _topic = channel._topic;
+        _clients = channel._clients;
+        _operators = channel._operators;
+        _invited = channel._invited;
+        _inviteOnly = channel._inviteOnly;
+        _topicLocked = channel._topicLocked;
+        _password = channel._password;
+        _userLimit = channel._userLimit;
+    }
+    return *this;
+}
+
 //------Client Management
 void    Channel::addClient(Client* user)
 {
