@@ -21,6 +21,7 @@
 #define ENV_VAR_NAME            "API_KEY"   // To change if needed
 
 #define WEATHER_API_HOST        "api.openweathermap.org" // following the path of the request
+#define OPENAI_API_HOST         "https://api.openai.com/v1/chat/completions" // following the path of the request
 #define HTTP_PORT               80
 
 struct t_IRCCommand
@@ -42,3 +43,4 @@ struct t_weather_infos
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests);
 std::string                 get_API_key();
 std::string                 parse_weather_api_response(const std::string &raw, const std::string &location);
+std::string                 parse_openai_api_response(const std::string& response);

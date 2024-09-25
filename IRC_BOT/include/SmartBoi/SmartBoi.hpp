@@ -23,10 +23,14 @@ class SmartBoi
         SmartBoi &operator=(const SmartBoi &toCopy);
 
         void        connect_to_irc_server(const std::string &server_ip, const std::string &server_port, const std::string &password);
-        void        connect_to_weather_api();
         void        loop();
 
-        std::string call_weather_api(const std::string &request);
+        #ifdef __WEATHER__
+            std::string call_weather_api(const std::string &request);
+            void        connect_to_weather_api();
+        #elif __OPENAI__
+            std::string call_openai_api(const std::string &request);
+        #endif
 
         void        handle_response(const std::string &message);
 

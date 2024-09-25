@@ -71,3 +71,5 @@ fclean: clean
 	@echo "\033[93mExecutable cleaned.\033[0m"
 
 re: fclean all
+
+.PHONY: all clean fclean re

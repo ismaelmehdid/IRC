@@ -51,3 +51,23 @@ std::string parse_weather_api_response(const std::string &raw, const std::string
 
     return parsed;
 }
+
+std::string parse_openai_api_response(const std::string& response) {
+    if (response.empty()) {
+        return "";
+    }
+
+    const std::string key = "\"content\": \"";
+    size_t start = response.find(key);
+
+    if (start == std::string::npos) {
+        return "";
+    }
+    start += key.length();
+
+    size_t end = response.find("\"", start);
+    if (end == std::string::npos) {
+        return "";
+    }
+    return response.substr(start, end - start);
+}

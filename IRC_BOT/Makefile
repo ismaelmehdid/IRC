@@ -1,12 +1,13 @@
 NAME    = smartboi
 
-SRCS    =	src/main.cpp \
-			src/SmartBoi/SmartBoi.cpp \
-			src/SmartBoi/OpenAI_API.cpp \
-			src/SmartBoi/Weather_API.cpp \
-			src/parsing/parse_API_response.cpp \
-			src/parsing/parseRequests.cpp \
-			src/utils/utils.cpp \
+COMMON_SRCS =   src/main.cpp \
+                src/SmartBoi/SmartBoi.cpp \
+                src/parsing/parse_API_response.cpp \
+                src/parsing/parseRequests.cpp \
+                src/utils/utils.cpp \
+
+OPENAI_SRCS =   src/SmartBoi/OpenAI_API.cpp
+WEATHER_SRCS =  src/SmartBoi/Weather_API.cpp
 
 UNAME_S := $(shell uname -s)
 
@@ -18,17 +19,28 @@ endif
 
 CC      = c++
 FLAGS   = -Wall -Wextra -Werror -std=c++98 $(OS_FLAGS)
-LDFLAGS = -lcurl
+LDFLAGS =
 
 RM      = rm -rf
 
 OBJS_DIR = build/
-OBJS = $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-all: $(NAME)
+COMMON_OBJS = $(addprefix $(OBJS_DIR), $(COMMON_SRCS:.cpp=.o))
+OPENAI_OBJS = $(addprefix $(OBJS_DIR), $(OPENAI_SRCS:.cpp=.o))
+WEATHER_OBJS = $(addprefix $(OBJS_DIR), $(WEATHER_SRCS:.cpp=.o))
 
-$(NAME): $(OBJS)
-	@$(CC) $(LDFLAGS) $(FLAGS) $(OBJS) -o $(NAME)
+all: weather
+
+openai: LDFLAGS += -lcurl
+openai: FLAGS += -D__OPENAI__
+openai: $(COMMON_OBJS) $(OPENAI_OBJS)
+	@$(CC) $(LDFLAGS) $(FLAGS) $(COMMON_OBJS) $(OPENAI_OBJS) -o $(NAME)
+	@echo "\033[92mCompiled: $(NAME) with OpenAI support.\033[0m"
+
+weather: FLAGS += -D__WEATHER__
+weather: $(COMMON_OBJS) $(WEATHER_OBJS)
+	@$(CC) $(LDFLAGS) $(FLAGS) $(COMMON_OBJS) $(WEATHER_OBJS) -o $(NAME)
+	@echo "\033[92mCompiled: $(NAME) with Weather API support.\033[0m"
 
 $(OBJS_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -44,3 +56,5 @@ fclean: clean
 	@echo "\033[93mExecutable cleaned.\033[0m"
 
 re: fclean all
+
+.PHONY: all clean fclean re openai weather

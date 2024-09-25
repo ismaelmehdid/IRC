@@ -34,11 +34,20 @@ void SmartBoi::handle_response(const std::string &request)
 
     for (size_t i = 0; i < parsed_commands.size(); i++) {
         if (parsed_commands[i].command == "PRIVMSG") {
-            const std::string &from = parsed_commands[i].prefix;
-            const std::string &message = parsed_commands[i].trailing;
 
-            std::string api_response = call_weather_api(message);
-            std::string parsed_api_response = parse_weather_api_response(api_response, message);
+            const std::string &from = parsed_commands[i].prefix;
+
+            #ifdef __WEATHER__
+                const std::string &message = parsed_commands[i].trailing;
+                std::string api_response = call_weather_api(message);
+                std::string parsed_api_response = parse_weather_api_response(api_response, message);
+            #elif __OPENAI__
+                const std::string &message = parsed_commands[i].trailing;
+                std::string api_response = call_openai_api(message);
+                std::string parsed_api_response = parse_openai_api_response(api_response);
+            #else
+                std::string parsed_api_response("");
+            #endif
 
             const std::string to_send = "PRIVMSG " + from + " :" + parsed_api_response + "\r\n";
 
