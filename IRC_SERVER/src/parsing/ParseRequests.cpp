@@ -2,11 +2,11 @@
 
 static bool isValidChar(char c)
 {
-    return (c < 32 || std::isalnum(c) || c == '!' || c == '#' || c == '$' || c == '%' || 
+    return (c == 1 || std::isalnum(c) || c == '!' || c == '#' || c == '$' || c == '%' || 
            c == '&' || c == '\'' || c == '*' || c == '+' || c == '/' ||
            c == '=' || c == '?' || c == '^' || c == '_' || c == '{' ||
            c == '|' || c == '}' || c == '~' || c == '-' || c == '.' ||
-           c == ':' || c == '@');
+           c == ':' || c == '@' || c == ',');
 }
 
 static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
