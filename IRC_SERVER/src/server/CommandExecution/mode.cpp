@@ -132,7 +132,7 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
 
             if (!targetToChange)
             {
-                this->_socket.send(fd, getMessage(client, NULL, NULL, command.params[parameter_index], ERR_NOSUCHNICK)); // TO CLEAN
+                this->_socket.send(fd, getMessage(client, NULL, NULL, command.params[parameter_index], ERR_NOSUCHNICK));
                 break ;
             }
 

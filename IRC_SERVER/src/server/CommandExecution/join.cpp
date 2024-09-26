@@ -122,7 +122,6 @@ void Server::join(Client *client, const t_IRCCommand &command)
 
         this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NAMREPLY));
         this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_ENDOFNAMES));
-        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_CHANNELMODEIS));
     }
 }
 

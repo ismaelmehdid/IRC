@@ -139,7 +139,7 @@ std::string Server::getMessage(Client *client, Client *target,
             break;
 
         case RAW_QUIT:
-            msg << client->getPrefix() << " QUIT " << " :" << command;
+            msg << client->getPrefix() << " QUIT " << " :" << command + "\r\n";
             break;
         
         case RAW_TOPIC:

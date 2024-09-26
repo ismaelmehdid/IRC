@@ -32,6 +32,9 @@ void Server::handleClientMessage(size_t i)
             std::string command = client->getBuffer().substr(0, pos + 2);
             client->getBuffer().erase(0, pos + 2);
             this->executeCommand(client, command);
+            if (_clients.find(_fds[i].fd) == _clients.end()) {
+                return;
+            }
         }
     }
 }
