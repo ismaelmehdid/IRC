@@ -66,8 +66,7 @@ void    Server::privMsg(Client *client, const t_IRCCommand &command)
             this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, target, ERR_NOSUCHNICK));
             return;
         }
-
-        std::cout << message << std::endl;
+        
         std::string privmsg = ":" + client->getNickName() + " PRIVMSG " + target + " :" + message + "\r\n";
         
         this->_socket.send(target_client->get_fd(), privmsg);
