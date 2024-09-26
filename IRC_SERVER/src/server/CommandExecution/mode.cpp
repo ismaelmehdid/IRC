@@ -23,12 +23,6 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
         return ;
     }
 
-    if (command.params.size() < 1)
-    {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
-        return ;
-    }
-
     std::string channelName = command.params[0];
     Channel     *channelToModify = this->findChannel(channelName);
 
@@ -38,14 +32,15 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
         return ;
     }
 
-    if (command.params.size() == 1)
-    {
-        this->_socket.send(fd, getMessage(client, NULL, channelToModify, "JOIN", RAW_MODE));
-        return ;
-    }
-    else if (command.params.size() < 2)
+    else if (command.params.size() < 1)
     {
         this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
+        return ;
+    }
+
+    if (command.params.size() == 1)
+    {
+        this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", RPL_CHANNELMODEIS));
         return ;
     }
 
@@ -81,11 +76,23 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
             break ;
 
         case 'i':
+            if ((addMode && channelToModify->isInviteOnly()) || (!addMode && !channelToModify->isInviteOnly()))
+                break;
             channelToModify->setInviteOnly(addMode);
+            if (addMode)
+                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +i\r\n"), channelToModify);
+            else
+                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -i\r\n"), channelToModify);
             break ;
 
         case 't':
+            if ((addMode && channelToModify->isTopicLocked()) || (!addMode && !channelToModify->isTopicLocked()))
+                break;
             channelToModify->setTopicLocked(addMode);
+            if (addMode)
+                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +t\r\n"), channelToModify);
+            else
+                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -t\r\n"), channelToModify);
             break ;
 
         case 'k':

@@ -102,9 +102,6 @@
 // Custom trailing message
 // :server 332 <nick> <channel> :<topic>
 
-#define RAW_MODE                    1000
-// :server MODE #channel +m
-
 #define RAW_JOIN                    1001
 // :username JOIN #channel
 

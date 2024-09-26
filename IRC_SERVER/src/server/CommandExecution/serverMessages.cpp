@@ -119,7 +119,7 @@ std::string Server::getMessage(Client *client, Client *target,
             break;
 
         case RPL_CHANNELMODEIS:
-            msg << SERVER_PREFIX << " MODE " << channel->getName() << " +";
+            msg << SERVER_PREFIX << getFormatedCode(code) << client->getNickName() << " " << channel->getName() << " +";
             if (channel->isInviteOnly()) msg << "i";
             if (channel->hasPassword()) msg << "k";
             if (channel->getUserLimit() != -1) msg << "l";
@@ -128,14 +128,6 @@ std::string Server::getMessage(Client *client, Client *target,
 
         case RPL_TOPIC:
             msg << SERVER_PREFIX << getFormatedCode(code) << client->getNickName() << " " << channel->getName() << " :" << channel->getTopic() << "\r\n";
-            break;
-
-        case RAW_MODE:
-            msg << SERVER_PREFIX << " MODE " << channel->getName() << " +";
-            if (channel->isInviteOnly()) msg << "i";
-            if (channel->hasPassword()) msg << "k";
-            if (channel->getUserLimit() != -1) msg << "l";
-            msg << "\r\n";
             break;
 
         case RAW_JOIN:
