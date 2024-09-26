@@ -14,7 +14,7 @@ void    Server::removeClient(Client* user, std::string reason)
 //--remove user from every channel
     for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
     {
-        Channel*            channel = it->second;
+        Channel* channel = it->second;
 
         if (channel->isMember(user))
         {
@@ -46,9 +46,11 @@ void    Server::removeClient(Client* user, std::string reason)
     }
 
 //--delete user from Server
-    delete (this->_clients[fd]);
+    
     this->_clients.erase(fd);
     this->_nbr_clients--;
+
+    delete user;
 }
 
 void    Server::pollRemove(int index)
