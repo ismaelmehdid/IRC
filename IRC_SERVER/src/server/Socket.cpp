@@ -133,7 +133,7 @@ Client* Socket::accept()
         std::cerr << "Accept failed: " << strerror(errno) << std::endl;
         return (NULL);
     }
-    inet_ntop(AF_INET, &client_addr.sin_addr, host, INET_ADDRSTRLEN);
+    inet_ntop(AF_INET, &client_addr.sin_addr, host, INET_ADDRSTRLEN); // convert IP address from int to string
 
     return (new Client(client_fd, host));
 }
@@ -198,11 +198,11 @@ std::string Socket::receive(int client_fd, bool& tempErr)
 
     if (bytes_received == -1)
     {
+        // meaning there is nothing else to read for the moment
         if (errno == EAGAIN || errno == EWOULDBLOCK) // temporary error, should try later
             tempErr = true;
         else
             std::cerr << "Receive failed: " << strerror(errno) << std::endl;
-
         return ("");
     }
 
@@ -215,4 +215,3 @@ int Socket::get_fd() const
 {
     return (this->_fd);
 }
-
