@@ -8,14 +8,21 @@ std::string get_API_key()
     std::string         env_variable = ENV_VAR_NAME;
     env_variable += "=";
 
-    if (file.is_open()) {
-        while (getline(file, line)) {
-            if (line.find(env_variable) == 0) {
+    if (file.is_open())
+    {
+        while (getline(file, line))
+        {
+            if (line.find(env_variable) == 0)
+            {
                 api_key = line.substr(env_variable.size());
-                if (api_key.size() < 3) {
+                
+                if (api_key.size() < 3)
+                {
                     std::cerr << "Couldn't get the API key." << std::endl;
-                    return "";
-                } else { // removing quotes
+                    return ("");
+                }
+                else // removing quotes
+                {
                     api_key.erase(0, 1);
                     api_key.erase(api_key.size() - 1, 1);
                 }
@@ -23,8 +30,10 @@ std::string get_API_key()
             }
         }
         file.close();
-    } else {
+    }
+    else
+    {
         std::cerr << "Couldn't get the API key." << std::endl;
     }
-    return api_key;
+    return (api_key);
 }
