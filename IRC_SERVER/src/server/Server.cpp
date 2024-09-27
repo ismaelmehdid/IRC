@@ -8,7 +8,8 @@ Server::Server(const std::string &password)
         _fds(),
         _server_pollfd(),
         _poll_count(0),
-        _socket() { initializeCommandMap(); }
+        _socket(),
+        _nicknames() { initializeCommandMap(); }
 
 Server::~Server()
 {
@@ -36,11 +37,13 @@ Server::Server(const Server &server) // shallow copy
         _fds(server._fds),
         _server_pollfd(server._server_pollfd),
         _poll_count(server._poll_count),
-        _socket() {}
+        _socket(),
+        _nicknames(server._nicknames) {}
 
 Server &Server::operator=(const Server &server) // shallow copy
 {
-    if (this != &server) {
+    if (this != &server)
+    {
         _nbr_clients = server._nbr_clients;
         _password = server._password;
         _clients = server._clients;
@@ -48,6 +51,7 @@ Server &Server::operator=(const Server &server) // shallow copy
         _fds = server._fds;
         _server_pollfd = server._server_pollfd;
         _poll_count = server._poll_count;
+        _nicknames = server._nicknames;
         // _socket default constructor called
     }
     return *this;
@@ -71,16 +75,11 @@ void    Server::initializeCommandMap()
     _commandMap["QUIT"]     = &Server::quit;
 }
 
-bool    Server::isNickNameTaken(const std::string &nickName)
+bool Server::isNickNameTaken(const std::string &nickName)
 {
-    for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
-    {
-        if (it->second->getNickName() == nickName)
-        {
-            return (true);
-        }
-    }
-    return (false);
+    std::vector<std::string>::iterator it = std::find(this->_nicknames.begin(), this->_nicknames.end(), nickName);
+    
+    return (it != this->_nicknames.end());
 }
 
 /**
@@ -94,9 +93,10 @@ void    Server::serverLoop()
     while (true)
     {
         this->_poll_count = poll(_fds.data(), _fds.size(), -1);
-
         if (this->_poll_count == -1)
+        {
             throw PollException();
+        }
 
         for (size_t i = 0; i < _fds.size(); i++)
         {

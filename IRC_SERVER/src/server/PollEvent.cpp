@@ -96,13 +96,13 @@ void    Server::handleClientDisconnection(size_t i)
     if (client)
     {
         std::cerr << RED << "Client error on fd " << fd << RESET << std::endl;
-
         removeClient(client, "disconnected\r\n");
     }
     else
     {
         std::cerr << RED << "Error: Client not found for fd " << fd << RESET <<std::endl;
     }
+    this->_fds.erase(this->_fds.begin() + i);
 }
 
 /**

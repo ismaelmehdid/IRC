@@ -15,7 +15,11 @@ std::string SmartBoi::call_weather_api(const std::string &input)
     request += "\r\n";
 
     // Sending the request
-    send(_api_socket_fd, request.c_str(), request.length(), 0);
+    if (send(_api_socket_fd, request.c_str(), request.length(), 0) < 0) {
+        std::cerr << "Failed to send the request to the API." << std::endl;
+        close(_api_socket_fd);
+        return "";
+    }
 
     // Get the request
     char buffer[4096];
@@ -42,6 +46,7 @@ void SmartBoi::connect_to_weather_api()
 
     struct hostent *server = gethostbyname(WEATHER_API_HOST);
     if (server == NULL) {
+        close (_api_socket_fd);
         throw std::runtime_error("Error resolving the DNS of the API server.");
     }
 
@@ -53,6 +58,7 @@ void SmartBoi::connect_to_weather_api()
 
     // Connecting to the API server
     if (connect(_api_socket_fd, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) < 0) {
+        close (_api_socket_fd);
         throw std::runtime_error("Error while connecting to the API server.");
     }
 }

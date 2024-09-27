@@ -60,6 +60,7 @@ void    Server::nick(Client *client, const t_IRCCommand &command)
                 this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", RPL_WELCOME));
                 std::cout << GREEN << "Client on fd " << client->get_fd()
                           << " authenticated " << client->getPrefix() << RESET << std::endl;
+                this->_nicknames.push_back(client->getNickName());
             }
         }
     }

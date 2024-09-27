@@ -40,7 +40,7 @@ void    Server::removeClient(Client* user, std::string reason)
     {
         if (this->_fds[i].fd == fd)
         {
-            pollRemove(i);
+            pollRemove(i); //removing data from the poll struct
             break ;
         }
     }
@@ -49,7 +49,13 @@ void    Server::removeClient(Client* user, std::string reason)
     
     this->_clients.erase(fd);
     this->_nbr_clients--;
-
+    std::vector<std::string>::iterator it = std::find(this->_nicknames.begin(), this->_nicknames.end(), user->getNickName());
+    
+    if (it != this->_nicknames.end())
+    {
+        this->_nicknames.erase(it);
+    }
+    
     delete user;
 }
 
@@ -57,14 +63,12 @@ void    Server::pollRemove(int index)
 {
     if (index >= 0 && index < this->_poll_count)
     {
-        close(this->_fds[index].fd);
+        close(this->_fds[index].fd); //closing the fd of the user
 
         if (index != this->_poll_count - 1)
         {
-            this->_fds[index].fd = this->_fds[this->_poll_count - 1].fd;
-            this->_fds[index].events = this->_fds[this->_poll_count - 1].events;
+            std::swap(this->_fds[index], this->_fds[this->_poll_count - 1]);
         }
-
         --this->_poll_count;
         this->_fds.pop_back();
     }

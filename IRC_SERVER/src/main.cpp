@@ -5,7 +5,6 @@ Server  *global_ircserv = NULL;
 int main(int argc, char **argv)
 {
     validateArguments(argc, argv);
-
     try
     {
         global_ircserv = new Server(argv[2]);

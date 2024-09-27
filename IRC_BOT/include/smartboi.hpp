@@ -6,12 +6,15 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <curl/curl.h>
 #include <cstring>
 #include <vector>
 #include <map>
 #include <exception>
 #include <sstream>
+#include <cstdlib>
+#include <csignal>
+#include <fcntl.h>
+#include <poll.h>
 
 #define EXPECTED_NBR_OF_ARGS    4
 
@@ -21,8 +24,12 @@
 #define ENV_VAR_NAME            "API_KEY"   // To change if needed
 
 #define WEATHER_API_HOST        "api.openweathermap.org" // following the path of the request
-#define OPENAI_API_HOST         "https://api.openai.com/v1/chat/completions" // following the path of the request
+#define OPENAI_API_HOST         "https://api.openai.com/v1/chat/completions"
 #define HTTP_PORT               80
+
+class SmartBoi;
+
+extern SmartBoi *global_smartboi;
 
 struct t_IRCCommand
 {

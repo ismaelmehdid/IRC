@@ -30,7 +30,8 @@ class Server
         pollfd                          _server_pollfd;    ///< Pollfd structure for the server socket
         int                             _poll_count;       ///< Number of poll events
         Socket                          _socket;           ///< Socket instance for network operations
-
+        std::vector<std::string>        _nicknames;
+        
 //---------------------MAIN CORE---------------------------------------------------------
         void                serverLoop();
         void                handlePollEvent(size_t i);
