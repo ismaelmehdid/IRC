@@ -9,36 +9,38 @@
  * 
  * @param i Index of the client in the _fds array.
  */
-void Server::handleClientMessage(size_t i)
+void    Server::handleClientMessage(size_t i)
 {
     Client*     client = _clients[_fds[i].fd];
     bool        tempErr = false;
     std::string message = this->_socket.receive(_fds[i].fd, tempErr);
     
-    if (tempErr == true)
-        return ;
+    if (tempErr)
+        return;
 
-    if (message.empty()) 
+    if (message.empty())
     {
         handleClientDisconnection(i);
-    } 
-    else
-    {
-        client->getBuffer() += message;
+        return;
+    }
 
-        size_t pos;
-        while ((pos = client->getBuffer().find("\r\n")) != std::string::npos) 
+    client->getBuffer() += message;
+
+    size_t      pos;
+    while ((pos = client->getBuffer().find("\r\n")) != std::string::npos) 
+    {
+        std::string command = client->getBuffer().substr(0, pos + 2);
+        client->getBuffer().erase(0, pos + 2);
+        
+        if (!this->executeCommand(client, command))
         {
-            std::string command = client->getBuffer().substr(0, pos + 2);
-            client->getBuffer().erase(0, pos + 2);
-            this->executeCommand(client, command);
-            if (_clients.find(_fds[i].fd) == _clients.end()) {
-                return;
-            }
+            handleClientDisconnection(i);
         }
+        
+        if (_clients.find(_fds[i].fd) == _clients.end())
+            return ;
     }
 }
-
 
 /**
  * Handles a new client connection.
@@ -57,7 +59,7 @@ void    Server::handleNewConnection()
         if (rejectedClient)
         {
             std::string rejectMsg = "ERROR :Server is full, try again later.\r\n";
-            this->_socket.send(rejectedClient->get_fd(), rejectMsg);
+            this->_socket.Send(rejectedClient->get_fd(), rejectMsg);
             std::cerr << RED << "Connection rejected: server is full (fd " << rejectedClient->get_fd() << ")" << RESET << std::endl;
             delete (rejectedClient);
         }
@@ -90,20 +92,23 @@ void    Server::handleNewConnection()
  */
 void    Server::handleClientDisconnection(size_t i)
 {
-    int     fd      = this->_fds[i].fd;
-    Client* client  = this->_clients[fd];
+    int     fd = this->_fds[i].fd;
+    Client* client = this->_clients[fd];
 
     if (client)
     {
         std::cerr << RED << "Client error on fd " << fd << RESET << std::endl;
         removeClient(client, "disconnected\r\n");
+        return ;
     }
     else
     {
-        std::cerr << RED << "Error: Client not found for fd " << fd << RESET <<std::endl;
+        std::cerr << RED << "Error: Client not found for fd " << fd << RESET << std::endl;
     }
+
     this->_fds.erase(this->_fds.begin() + i);
 }
+
 
 /**
  * @brief Handles poll events for a specific file descriptor.
@@ -117,13 +122,13 @@ void    Server::handleClientDisconnection(size_t i)
  */
 void    Server::handlePollEvent(size_t i)
 {
-    if (this->_fds[i].revents & (POLLHUP | POLLOUT))
+    if (this->_fds[i].revents & (POLLHUP | POLLERR))
     {
         handleClientDisconnection(i);
     }
     else if (_fds[i].revents & POLLIN)
     {
-        if (this->_fds[i].fd == this->_socket.get_fd()) // there is smth to read on the server socket (which mean a new connection)
+        if (this->_fds[i].fd == this->_socket.get_fd()) // there is smth to read on the server's socket
         {
             handleNewConnection();
         }

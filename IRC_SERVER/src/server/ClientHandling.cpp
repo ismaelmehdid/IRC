@@ -8,6 +8,9 @@ void    Server::addClient(Client *client)
 
 void    Server::removeClient(Client* user, std::string reason)
 {
+    if (!user)
+        return ;
+
     std::list<std::string>  empty_channels;
     int                     fd = user->get_fd();
 
@@ -46,7 +49,6 @@ void    Server::removeClient(Client* user, std::string reason)
     }
 
 //--delete user from Server
-    
     this->_clients.erase(fd);
     this->_nbr_clients--;
     std::vector<std::string>::iterator it = std::find(this->_nicknames.begin(), this->_nicknames.end(), user->getNickName());
@@ -56,20 +58,26 @@ void    Server::removeClient(Client* user, std::string reason)
         this->_nicknames.erase(it);
     }
     
-    delete user;
+    delete (user);
 }
 
-void    Server::pollRemove(int index)
+void Server::pollRemove(int index)
 {
-    if (index >= 0 && index < this->_poll_count)
-    {
-        close(this->_fds[index].fd); //closing the fd of the user
+    if (index < 0 || index >= this->_poll_count)
+        return ;
 
-        if (index != this->_poll_count - 1)
-        {
-            std::swap(this->_fds[index], this->_fds[this->_poll_count - 1]);
-        }
-        --this->_poll_count;
-        this->_fds.pop_back();
+    int fd = this->_fds[index].fd;
+    if (fd != -1) 
+    {
+        close(fd);
     }
+
+    if (index != this->_poll_count - 1)
+    {
+        std::swap(this->_fds[index], this->_fds[this->_poll_count - 1]);
+    }
+    
+    --this->_poll_count;
+    this->_fds.pop_back();
 }
+

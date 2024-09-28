@@ -35,16 +35,13 @@ void    Server::removeChannel(Channel* channel)
 void    Server::broadcastMessage(const std::string& msg, Channel* channel)
 {
     if (msg.empty())
-    {
-        std::cerr << "Attempted to broadcast an empty message in channel " << channel->getName() << std::endl;
         return ;
-    }
     
     const std::set<Client*>& clients = channel->getClients();
 
     for (std::set<Client*>::iterator it = clients.begin(); it != clients.end(); ++it)
     {
-        this->_socket.send((*it)->get_fd(), msg);
+        this->_socket.Send((*it)->get_fd(), msg);
     }
 }
 
