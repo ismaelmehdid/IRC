@@ -1,11 +1,6 @@
 #include "../../../include/server/Server.hpp"
 
-// void Server::PermissionDenied(Client* client, const std::string &nickName)
-// {
-//     this->_socket.send(client->get_fd(), ":server 481 " + nickName + ": Permission Denied - You're not an IRC operator.\r\n");
-// }
-
-void    Server::executeCommand(Client* client, const std::string &message)
+bool    Server::executeCommand(Client* client, const std::string &message)
 {
     try
     {
@@ -17,11 +12,14 @@ void    Server::executeCommand(Client* client, const std::string &message)
             
             if (it != _commandMap.end())
             {
-                (this->*(it->second))(client, parsed_commands[i]);
+                CommandFunction commandFunction = it->second;
+                if (!(this->*commandFunction)(client, parsed_commands[i]))
+                    return (false);
             }
             else
             {
-                this->_socket.send(client->get_fd(), global_ircserv->getMessage(client, NULL, NULL, parsed_commands[i].command, ERR_UNKNOWNCOMMAND));
+                if (!this->_socket.Send(client->get_fd(), global_ircserv->getMessage(client, NULL, NULL, parsed_commands[i].command, ERR_UNKNOWNCOMMAND)))
+                    return (false);
             }
         }
     }
@@ -29,4 +27,6 @@ void    Server::executeCommand(Client* client, const std::string &message)
     {
         std::cerr << e.what() << std::endl;
     }
+
+    return (true);
 }

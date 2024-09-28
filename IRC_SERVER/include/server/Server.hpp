@@ -43,7 +43,6 @@ class Server
         void                addClient(Client *client);
         void                removeClient(Client* user, const std::string &reason);
         void                removeClientFromEveryChannels(Client* user, const std::string &reason);
-        void                removeClientFdFromPoll(int fd);
 
 //---------------------CHANNEL HANDLING--------------------------------------------------
         Channel*            createChannel(const std::string& channelName);
@@ -53,27 +52,27 @@ class Server
         void                broadcastMessage(const std::string& msg, Channel* channel);
 
 //---------------------EXECUTION---------------------------------------------------------
-        void                executeCommand(Client* client, const std::string &message);
+        bool                executeCommand(Client* client, const std::string &message);
         std::string         getMessage(Client *client, Client *target, Channel *channel, const std::string &command, size_t code);
         void                privMsgBroadcast(const std::string& msg, Channel* channel, int sender_fd);
 
-        typedef void (Server::*CommandFunction)(Client*, const t_IRCCommand &);
+        typedef bool (Server::*CommandFunction)(Client*, const t_IRCCommand &);
         void                initializeCommandMap();
         std::map<std::string, CommandFunction>  _commandMap;
 
-        void                kick    (Client *, const t_IRCCommand &);
-        void                invite  (Client *, const t_IRCCommand &);
-        void                topic   (Client *, const t_IRCCommand &);
-        void                mode    (Client *, const t_IRCCommand &);
-        void                join    (Client *, const t_IRCCommand &);
-        void                part    (Client *, const t_IRCCommand &);
-        void                privMsg (Client *, const t_IRCCommand &);
-        void                ping    (Client *, const t_IRCCommand &);
-        void                cap     (Client *, const t_IRCCommand &);
-        void                pass    (Client *, const t_IRCCommand &);
-        void                user    (Client *, const t_IRCCommand &);
-        void                nick    (Client *, const t_IRCCommand &);
-        void                quit    (Client *, const t_IRCCommand &);
+        bool                kick    (Client *, const t_IRCCommand &);
+        bool                invite  (Client *, const t_IRCCommand &);
+        bool                topic   (Client *, const t_IRCCommand &);
+        bool                mode    (Client *, const t_IRCCommand &);
+        bool                join    (Client *, const t_IRCCommand &);
+        bool                part    (Client *, const t_IRCCommand &);
+        bool                privMsg (Client *, const t_IRCCommand &);
+        bool                ping    (Client *, const t_IRCCommand &);
+        bool                cap     (Client *, const t_IRCCommand &);
+        bool                pass    (Client *, const t_IRCCommand &);
+        bool                user    (Client *, const t_IRCCommand &);
+        bool                nick    (Client *, const t_IRCCommand &);
+        bool                quit    (Client *, const t_IRCCommand &);
 //---------------------------------------------------------------------------------------
 
         bool                isNickNameTaken(const std::string &nickName);

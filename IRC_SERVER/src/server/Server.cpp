@@ -70,11 +70,9 @@ void    Server::initializeCommandMap()
     _commandMap["QUIT"]     = &Server::quit;
 }
 
-bool Server::isNickNameTaken(const std::string &nickName)
+bool    Server::isNickNameTaken(const std::string &nickName)
 {
-    std::vector<std::string>::iterator it = std::find(this->_nicknames.begin(), this->_nicknames.end(), nickName);
-    
-    return (it != this->_nicknames.end());
+    return (std::find(_nicknames.begin(), _nicknames.end(), nickName) != _nicknames.end());
 }
 
 /**
@@ -88,6 +86,7 @@ void    Server::serverLoop()
     while (true)
     {
         this->_poll_count = poll(_fds.data(), _fds.size(), -1);
+        
         if (this->_poll_count == -1)
         {
             throw PollException();

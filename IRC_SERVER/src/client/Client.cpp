@@ -34,7 +34,8 @@ Client& Client::operator=(const Client& other)
 
 Client::~Client()
 {
-    close (this->_fd);
+    if (this->_fd != -1)
+        close (this->_fd);
 }
 
 //----------Getters

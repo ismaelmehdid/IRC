@@ -25,6 +25,7 @@ void    Server::removeClient(Client* user, const std::string &reason)
 
     std::cout << fd << std::endl;
 
+
     delete user;
 }
 

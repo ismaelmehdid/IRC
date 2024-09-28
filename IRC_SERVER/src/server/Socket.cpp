@@ -1,22 +1,24 @@
-#include "../../include/server/Socket.hpp"
-#include "../../include/irc.hpp"
+#include "../../include/server/Server.hpp"
 
 Socket::Socket() : _fd(-1), _backlog(MAX_CLIENTS) {}
 
 Socket::~Socket() 
 {
-    close(this->_fd);
+    if (this->_fd != -1)
+        close(this->_fd);
 }
 
 Socket::Socket(const Socket &socket) : _fd(socket._fd), _backlog(socket._backlog) {}
 
 Socket &Socket::operator=(const Socket &socket)
 {
-    if (this != &socket) {
-        _fd = socket._fd;
-        _backlog = socket._backlog;
+    if (this != &socket)
+    {
+        this->_fd = socket._fd;
+        this->_backlog = socket._backlog;
     }
-    return *this;
+
+    return (*this);
 }
 
 
@@ -62,7 +64,7 @@ bool    Socket::create()
     }
     
     int opt = 1;
-    // allows to connect no port while its on TIME_WAIT status
+    // allows to connect to port while its on TIME_WAIT status
     if (setsockopt(this->_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
     {
         std::cerr << "setsockopt(SO_REUSEADDR) failed" << std::endl;
@@ -145,7 +147,7 @@ Client* Socket::accept()
  * @param message The message to be sent.
  * @return True if the message was sent successfully, false otherwise.
  */
-bool    Socket::send(int client_fd, const std::string &message)
+bool    Socket::Send(int client_fd, const std::string &message)
 {
     size_t      total_sent     = 0;
     size_t      message_length = message.size();
@@ -159,6 +161,11 @@ bool    Socket::send(int client_fd, const std::string &message)
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
                 return (true);
+            }
+            else if (errno == EPIPE)
+            {
+                std::cerr << "Client disconnected (SIGPIPE): " << strerror(errno) << std::endl;
+                return (false);
             }
             else
             {

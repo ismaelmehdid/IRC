@@ -1,33 +1,37 @@
 #include "../../../include/server/Server.hpp"
 
-void    Server::topic(Client *client, const t_IRCCommand &command)
+bool    Server::topic(Client *client, const t_IRCCommand &command)
 {
     int fd = client->get_fd();
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "TOPIC", ERR_NOTREGISTERED));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "TOPIC", ERR_NOTREGISTERED)))
+            return (false);
+        return (true);
     }
 
     if (command.params.size() < 1)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "TOPIC", ERR_NEEDMOREPARAMS));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "TOPIC", ERR_NEEDMOREPARAMS)))
+            return (false);
+        return (true);
     }
 
     Channel *channel = global_ircserv->findChannel(command.params[0]);
     
     if (!channel)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, command.params[0], ERR_NOSUCHCHANNEL));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, command.params[0], ERR_NOSUCHCHANNEL)))
+            return (false);
+        return (true);
     }
 
     if (!channel->isMember(client))
     {
-        this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", ERR_NOTONCHANNEL));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "TOPIC", ERR_NOTONCHANNEL)))
+            return (false);
+        return (true);
     }
 
     const std::string   &newTopic = command.trailing;
@@ -36,24 +40,27 @@ void    Server::topic(Client *client, const t_IRCCommand &command)
     {
         if (channel->getTopic().empty())
         {
-            this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", RPL_NOTOPIC));
+            if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "TOPIC", RPL_NOTOPIC)))
+                return (false);
         }
         else
         {
-            this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", RPL_TOPIC));
+            if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "TOPIC", RPL_TOPIC)))
+                return (false);
         }
     }
     else // change the topic
     {
         if (channel->isTopicLocked() && !channel->isOperator(client))
         {
-            this->_socket.send(fd, getMessage(client, NULL, channel, "TOPIC", ERR_CHANOPRIVSNEEDED));
+            if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "TOPIC", ERR_CHANOPRIVSNEEDED)))
+                return (false);
         }
         else
         {
             if (newTopic.size() > MAX_TOPIC_LENGTH)
             {
-                return ;
+                return (true);
             }
             else
             {
@@ -62,4 +69,5 @@ void    Server::topic(Client *client, const t_IRCCommand &command)
             }
         }
     }
+    return (true);
 }

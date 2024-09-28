@@ -1,16 +1,18 @@
 #include "../../../include/server/Server.hpp"
 
-void    Server::pass(Client *client, const t_IRCCommand &command)
+bool    Server::pass(Client *client, const t_IRCCommand &command)
 {
     if (!client->is_authenticated())
     {
         if (command.params.empty())
         {
-            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_NEEDMOREPARAMS));
+            if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_NEEDMOREPARAMS)))
+                return (false);
         }
         else if (command.params[0] != this->_password)
         {
-            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_PASSWDMISMATCH));
+            if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_PASSWDMISMATCH)))
+                return (false);
         }
         else
         {
@@ -19,6 +21,8 @@ void    Server::pass(Client *client, const t_IRCCommand &command)
     }
     else
     {
-        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_ALREADYREGISTERED));
+        if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, "PASS", ERR_ALREADYREGISTERED)))
+            return (false);
     }
+    return (true);
 }

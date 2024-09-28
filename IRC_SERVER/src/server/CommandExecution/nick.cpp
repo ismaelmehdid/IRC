@@ -26,29 +26,33 @@ static bool is_nickname_valid(const std::string &nick)
 }
 
 
-void    Server::nick(Client *client, const t_IRCCommand &command)
+bool    Server::nick(Client *client, const t_IRCCommand &command)
 {
     if (!client->_has_set_password)
     {
-        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", ERR_PASSWDMISMATCH));
+        if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", ERR_PASSWDMISMATCH)))
+            return (false);
     } 
     else if (command.params.empty())
     {
-        this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", ERR_NEEDMOREPARAMS));
+        if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", ERR_NEEDMOREPARAMS)))
+            return (false);
     }
     else
     {
         std::string newNick = command.params[0];
         if (client->getNickName() == newNick)
-            return ;
+            return (true);
         
         if (!is_nickname_valid(newNick))
         {
-            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_ERRONEUSNICKNAME));
+            if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_ERRONEUSNICKNAME)))
+                return (false);
         }
         else if (this->isNickNameTaken(newNick))
         {
-            this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_NICKNAMEINUSE));
+            if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, newNick, ERR_NICKNAMEINUSE)))
+                return (false);
         }
         else
         {
@@ -57,11 +61,13 @@ void    Server::nick(Client *client, const t_IRCCommand &command)
             
             if (wasEmpty && client->is_authenticated())
             {
-                this->_socket.send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", RPL_WELCOME));
+                if (!this->_socket.Send(client->get_fd(), getMessage(client, NULL, NULL, "NICK", RPL_WELCOME)))
+                    return (false);
                 std::cout << GREEN << "Client on fd " << client->get_fd()
                           << " authenticated " << client->getPrefix() << RESET << std::endl;
                 this->_nicknames.push_back(client->getNickName());
             }
         }
     }
+    return (true);
 }

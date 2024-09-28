@@ -13,14 +13,15 @@
 
 // Treated separatly
 
-void    Server::mode(Client *client, const t_IRCCommand &command)
+bool    Server::mode(Client *client, const t_IRCCommand &command)
 {
     int         fd = client->get_fd();
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NOTREGISTERED));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NOTREGISTERED)))
+            return (false);
+        return (true);
     }
 
     std::string channelName = command.params[0];
@@ -28,34 +29,39 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
 
     if (!channelToModify)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL)))
+            return (false);
+        return (true);
     }
 
     else if (command.params.size() < 1)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS)))
+            return (false);
+        return (true);
     }
 
     if (command.params.size() == 1)
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", RPL_CHANNELMODEIS));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", RPL_CHANNELMODEIS)))
+            return (false);
+        return (true);
     }
 
     std::string modesToChange = command.params[1];
 
     if (!channelToModify->isOperator(client))
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_CHANOPRIVSNEEDED));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_CHANOPRIVSNEEDED)))
+            return (false);
+        return (true);
     }
 
     if (!channelToModify->isMember(client))
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NOTONCHANNEL));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NOTONCHANNEL)))
+            return (false);
+        return (true);
     }
 
     size_t  parameter_index = 2;
@@ -101,11 +107,13 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
             {
                 if (channelToModify->hasPassword())
                 {
-                    this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_KEYSET));
+                    if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_KEYSET)))
+                        return (false);
                 }
                 else if (parameter_index >= command.params.size())
                 {
-                    this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS));
+                    if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS)))
+                        return (false);
                 }
                 else
                 {
@@ -124,7 +132,8 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
         case 'o':
             if (parameter_index >= command.params.size())
             {
-                this->_socket.send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS));
+                if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS)))
+                    return (false);
                 break ;
             }
 
@@ -132,13 +141,15 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
 
             if (!targetToChange)
             {
-                this->_socket.send(fd, getMessage(client, NULL, NULL, command.params[parameter_index], ERR_NOSUCHNICK));
+                if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, command.params[parameter_index], ERR_NOSUCHNICK)))
+                    return (false);
                 break ;
             }
 
             if (!channelToModify->isMember(targetToChange))
             {
-                this->_socket.send(fd, getMessage(client, targetToChange, channelToModify, "MODE", ERR_USERNOTINCHANNEL));
+                if (!this->_socket.Send(fd, getMessage(client, targetToChange, channelToModify, "MODE", ERR_USERNOTINCHANNEL)))
+                    return (false);
                 break ;
             }
 
@@ -160,7 +171,8 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
             {
                 if (parameter_index >= command.params.size())
                 {
-                    this->_socket.send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS));
+                    if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS)))
+                        return (false);
                 }
                 else
                 {
@@ -186,8 +198,10 @@ void    Server::mode(Client *client, const t_IRCCommand &command)
         
         default:
             std::string unknownChar(1, modesToChange[i]);
-            this->_socket.send(fd, getMessage(client, targetToChange, channelToModify, unknownChar, ERR_UNKNOWNMODE));
+            if (!this->_socket.Send(fd, getMessage(client, targetToChange, channelToModify, unknownChar, ERR_UNKNOWNMODE)))
+                return (false);
             break ;
         }
     }
+    return (true);
 }

@@ -1,19 +1,21 @@
 #include "../../../include/server/Server.hpp"
 
-void    Server::kick(Client *client, const t_IRCCommand &command)
+bool    Server::kick(Client *client, const t_IRCCommand &command)
 {
     int fd = client->get_fd();
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NOTREGISTERED));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NOTREGISTERED)))
+            return (false);
+        return (true);
     }
 
     if (command.params.size() < 2)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NEEDMOREPARAMS));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "KICK", ERR_NEEDMOREPARAMS)))
+            return (false);
+        return (true);
     }
 
     std::string channelName = command.params[0];
@@ -23,31 +25,35 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
     
     if (!channelToKickFrom)
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL)))
+            return (false);
+        return (true);
     }
 
     if (!channelToKickFrom->isOperator(client))
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, "KICK", ERR_CHANOPRIVSNEEDED));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channelToKickFrom, "KICK", ERR_CHANOPRIVSNEEDED)))
+            return (false);
+        return (true);
     }
 
     Client      *clientToKick = this->findClientByNick(clientName);
+    
     if (!clientToKick)
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, clientName, ERR_NOSUCHNICK));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channelToKickFrom, clientName, ERR_NOSUCHNICK)))
+            return (false);
+        return (true);
     }
 
     if (!channelToKickFrom->isMember(clientToKick))
     {
-        this->_socket.send(fd, getMessage(client, NULL, channelToKickFrom, "KICK", ERR_NOTONCHANNEL));
-        return ;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channelToKickFrom, "KICK", ERR_NOTONCHANNEL)))
+            return (false);
+        return (true);
     }
 
-    this->broadcastMessage
-    (clientToKick->getPrefix() + " KICK " + channelName + " " + clientName + " :" + kickMessage + "\r\n", channelToKickFrom); // raw
+    this->broadcastMessage(clientToKick->getPrefix() + " KICK " + channelName + " " + clientName + " :" + kickMessage + "\r\n", channelToKickFrom);
     
     channelToKickFrom->removeClient(clientToKick);
 
@@ -55,4 +61,6 @@ void    Server::kick(Client *client, const t_IRCCommand &command)
     {
         this->removeChannel(channelToKickFrom); // delete channel if it's empty
     }
+    
+    return (true);
 }

@@ -31,20 +31,22 @@ static void splitByComma(const std::string &str, std::vector<std::string> &resul
 }
 
 
-void Server::join(Client *client, const t_IRCCommand &command)
+bool    Server::join(Client *client, const t_IRCCommand &command)
 {
     int fd = client->get_fd();
 
     if (!client->is_authenticated())
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "JOIN", ERR_NOTREGISTERED));
-        return;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "JOIN", ERR_NOTREGISTERED)))
+            return (false);
+        return (true);
     }
 
     if (command.params.empty())
     {
-        this->_socket.send(fd, getMessage(client, NULL, NULL, "JOIN", ERR_NEEDMOREPARAMS));
-        return;
+        if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "JOIN", ERR_NEEDMOREPARAMS)))
+            return (false);
+        return (true);
     }
 
     std::string channelNames = command.params[0];
@@ -64,7 +66,8 @@ void Server::join(Client *client, const t_IRCCommand &command)
 
         if (!IsChannelNameValid(channelName))
         {
-            this->_socket.send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL));
+            if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, channelName, ERR_NOSUCHCHANNEL)))
+                return (false);
             continue ;
         }
 
@@ -87,7 +90,8 @@ void Server::join(Client *client, const t_IRCCommand &command)
             {
                 if (!channel->isInvited(client))
                 {
-                    this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_INVITEONLYCHAN));
+                    if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", ERR_INVITEONLYCHAN)))
+                        return (false);
                     continue ;
                 }
             }
@@ -97,14 +101,16 @@ void Server::join(Client *client, const t_IRCCommand &command)
                 {
                     if (password.empty() || !channel->checkPassword(password))
                     {
-                        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_BADCHANNELKEY));
+                        if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", ERR_BADCHANNELKEY)))
+                            return (false);
                         continue ;
                     }
                 }
                 
                 if (channel->getUserLimit() != -1 && channel->getNbrUsers() >= channel->getUserLimit())
                 {
-                    this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", ERR_CHANNELISFULL));
+                    if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", ERR_CHANNELISFULL)))
+                        return (false);
                     continue ;
                 }
             }
@@ -116,13 +122,23 @@ void Server::join(Client *client, const t_IRCCommand &command)
         this->broadcastMessage(getMessage(client, NULL, channel, "JOIN", RAW_JOIN), channel);
 
         if (!channel->getTopic().empty())
-            this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_TOPIC));
+        {
+            if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", RPL_TOPIC)))
+                return (false);
+        }
         else
-            this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NOTOPIC));
+        {
+            if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NOTOPIC)))
+                return (false);
+        }
 
-        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NAMREPLY));
-        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_ENDOFNAMES));
-        this->_socket.send(fd, getMessage(client, NULL, channel, "JOIN", RPL_CHANNELMODEIS));
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", RPL_NAMREPLY)))
+            return (false);
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", RPL_ENDOFNAMES)))
+            return (false);
+        if (!this->_socket.Send(fd, getMessage(client, NULL, channel, "JOIN", RPL_CHANNELMODEIS)))
+            return (false);
     }
+    return (true);
 }
 
