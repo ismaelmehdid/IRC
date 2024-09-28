@@ -4,6 +4,8 @@
 #include <map>
 #include <set>
 
+//===----------------------------------------------------------------------===//
+
 class Channel
 {
     private:
@@ -27,7 +29,7 @@ class Channel
         Channel(const std::string& name);
         ~Channel();
 
-//------Getters
+//=== Getters -------------------------------------------------------------===//
         const std::string&              getName() const;
         const std::string&              getTopic() const;
         int                             getUserLimit() const;
@@ -42,14 +44,14 @@ class Channel
         bool                            checkPassword(const std::string& key) const;
         int                             getNbrUsers() const;
 
-//------Setters
+//=== Setters -------------------------------------------------------------===//
         void                            setTopic(const std::string& topic);
         void                            setTopicLocked(bool mode); // t mode
         void                            setInviteOnly(bool mode);  // i mode
         void                            setPassword(const std::string& key); // k mode
         void                            setUserLimit(int limit);   // l mode
 
-//------Client management
+//=== Client management ---------------------------------------------------===//
         void                            addClient(Client* client);
         bool                            removeClient(Client* client);
         void                            addOperator(Client* client);
@@ -57,3 +59,5 @@ class Channel
         void                            addInvited(Client* client);
         void                            removeInvited(Client* client);
 };
+
+//===----------------------------------------------------------------------===//

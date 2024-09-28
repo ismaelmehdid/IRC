@@ -16,6 +16,8 @@
 #include <fcntl.h>
 #include <poll.h>
 
+//===----------------------------------------------------------------------===//
+
 #define EXPECTED_NBR_OF_ARGS    4
 
 #define NICK_NAME               "smartboi"
@@ -27,9 +29,15 @@
 #define OPENAI_API_HOST         "https://api.openai.com/v1/chat/completions"
 #define HTTP_PORT               80
 
+//===----------------------------------------------------------------------===//
+
 class SmartBoi;
 
+//===----------------------------------------------------------------------===//
+
 extern SmartBoi *global_smartboi;
+
+//===----------------------------------------------------------------------===//
 
 struct t_IRCCommand
 {
@@ -47,7 +55,10 @@ struct t_weather_infos
     std::string humidity;       // x%
 };
 
+//===----------------------------------------------------------------------===//
+
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests);
 std::string                 get_API_key();
 std::string                 parse_weather_api_response(const std::string &raw, const std::string &location);
-std::string                 parse_openai_api_response(const std::string& response);
+
+//===----------------------------------------------------------------------===//

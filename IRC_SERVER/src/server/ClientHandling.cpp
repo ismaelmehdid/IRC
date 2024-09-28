@@ -4,10 +4,6 @@ void    Server::addClient(Client *client)
 {
     this->_clients[client->get_fd()] = client;
     this->_nbr_clients++;
-    for (std::vector<pollfd>::iterator it = _fds.begin(); it != _fds.end(); it++) {
-        std::cout << it->fd << " ";
-    }
-    std::cout << std::endl;
 }
 
 void    Server::removeClient(Client* user, const std::string &reason)
@@ -22,9 +18,6 @@ void    Server::removeClient(Client* user, const std::string &reason)
     if (it != this->_nicknames.end()) {
         this->_nicknames.erase(it);
     }
-
-    std::cout << fd << std::endl;
-
 
     delete user;
 }

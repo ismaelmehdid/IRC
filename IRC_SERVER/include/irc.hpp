@@ -1,5 +1,7 @@
 #pragma once
 
+//===----------------------------------------------------------------------===//
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -27,6 +29,8 @@
 
 #include "server/serverMessages.hpp"
 
+//===----------------------------------------------------------------------===//
+
 #define MIN_PORT_VALUE 1024
 #define MAX_PORT_VALUE 65535
 
@@ -40,16 +44,19 @@
 #define MAX_CLIENTS 25
 #endif
 
-
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
 #define GREEN   "\033[32m"
 #define YELLOW  "\033[33m"
 #define MAGENTA "\033[35m"
 
+//===----------------------------------------------------------------------===//
+
 class Socket;
 class Server;
 class Client;
+
+//===----------------------------------------------------------------------===//
 
 enum t_errors
 {
@@ -65,9 +72,15 @@ struct t_IRCCommand
     std::string                 trailing;
 };
 
+//===----------------------------------------------------------------------===//
+
 extern Server *global_ircserv;
+
+//===----------------------------------------------------------------------===//
 
 void                        validateArguments(int argc, char **argv);
 void                        display_error_message(t_errors code);
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests);
 void                        handleShuttingDown(int sig);
+
+//===----------------------------------------------------------------------===//

@@ -20,6 +20,16 @@ SmartBoi &SmartBoi::operator=(const SmartBoi &toCopy)
     return *this;
 }
 
+/**
+ * @brief Starts the SmartBoi bot by connecting to the IRC server and entering the main loop.
+ * 
+ * This function initializes the bot by retrieving the API key, connecting to the specified IRC server,
+ * and then entering the main event loop to handle incoming messages and events.
+ * 
+ * @param server_ip The IP address of the IRC server to connect to.
+ * @param server_port The port number of the IRC server to connect to.
+ * @param server_password The password for the IRC server, if required.
+ */
 void SmartBoi::start(const std::string &server_ip, const std::string &server_port, const std::string &server_password)
 {
     _api_key = get_API_key();
@@ -27,6 +37,15 @@ void SmartBoi::start(const std::string &server_ip, const std::string &server_por
     this->loop();
 }
 
+/**
+ * @brief Handles the response for a given IRC request.
+ *
+ * This function processes the incoming IRC request, parses the commands,
+ * and if the command is "PRIVMSG", it calls a weather API based on the message content.
+ * The response from the weather API is then parsed and sent back to the IRC server.
+ *
+ * @param request The incoming IRC request as a string.
+ */
 void SmartBoi::handle_response(const std::string &request)
 {
     std::vector<t_IRCCommand>   parsed_commands = parseRequests(request);
@@ -50,6 +69,16 @@ void SmartBoi::handle_response(const std::string &request)
     }
 }
 
+/**
+ * @brief Continuously listens for incoming messages from the IRC server and processes them.
+ * 
+ * This function runs an infinite loop that waits for data from the IRC server. It uses the 
+ * `recv` function to receive data into a buffer. If an error occurs during reception, or if 
+ * the server closes the connection, it throws a runtime exception. Otherwise, it processes 
+ * the received data using the `handle_response` function.
+ * 
+ * @throws std::runtime_error If an error occurs while receiving data or if the server closes the connection.
+ */
 void SmartBoi::loop()
 {
     char buffer[4096];
@@ -67,6 +96,21 @@ void SmartBoi::loop()
     }
 }
 
+/**
+ * @brief Connects to an IRC server using the provided server IP, port, and password.
+ *
+ * This function creates a socket, sets up the server address structure, and attempts
+ * to connect to the specified IRC server. Upon successful connection, it sends the
+ * authentication credentials (password, user, and nickname) to the server.
+ *
+ * @param server_ip The IP address of the IRC server to connect to.
+ * @param server_port The port number of the IRC server to connect to.
+ * @param password The password for authenticating with the IRC server.
+ *
+ * @throws std::runtime_error If there is an error creating the socket, converting the
+ *                            server port, connecting to the server, or sending the
+ *                            authentication credentials.
+ */
 void SmartBoi::connect_to_irc_server(const std::string &server_ip, const std::string &server_port, const std::string &password)
 {
     _irc_socket_fd = socket(AF_INET, SOCK_STREAM, 0);

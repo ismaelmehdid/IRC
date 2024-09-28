@@ -8,14 +8,11 @@
 # include "../exception/ServerCreationException.hpp"
 # include "../exception/ServerListenException.hpp"
 # include "../exception/PollException.hpp"
+
 # include <list>
 
-/**
- * @brief Main class representing the server.
- * 
- * This class is responsible for managing client connections, communication, and server events.
- * It handles incoming connections, client disconnections, and message processing.
- */
+//===----------------------------------------------------------------------===//
+
 class Server
 {
     private:
@@ -32,26 +29,26 @@ class Server
         Socket                          _socket;           ///< Socket instance for network operations
         std::vector<std::string>        _nicknames;
         
-//---------------------MAIN CORE---------------------------------------------------------
+//=== Main core -----------------------------------------------------------===//
         void                serverLoop();
         void                handlePollEvent(size_t i);
         void                handleClientDisconnection(size_t i);
         void                handleNewConnection();
         void                handleClientMessage(size_t i);
 
-//---------------------CLIENT HANDLING---------------------------------------------------
+//=== Client handling -----------------------------------------------------===//
         void                addClient(Client *client);
         void                removeClient(Client* user, const std::string &reason);
         void                removeClientFromEveryChannels(Client* user, const std::string &reason);
 
-//---------------------CHANNEL HANDLING--------------------------------------------------
+//=== Channel handling ----------------------------------------------------===//
         Channel*            createChannel(const std::string& channelName);
         void                removeChannel(Channel *channel);
         Channel*            findChannel(const std::string& channelName);
         Client*             findClientByNick(const std::string& target);
         void                broadcastMessage(const std::string& msg, Channel* channel);
 
-//---------------------EXECUTION---------------------------------------------------------
+//=== Execution -----------------------------------------------------------===//
         bool                executeCommand(Client* client, const std::string &message);
         std::string         getMessage(Client *client, Client *target, Channel *channel, const std::string &command, size_t code);
         void                privMsgBroadcast(const std::string& msg, Channel* channel, int sender_fd);
@@ -73,7 +70,6 @@ class Server
         bool                user    (Client *, const t_IRCCommand &);
         bool                nick    (Client *, const t_IRCCommand &);
         bool                quit    (Client *, const t_IRCCommand &);
-//---------------------------------------------------------------------------------------
 
         bool                isNickNameTaken(const std::string &nickName);
 
@@ -83,3 +79,5 @@ class Server
 
         void                runServer(char **argv);
 };
+
+//===----------------------------------------------------------------------===//

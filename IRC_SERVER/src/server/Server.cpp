@@ -52,7 +52,16 @@ Server &Server::operator=(const Server &server) // shallow copy
     return *this;
 }
 
-
+/**
+ * @brief Initializes the command map with IRC command strings as keys and 
+ *        corresponding member function pointers as values.
+ * 
+ * This function sets up the _commandMap by associating various IRC command 
+ * strings (e.g., "KICK", "INVITE", "TOPIC") with their respective handler 
+ * member functions (e.g., &Server::kick, &Server::invite, &Server::topic).
+ * This allows the server to dynamically call the appropriate function 
+ * based on the received command.
+ */
 void    Server::initializeCommandMap()
 {
     _commandMap["KICK"]     = &Server::kick;
@@ -70,16 +79,28 @@ void    Server::initializeCommandMap()
     _commandMap["QUIT"]     = &Server::quit;
 }
 
+/**
+ * @brief Checks if a given nickname is already taken.
+ * 
+ * This function searches through the list of nicknames to determine if the 
+ * specified nickname is already in use.
+ * 
+ * @param nickName The nickname to check for availability.
+ * @return true if the nickname is already taken, false otherwise.
+ */
 bool    Server::isNickNameTaken(const std::string &nickName)
 {
     return (std::find(_nicknames.begin(), _nicknames.end(), nickName) != _nicknames.end());
 }
 
 /**
- * @brief The main server loop for handling connections and events.
+ * @brief Main server loop that continuously polls for events and handles them.
  * 
- * This function continuously polls the file descriptors in the _fds array for events.
- * If poll fails, it throws a PollException. For each event, it delegates to handlePollEvent().
+ * This function runs an infinite loop that uses the poll system call to monitor
+ * multiple file descriptors for events. When an event is detected, it is handled
+ * by the handlePollEvent function. If poll returns an error, a PollException is thrown.
+ * 
+ * @throws PollException if the poll system call fails.
  */
 void    Server::serverLoop()
 {
@@ -109,15 +130,17 @@ void    Server::serverLoop()
 }
 
 /**
- * @brief Starts the server and sets it up for accepting connections.
- * 
- * This function creates the server socket, binds it to a port, and starts listening for connections.
- * It sets up the server file descriptor in the pollfd array and enters the ServerLoop() to begin processing connections.
- * 
- * @param argv Command-line arguments. argv[1] should contain the port number to bind to.
- * @throws ServerCreationException if socket creation fails.
- * @throws ServerBindException if binding the socket fails.
- * @throws ServerListenException if the server fails to start listening for connections.
+ * @brief Runs the server with the specified arguments.
+ *
+ * This function initializes the server by creating a socket, binding it to the specified port,
+ * and setting it to listen for incoming connections. It also sets up the polling file descriptor
+ * and starts the server loop to handle incoming connections.
+ *
+ * @param argv Command-line arguments, where argv[1] is expected to be the port number.
+ *
+ * @throws ServerCreationException If the socket creation fails.
+ * @throws ServerBindException If the socket binding fails.
+ * @throws ServerListenException If the socket fails to listen for connections.
  */
 void    Server::runServer(char **argv)
 {

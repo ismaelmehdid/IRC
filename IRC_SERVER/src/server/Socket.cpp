@@ -21,21 +21,14 @@ Socket &Socket::operator=(const Socket &socket)
     return (*this);
 }
 
-
 /**
  * @brief Creates a socket and sets it to non-blocking mode.
+ *
+ * This function creates a socket using the appropriate system calls for the
+ * current operating system. On Linux, it creates a non-blocking socket directly.
+ * On macOS, it creates a socket and then sets it to non-blocking mode using fcntl.
  * 
- * For Linux:
- * - AF_INET: Uses IPv4 addresses.
- * - SOCK_STREAM: Uses the TCP protocol.
- * - SOCK_NONBLOCK: Sets the socket to non-blocking mode at creation.
- * 
- * For macOS:
- * - AF_INET: Uses IPv4 addresses.
- * - SOCK_STREAM: Uses the TCP protocol.
- * - fcntl is used to set the socket to non-blocking mode after creation.
- * 
- * @return true if the socket is successfully created and set to non-blocking mode, false otherwise.
+ * @return true if the socket was successfully created and configured, false otherwise.
  */
 bool    Socket::create()
 {
@@ -75,13 +68,13 @@ bool    Socket::create()
 }
 
 /**
- * @brief Binds the socket to a specific port.
- * 
- * AF_INET      indicating that the adress is an IPv4
- * INADDR_ANY   socket can accept connections from any available network interface
- * 
+ * @brief Binds the socket to the specified port.
+ *
+ * This function sets up the socket address structure with the given port and binds the socket
+ * to it. The address is set to accept connections from any IP address (INADDR_ANY).
+ *
  * @param port The port number to bind the socket to.
- * @return True if the binding is successful, false otherwise.
+ * @return true if the binding is successful, false otherwise.
  */
 bool    Socket::bind(int port)
 {
@@ -103,9 +96,10 @@ bool    Socket::bind(int port)
 /**
  * @brief Starts listening for incoming connections on the socket.
  * 
- * this->_backlog -> max clients in the queu
+ * This function sets the socket to listen for incoming connection requests.
+ * It uses the file descriptor and backlog value stored in the Socket object.
  * 
- * @return true if the listen operation was successful, false otherwise.
+ * @return true if the socket successfully starts listening, false otherwise.
  */
 bool    Socket::listen()
 {
@@ -118,9 +112,14 @@ bool    Socket::listen()
 }
 
 /**
- * @brief Accepts a new incoming connection on the socket.
- * 
- * @return The file descriptor of the accepted connection, or -1 if an error occurred.
+ * @brief Accepts a new client connection.
+ *
+ * This function waits for a new client connection on the socket and accepts it.
+ * It retrieves the client's network information, including the IP address, and
+ * creates a new Client object with the client's file descriptor and IP address.
+ *
+ * @return A pointer to a new Client object if the connection is successfully accepted,
+ *         or NULL if the accept operation fails.
  */
 Client* Socket::accept()
 {
@@ -141,13 +140,17 @@ Client* Socket::accept()
 }
 
 /**
- * @brief Sends a message to the specified client socket.
- *
+ * @brief Sends a message to a client socket.
+ * 
+ * This function attempts to send the entire message to the specified client socket.
+ * It handles partial sends and retries until the entire message is sent or an error occurs.
+ * 
  * @param client_fd The file descriptor of the client socket.
- * @param message The message to be sent.
- * @return True if the message was sent successfully, false otherwise.
+ * @param message The message to be sent to the client.
+ * @return true if the message was successfully sent or if the send operation would block.
+ * @return false if an error occurred during the send operation.
  */
-bool    Socket::Send(int client_fd, const std::string &message)
+bool Socket::Send(int client_fd, const std::string &message)
 {
     size_t      total_sent     = 0;
     size_t      message_length = message.size();
@@ -180,11 +183,18 @@ bool    Socket::Send(int client_fd, const std::string &message)
 
 /**
  * @brief Receives data from a client socket.
- * 
- * This function receives data from the specified client socket and returns it as a string.
- * 
+ *
+ * This function reads data from the specified client socket file descriptor
+ * and appends it to a result string. It continues reading until there is no
+ * more data to read or an error occurs.
+ *
  * @param client_fd The file descriptor of the client socket.
- * @return The received data as a string.
+ * @param tempErr A reference to a boolean that will be set to true if a 
+ *        temporary error occurs (EAGAIN or EWOULDBLOCK), indicating that 
+ *        the operation should be tried again later. Otherwise, it will be 
+ *        set to false.
+ * @return A string containing the data received from the client socket. If 
+ *         an error occurs, an empty string is returned.
  */
 std::string Socket::receive(int client_fd, bool& tempErr)
 {
@@ -216,7 +226,6 @@ std::string Socket::receive(int client_fd, bool& tempErr)
     tempErr = false;
     return (result);
 }
-
 
 int Socket::get_fd() const
 {

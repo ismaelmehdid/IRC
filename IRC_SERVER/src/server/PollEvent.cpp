@@ -1,13 +1,16 @@
 #include "../../include/server/Server.hpp"
 
 /**
- * @brief Handles the message received from a client.
- * 
- * This function processes the message received from the client identified by the given pollfd index.
- * If the message is empty, it handles the client's disconnection. Otherwise, it prints and sends
- * a confirmation message back to the client.
- * 
- * @param i Index of the client in the _fds array.
+ * @brief Handles incoming messages from a client.
+ *
+ * This function processes messages received from a client identified by the file descriptor
+ * at the given index in the _fds array. It retrieves the client from the _clients map, receives
+ * the message from the socket, and processes it. If the message is empty, it handles client 
+ * disconnection. Otherwise, it appends the message to the client's buffer and processes commands 
+ * separated by "\r\n". If command execution fails or the client disconnects, it handles the 
+ * disconnection.
+ *
+ * @param i The index of the file descriptor in the _fds array.
  */
 void    Server::handleClientMessage(size_t i)
 {
@@ -47,12 +50,15 @@ void    Server::handleClientMessage(size_t i)
 }
 
 /**
- * Handles a new client connection.
+ * @brief Handles new incoming connections to the server.
  * 
- * This function accepts a new client connection, creates a pollfd structure for the client,
- * adds it to the list of file descriptors to be polled, creates a new Client object for the client,
- * adds the client to the server's list of clients, sends a welcome message to the client,
- * and prints a message indicating that a client has connected.
+ * This function checks if the server has reached its maximum client capacity.
+ * If the server is full, it rejects the new connection and sends an error message
+ * to the client. If there is room for more clients, it accepts the new connection,
+ * sets up the necessary polling structures, and adds the client to the server's
+ * client list.
+ * 
+ * @note If the server is full, the rejected client is properly deleted to avoid memory leaks.
  */
 void    Server::handleNewConnection()
 {
@@ -88,12 +94,15 @@ void    Server::handleNewConnection()
 }
 
 /**
- * @brief Handles a client's disconnection from the server.
- * 
- * This function handles the disconnection of the client at the given index in the pollfd array.
- * It closes the client’s socket, removes the client from the server, and erases the pollfd entry.
- * 
- * @param i Index of the client in the _fds array.
+ * @brief Handles the disconnection of a client.
+ *
+ * This function is responsible for managing the disconnection of a client
+ * identified by the file descriptor at the given index in the _fds vector.
+ * It retrieves the client associated with the file descriptor, logs an error
+ * message if the client is found, removes the client, and updates the _fds
+ * vector and _poll_count accordingly.
+ *
+ * @param i The index of the file descriptor in the _fds vector.
  */
 void    Server::handleClientDisconnection(size_t i)
 {
@@ -114,16 +123,18 @@ void    Server::handleClientDisconnection(size_t i)
     _poll_count--;
 }
 
-
 /**
- * @brief Handles poll events for a specific file descriptor.
- * 
- * This function processes the poll events for the client or server socket identified by the index in the pollfd array.
- * It checks if there are any errors or hangups, in which case it handles the disconnection. If the event is a 
- * readable event (POLLIN), it either handles a new connection (if it's the server socket) or a client message 
- * (if it's a client socket).
- * 
- * @param i Index of the client in the _fds array.
+ * @brief Handles poll events for the server.
+ *
+ * This function processes different types of poll events for the server. It checks the revents field
+ * of the pollfd structure to determine the type of event that occurred and takes appropriate actions.
+ *
+ * @param i The index of the pollfd structure in the _fds vector.
+ *
+ * - If the event is POLLHUP, POLLOUT, or POLLNVAL, it handles client disconnection.
+ * - If the event is POLLIN, it checks if the event is on the server's socket or a client's socket:
+ *   - If it's on the server's socket, it handles a new connection.
+ *   - If it's on a client's socket, it handles a client message.
  */
 void    Server::handlePollEvent(size_t i)
 {

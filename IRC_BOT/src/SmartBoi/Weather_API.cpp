@@ -1,6 +1,15 @@
 #include "../../include/SmartBoi/SmartBoi.hpp"
 #include "../../include/smartboi.hpp"
 
+/**
+ * @brief Calls the weather API with the given input and retrieves the response.
+ *
+ * This function connects to the weather API, sends a GET request with the specified input,
+ * and retrieves the response. The response is returned as a string.
+ *
+ * @param input The input string to be used in the API request (e.g., city name).
+ * @return A string containing the response from the weather API.
+ */
 std::string SmartBoi::call_weather_api(const std::string &input)
 {
     this->connect_to_weather_api();
@@ -37,6 +46,19 @@ std::string SmartBoi::call_weather_api(const std::string &input)
     return response;
 }
 
+/**
+ * @brief Connects to the weather API server.
+ *
+ * This function establishes a socket connection to the weather API server.
+ * It performs the following steps:
+ * 1. Creates a socket for communication.
+ * 2. Resolves the DNS of the API server.
+ * 3. Sets up the server address structure.
+ * 4. Connects to the API server using the created socket.
+ *
+ * @throws std::runtime_error if there is an error creating the socket,
+ *                            resolving the DNS, or connecting to the server.
+ */
 void SmartBoi::connect_to_weather_api()
 {
     _api_socket_fd = socket(AF_INET, SOCK_STREAM, 0);

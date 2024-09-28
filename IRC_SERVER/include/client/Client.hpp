@@ -2,6 +2,8 @@
 
 #include "../irc.hpp"
 
+//===----------------------------------------------------------------------===//
+
 class Client
 {
     private:
@@ -20,7 +22,8 @@ class Client
 
         ~Client();
 
-//----------Getters
+//=== Getters -------------------------------------------------------------===//
+
         std::string&    getNickName();
         std::string&    getUserName();
         std::string&    getFullName();
@@ -30,11 +33,13 @@ class Client
         int             get_fd() const;
         bool            is_authenticated();
 
-//----------Setters
+//=== Setters -------------------------------------------------------------===//
         void            setNickName(const std::string &nickName);
         void            setUserName(const std::string &username);
         void            setFullName(const std::string &fullname);
            
-//----------Auth
+//=== Auth ----------------------------------------------------------------===//
         bool        _has_set_password;
 };
+
+//===----------------------------------------------------------------------===//

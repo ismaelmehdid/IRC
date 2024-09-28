@@ -1,5 +1,21 @@
 #include "../../include/smartboi.hpp"
 
+/**
+ * @brief Parses a single IRC request from a raw request string.
+ *
+ * This function takes a raw IRC request string and parses it into a structured
+ * t_IRCCommand object. The raw request string is expected to follow the IRC
+ * protocol format.
+ *
+ * @param rawRequest The raw IRC request string to be parsed.
+ * @return A t_IRCCommand object containing the parsed components of the request.
+ *
+ * The t_IRCCommand object contains the following fields:
+ * - prefix: The prefix of the request, if present.
+ * - command: The command of the request.
+ * - params: A vector of parameters for the command.
+ * - trailing: The trailing part of the request, if present.
+ */
 static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
 {
     t_IRCCommand    request;
@@ -41,10 +57,14 @@ static t_IRCCommand parseSingleRequest(const std::string &rawRequest)
 }
 
 /**
- * Parses a string of client commands and extracts individual commands into a vector of t_IRCCommand.
+ * @brief Parses a string containing multiple IRC requests separated by "\r\n".
  *
- * @param commands The string of client commands to be parsed.
- * @return A vector of t_IRCCommand containing the extracted commands.
+ * This function takes a string of concatenated IRC requests, splits them by the
+ * delimiter "\r\n", and parses each individual request into a t_IRCCommand object.
+ * The parsed commands are then stored in a vector and returned.
+ *
+ * @param requests A string containing multiple IRC requests separated by "\r\n".
+ * @return A vector of t_IRCCommand objects, each representing a parsed IRC request.
  */
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests)
 {
