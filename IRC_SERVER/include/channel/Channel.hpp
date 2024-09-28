@@ -51,7 +51,7 @@ class Channel
 
 //------Client management
         void                            addClient(Client* client);
-        void                            removeClient(Client* client);
+        bool                            removeClient(Client* client);
         void                            addOperator(Client* client);
         void                            removeOperator(Client* client);
         void                            addInvited(Client* client);

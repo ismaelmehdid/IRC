@@ -60,10 +60,11 @@ void    Channel::addClient(Client* user)
     this->_nbr_users++;
 }
 
-void    Channel::removeClient(Client* user)
+// Return true if the client was in the channel
+bool    Channel::removeClient(Client* user)
 {
     if (!isMember(user))
-        return ;
+        return false;
 
     if (isOperator(user))
         this->_operators.erase(user);
@@ -73,6 +74,7 @@ void    Channel::removeClient(Client* user)
 
     this->_clients.erase(user);
     this->_nbr_users--;
+    return true;
 }
 
 void Channel::addOperator(Client* client)
@@ -92,7 +94,7 @@ void    Channel::removeOperator(Client* client)
         return ;
 
     if (!isOperator(client))
-        return;
+        return ;
 
     this->_operators.erase(client);
 }

@@ -4,72 +4,47 @@ void    Server::addClient(Client *client)
 {
     this->_clients[client->get_fd()] = client;
     this->_nbr_clients++;
+    for (std::vector<pollfd>::iterator it = _fds.begin(); it != _fds.end(); it++) {
+        std::cout << it->fd << " ";
+    }
+    std::cout << std::endl;
 }
 
-void    Server::removeClient(Client* user, std::string reason)
+void    Server::removeClient(Client* user, const std::string &reason)
 {
-    std::list<std::string>  empty_channels;
-    int                     fd = user->get_fd();
+    int fd = user->get_fd();
 
-//--remove user from every channel
-    for (std::map<std::string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
-    {
-        Channel* channel = it->second;
+    removeClientFromEveryChannels(user, reason);
 
-        if (channel->isMember(user))
-        {
-            channel->removeClient(user);
-
-            // Check if the channel is empty and should be deleted
-            if (channel->getNbrUsers() == 0)
-                empty_channels.push_back(channel->getName());
-
-            this->broadcastMessage(user->getPrefix() + " QUIT :" + reason, channel);
-        }
-    }
-
-//--delete empty channels
-    for (std::list<std::string>::const_iterator it = empty_channels.begin(); it != empty_channels.end(); ++it)
-    {
-        delete (this->_channels[*it]);
-        this->_channels.erase(*it);
-    }
-
-//--delete user from poll struct
-    for (int i = 0; i < this->_poll_count; ++i)
-    {
-        if (this->_fds[i].fd == fd)
-        {
-            pollRemove(i); //removing data from the poll struct
-            break ;
-        }
-    }
-
-//--delete user from Server
-    
     this->_clients.erase(fd);
     this->_nbr_clients--;
     std::vector<std::string>::iterator it = std::find(this->_nicknames.begin(), this->_nicknames.end(), user->getNickName());
-    
-    if (it != this->_nicknames.end())
-    {
+    if (it != this->_nicknames.end()) {
         this->_nicknames.erase(it);
     }
-    
+
+    std::cout << fd << std::endl;
+
     delete user;
 }
 
-void    Server::pollRemove(int index)
+void    Server::removeClientFromEveryChannels(Client* user, const std::string &reason)
 {
-    if (index >= 0 && index < this->_poll_count)
-    {
-        close(this->_fds[index].fd); //closing the fd of the user
+    std::map<std::string, Channel*>::iterator it = _channels.begin();
 
-        if (index != this->_poll_count - 1)
-        {
-            std::swap(this->_fds[index], this->_fds[this->_poll_count - 1]);
+    while (it != _channels.end()) {
+        if (it->second) {
+            if (it->second->removeClient(user) == true) { // check if the user has indead been removed from this channel
+                this->broadcastMessage(user->getPrefix() + " QUIT :" + reason, it->second); // quit message for the users inside the channel the user have been removed to
+                if (it->second->getNbrUsers() == 0) { // if the channel is now empty we have to delete it
+                    delete it->second; // delete the channel
+                    std::map<std::string, Channel*>::iterator toErase = it;
+                    ++it; // increment the iterator before erasing
+                    _channels.erase(toErase); // erase the channel from the channel map of the server                   
+                    continue; // we skiped the erased element above so we don't need to increment 'it'
+                }
+            }
         }
-        --this->_poll_count;
-        this->_fds.pop_back();
+        ++it;
     }
 }

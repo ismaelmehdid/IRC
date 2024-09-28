@@ -41,8 +41,9 @@ class Server
 
 //---------------------CLIENT HANDLING---------------------------------------------------
         void                addClient(Client *client);
-        void                removeClient(Client* user, std::string reason);
-        void                pollRemove(int index);
+        void                removeClient(Client* user, const std::string &reason);
+        void                removeClientFromEveryChannels(Client* user, const std::string &reason);
+        void                removeClientFdFromPoll(int fd);
 
 //---------------------CHANNEL HANDLING--------------------------------------------------
         Channel*            createChannel(const std::string& channelName);

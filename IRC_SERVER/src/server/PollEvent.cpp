@@ -11,7 +11,11 @@
  */
 void Server::handleClientMessage(size_t i)
 {
-    Client*     client = _clients[_fds[i].fd];
+    std::map<int, Client*>::iterator it = _clients.find(_fds[i].fd);
+    if (it == _clients.end())
+        return;
+    
+    Client* client = it->second;
     bool        tempErr = false;
     std::string message = this->_socket.receive(_fds[i].fd, tempErr);
     
@@ -76,6 +80,7 @@ void    Server::handleNewConnection()
         client_pollfd.events = POLLIN;
         client_pollfd.revents = 0;
         _fds.push_back(client_pollfd);
+        _poll_count++;
         addClient(newClient);
     }
 }
@@ -102,7 +107,8 @@ void    Server::handleClientDisconnection(size_t i)
     {
         std::cerr << RED << "Error: Client not found for fd " << fd << RESET <<std::endl;
     }
-    this->_fds.erase(this->_fds.begin() + i);
+    _fds.erase(_fds.begin() + i);
+    _poll_count--;
 }
 
 /**
@@ -117,7 +123,7 @@ void    Server::handleClientDisconnection(size_t i)
  */
 void    Server::handlePollEvent(size_t i)
 {
-    if (this->_fds[i].revents & (POLLHUP | POLLOUT))
+    if (this->_fds[i].revents & (POLLHUP | POLLOUT | POLLNVAL))
     {
         handleClientDisconnection(i);
     }

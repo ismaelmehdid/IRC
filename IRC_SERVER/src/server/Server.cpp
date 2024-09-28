@@ -22,11 +22,6 @@ Server::~Server()
     {
         delete (it->second);
     }
-
-    for (int i = _poll_count - 1; i >= 0; --i)
-    {
-        pollRemove(i);
-    }
 }
 
 Server::Server(const Server &server) // shallow copy
@@ -98,9 +93,18 @@ void    Server::serverLoop()
             throw PollException();
         }
 
-        for (size_t i = 0; i < _fds.size(); i++)
+        for (size_t i = 0; i < _fds.size() && _poll_count > 0; )
         {
-            handlePollEvent(i);
+            if (_fds[i].revents != 0)
+            {
+                handlePollEvent(i);
+                _poll_count--; // Decrement the count of events to handle
+                // Only increment i if no element was removed
+                if (i < _fds.size() && _fds[i].revents == 0)
+                    i++;
+            }
+            else
+                i++;
         }
     }
 }

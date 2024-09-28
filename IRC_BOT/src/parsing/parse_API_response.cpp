@@ -28,7 +28,6 @@ std::string parse_weather_api_response(const std::string &raw, const std::string
 {
     std::string parsed;
     struct t_weather_infos weather;
-    std::memset(&weather, 0, sizeof(weather));
 
     std::stringstream iss(raw);
     std::string http_code;
