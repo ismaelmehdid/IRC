@@ -184,8 +184,8 @@ bool    Server::mode(Client *client, const t_IRCCommand &command)
                     else
                     {
                         channelToModify->setUserLimit(newLimit);
-                        parameter_index++;
                         broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +l " + command.params[parameter_index] + "\r\n"), channelToModify);
+                        parameter_index++;
                     }
                 }
             }
