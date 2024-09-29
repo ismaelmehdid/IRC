@@ -47,9 +47,6 @@ RM          =   rm -rf
 OBJS_DIR    =   build/
 OBJS        =   $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
 
-MAX_FD      :=  $(shell echo $$((`ulimit -n` / 10)))
-FLAGS       +=  -DMAX_CLIENTS=$(MAX_FD)
-
 all: $(NAME)
 
 $(NAME): $(OBJS)

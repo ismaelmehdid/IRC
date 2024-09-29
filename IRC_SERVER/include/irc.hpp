@@ -40,9 +40,7 @@
 #define MAX_CHANNEL_NAME_LENGTH 50
 #define MAX_TOPIC_LENGTH 300
 
-#ifndef MAX_CLIENTS
 #define MAX_CLIENTS 25
-#endif
 
 #define RESET   "\033[0m"
 #define RED     "\033[31m"

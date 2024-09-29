@@ -13,7 +13,8 @@ void    Server::removeClient(Client* user, const std::string &reason)
     removeClientFromEveryChannels(user, reason);
 
     this->_clients.erase(fd);
-    this->_nbr_clients--;
+    if (this->_nbr_clients > 0)
+        this->_nbr_clients--;
     std::vector<std::string>::iterator it = std::find(this->_nicknames.begin(), this->_nicknames.end(), user->getNickName());
     if (it != this->_nicknames.end()) {
         this->_nicknames.erase(it);

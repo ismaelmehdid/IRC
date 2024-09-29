@@ -88,7 +88,6 @@ void    Server::handleNewConnection()
         client_pollfd.events = POLLIN;
         client_pollfd.revents = 0;
         _fds.push_back(client_pollfd);
-        _poll_count++;
         addClient(newClient);
     }
 }
@@ -115,12 +114,7 @@ void    Server::handleClientDisconnection(size_t i)
         removeClient(client, "disconnected\r\n");
         return ;
     }
-    else
-    {
-        std::cerr << RED << "Error: Client not found for fd " << fd << RESET << std::endl;
-    }
     _fds.erase(_fds.begin() + i);
-    _poll_count--;
 }
 
 /**

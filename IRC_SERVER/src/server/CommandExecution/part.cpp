@@ -36,7 +36,7 @@ bool    Server::part(Client *client, const t_IRCCommand &command)
         return (true);
     }
 
-    std::string         part_message = ":" + client->getPrefix() + " PART " + channelName;
+    std::string         part_message = client->getPrefix() + " PART " + channelName;
     if (!command.trailing.empty())
     {
         part_message += " :" + command.trailing;

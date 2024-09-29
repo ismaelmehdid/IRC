@@ -49,7 +49,7 @@ Client* Server::findClientByNick(const std::string& target)
 {
     for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
     {
-        if (it->second->getNickName() == target)
+        if (it->second && it->second->getNickName() == target)
         {
             return (it->second);
         }
