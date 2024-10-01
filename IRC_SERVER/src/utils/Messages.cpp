@@ -34,9 +34,10 @@ void display_error_message(t_errors code)
     }
 }
 
-std::string trimMessage(const std::string &message)
+static std::string  trimMessage(const std::string &message)
 {
     std::string trimmedMessage = message;
+    
     while (!trimmedMessage.empty() && \
         (trimmedMessage[trimmedMessage.size() - 1] == '\r' || \
             trimmedMessage[trimmedMessage.size() - 1] == '\n'))
