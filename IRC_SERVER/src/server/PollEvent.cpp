@@ -47,6 +47,10 @@ void    Server::handleClientMessage(size_t i)
         if (_clients.find(_fds[i].fd) == _clients.end())
             return ;
     }
+    if (pos == std::string::npos)
+    {
+        std::cout << RED << "Partial command received from client on fd " << _fds[i].fd << RESET << std::endl;
+    }
 }
 
 /**

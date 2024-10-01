@@ -1,7 +1,7 @@
 NAME        =   ircserv
 
 SRCS        =	src/main.cpp \
-                src/utils/ErrorMessages.cpp \
+                src/utils/Messages.cpp \
                 src/utils/SignalHandling.cpp \
                 src/parsing/ParseRequests.cpp \
                 src/parsing/ArgCheck.cpp \

@@ -2,6 +2,8 @@
 
 bool    Server::executeCommand(Client* client, const std::string &message)
 {
+    displayUserMessage(client->getNickName(), message);
+
     try
     {
         std::vector<t_IRCCommand>   parsed_commands = parseRequests(message);

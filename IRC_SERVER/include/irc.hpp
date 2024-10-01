@@ -49,6 +49,8 @@
 #define GREEN   "\033[32m"
 #define YELLOW  "\033[33m"
 #define MAGENTA "\033[35m"
+#define BG_BLUE "\033[44m"
+#define WHITE   "\033[37m"
 
 //===----------------------------------------------------------------------===//
 
@@ -82,5 +84,6 @@ void                        validateArguments(int argc, char **argv);
 void                        display_error_message(t_errors code);
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests);
 void                        handleShuttingDown(int sig);
+void                        displayUserMessage(const std::string &nickName, const std::string &message);
 
 //===----------------------------------------------------------------------===//
