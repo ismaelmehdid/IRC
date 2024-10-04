@@ -13,6 +13,175 @@
 
 // Treated separatly
 
+void    Server::handle_i(t_ModeCommandData &data)
+{
+    if ((data.addMode && data.channelToModify->isInviteOnly()) || (!data.addMode && !data.channelToModify->isInviteOnly()))
+        return;
+    data.channelToModify->setInviteOnly(data.addMode);
+    if (data.addMode)
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " +i\r\n"), data.channelToModify);
+    else
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " -i\r\n"), data.channelToModify);
+}
+
+void    Server::handle_t(t_ModeCommandData &data)
+{
+    if ((data.addMode && data.channelToModify->isTopicLocked()) || (!data.addMode && !data.channelToModify->isTopicLocked()))
+        return;
+    data.channelToModify->setTopicLocked(data.addMode);
+    if (data.addMode)
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " +t\r\n"), data.channelToModify);
+    else
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " -t\r\n"), data.channelToModify);
+}
+
+bool    Server::handle_k(t_ModeCommandData &data)
+{
+    if (data.addMode)
+    {
+        if (data.channelToModify->hasPassword())
+        {
+            if (!this->_socket.Send(data.client_fd, getMessage(data.client, NULL, data.channelToModify, "MODE", ERR_KEYSET)))
+                return (false);
+        }
+        else if (data.parameter_index >= data.command.params.size())
+        {
+            if (!this->_socket.Send(data.client_fd, getMessage(data.client, NULL, data.channelToModify, "MODE", ERR_NEEDMOREPARAMS)))
+                return (false);
+        }
+        else
+        {
+            data.channelToModify->setPassword(data.command.params[data.parameter_index]);
+            broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " +k " + data.command.params[data.parameter_index] + "\r\n"), data.channelToModify);
+            data.parameter_index++;
+        }
+    }
+    else
+    {
+        data.channelToModify->setPassword("");
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " -k *\r\n"), data.channelToModify);
+    }
+    return (true);
+}
+
+bool    Server::handle_o(t_ModeCommandData &data)
+{
+    if (data.parameter_index >= data.command.params.size())
+    {
+        if (!this->_socket.Send(data.client_fd, getMessage(data.client, NULL, data.channelToModify, "MODE", ERR_NEEDMOREPARAMS)))
+            return (false);
+        return (true);
+    }
+
+    data.target_to_change = this->findClientByNick(data.command.params[data.parameter_index]);
+
+    if (!data.target_to_change)
+    {
+        if (!this->_socket.Send(data.client_fd, getMessage(data.client, NULL, NULL, data.command.params[data.parameter_index], ERR_NOSUCHNICK)))
+            return (false);
+        return (true);
+    }
+
+    if (!data.channelToModify->isMember(data.target_to_change))
+    {
+        if (!this->_socket.Send(data.client_fd, getMessage(data.client, data.target_to_change, data.channelToModify, "MODE", ERR_USERNOTINCHANNEL)))
+            return (false);
+        return (true);
+    }
+
+    if (data.addMode)
+    {
+        data.channelToModify->addOperator(data.target_to_change);
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " +o " + data.target_to_change->getNickName() + "\r\n"), data.channelToModify);
+    }
+    else
+    {
+        data.channelToModify->removeOperator(data.target_to_change);
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " -o " + data.target_to_change->getNickName() + "\r\n"), data.channelToModify);
+    }
+    data.parameter_index++;
+    return (true);
+}
+
+bool    Server::handle_l(t_ModeCommandData &data)
+{
+    if (data.addMode)
+    {
+        if (data.parameter_index >= data.command.params.size())
+        {
+            if (!this->_socket.Send(data.client_fd, getMessage(data.client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS)))
+                return (false);
+        }
+        else
+        {
+            int                 newLimit;
+            std::stringstream   ss(data.command.params[data.parameter_index]);
+            ss >> newLimit;
+
+            if (ss.fail() || !ss.eof()) {}
+            else
+            {
+                data.channelToModify->setUserLimit(newLimit);
+                broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " +l " + data.command.params[data.parameter_index] + "\r\n"), data.channelToModify);
+                data.parameter_index++;
+            }
+        }
+    }
+    else
+    {
+        data.channelToModify->setUserLimit(-1);
+        broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " -l\r\n"), data.channelToModify);
+    }
+    return (true);
+}
+
+bool     Server::handleModesToChange(t_ModeCommandData &data)
+{
+    for (size_t i = 0; i != data.modesToChange.size(); i++)
+    {
+        switch (data.modesToChange[i])
+        {
+        case '+':
+            data.addMode = true;
+            break ;
+
+        case '-':
+            data.addMode = false;
+            break ;
+
+        case 'i':
+            handle_i(data);
+            break ;
+
+        case 't':
+            handle_t(data);
+            break ;
+
+        case 'k':
+            if (!handle_k(data))
+                return (false);
+            break ;
+
+        case 'o':
+            if (!handle_o(data))
+                return (false);
+            break ;
+
+        case 'l':
+            if (!handle_l(data))
+                return (false);
+            break ;
+        
+        default:
+            std::string unknownChar(1, data.modesToChange[i]);
+            if (!this->_socket.Send(data.client_fd, global_ircserv->getMessage(data.client, data.target_to_change, data.channelToModify, unknownChar, ERR_UNKNOWNMODE)))
+                return (false);
+            break ;
+        }
+    }
+    return (true);
+}
+
 bool    Server::mode(Client *client, const t_IRCCommand &command)
 {
     int         fd = client->get_fd();
@@ -64,144 +233,15 @@ bool    Server::mode(Client *client, const t_IRCCommand &command)
         return (true);
     }
 
-    size_t  parameter_index = 2;
-    bool    addMode         = true; // toogle to check if we are adding or removing a mode
-    Client  *targetToChange = NULL;
+    t_ModeCommandData data;
+    data.client = client;
+    data.client_fd = fd;
+    data.channelToModify = channelToModify;
+    data.modesToChange = modesToChange;
+    data.parameter_index = 2;
+    data.target_to_change = NULL;
+    data.addMode = true;
+    data.command = command;
 
-    //472 for unknown mode ERR_UNKNOWNMODE
-    for (size_t i = 0; i != modesToChange.size(); i++)
-    {
-        switch (modesToChange[i])
-        {
-        case '+':
-            addMode = true;
-            break ;
-
-        case '-':
-            addMode = false;
-            break ;
-
-        case 'i':
-            if ((addMode && channelToModify->isInviteOnly()) || (!addMode && !channelToModify->isInviteOnly()))
-                break;
-            channelToModify->setInviteOnly(addMode);
-            if (addMode)
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +i\r\n"), channelToModify);
-            else
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -i\r\n"), channelToModify);
-            break ;
-
-        case 't':
-            if ((addMode && channelToModify->isTopicLocked()) || (!addMode && !channelToModify->isTopicLocked()))
-                break;
-            channelToModify->setTopicLocked(addMode);
-            if (addMode)
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +t\r\n"), channelToModify);
-            else
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -t\r\n"), channelToModify);
-            break ;
-
-        case 'k':
-
-            if (addMode)
-            {
-                if (channelToModify->hasPassword())
-                {
-                    if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_KEYSET)))
-                        return (false);
-                }
-                else if (parameter_index >= command.params.size())
-                {
-                    if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS)))
-                        return (false);
-                }
-                else
-                {
-                    channelToModify->setPassword(command.params[parameter_index]);
-                    broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +k " + command.params[parameter_index] + "\r\n"), channelToModify);
-                    parameter_index++;
-                }
-            }
-            else
-            {
-                channelToModify->setPassword("");
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -k *\r\n"), channelToModify);
-            }
-            break ;
-
-        case 'o':
-            if (parameter_index >= command.params.size())
-            {
-                if (!this->_socket.Send(fd, getMessage(client, NULL, channelToModify, "MODE", ERR_NEEDMOREPARAMS)))
-                    return (false);
-                break ;
-            }
-
-            targetToChange = this->findClientByNick(command.params[parameter_index]);
-
-            if (!targetToChange)
-            {
-                if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, command.params[parameter_index], ERR_NOSUCHNICK)))
-                    return (false);
-                break ;
-            }
-
-            if (!channelToModify->isMember(targetToChange))
-            {
-                if (!this->_socket.Send(fd, getMessage(client, targetToChange, channelToModify, "MODE", ERR_USERNOTINCHANNEL)))
-                    return (false);
-                break ;
-            }
-
-            if (addMode)
-            {
-                channelToModify->addOperator(targetToChange);
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +o " + targetToChange->getNickName() + "\r\n"), channelToModify);
-            }
-            else
-            {
-                channelToModify->removeOperator(targetToChange);
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -o " + targetToChange->getNickName() + "\r\n"), channelToModify);
-            }
-            parameter_index++;
-            break ;
-
-        case 'l':
-            if (addMode)
-            {
-                if (parameter_index >= command.params.size())
-                {
-                    if (!this->_socket.Send(fd, getMessage(client, NULL, NULL, "MODE", ERR_NEEDMOREPARAMS)))
-                        return (false);
-                }
-                else
-                {
-                    int                 newLimit;
-                    std::stringstream   ss(command.params[parameter_index]);
-                    ss >> newLimit;
-
-                    if (ss.fail() || !ss.eof()) {}
-                    else
-                    {
-                        channelToModify->setUserLimit(newLimit);
-                        broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " +l " + command.params[parameter_index] + "\r\n"), channelToModify);
-                        parameter_index++;
-                    }
-                }
-            }
-            else
-            {
-                channelToModify->setUserLimit(-1);
-                broadcastMessage((client->getPrefix() + " MODE " + channelToModify->getName() + " -l\r\n"), channelToModify);
-            }
-            break ;
-        
-        default:
-            std::string unknownChar(1, modesToChange[i]);
-            if (!this->_socket.Send(fd, getMessage(client, targetToChange, channelToModify, unknownChar, ERR_UNKNOWNMODE)))
-                return (false);
-            break ;
-        }
-    }
-    return (true);
+    return handleModesToChange(data);
 }

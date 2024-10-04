@@ -57,6 +57,7 @@
 class Socket;
 class Server;
 class Client;
+class Channel;
 
 //===----------------------------------------------------------------------===//
 
@@ -72,6 +73,18 @@ struct t_IRCCommand
     std::string                 command;
     std::vector<std::string>    params;
     std::string                 trailing;
+};
+
+struct t_ModeCommandData
+{
+    Client                      *client;
+    int                         client_fd;
+    Channel                     *channelToModify;
+    std::string                 modesToChange;
+    size_t                      parameter_index;
+    Client                      *target_to_change;
+    bool                        addMode;
+    t_IRCCommand                command;
 };
 
 //===----------------------------------------------------------------------===//

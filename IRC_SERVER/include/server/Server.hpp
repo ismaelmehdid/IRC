@@ -50,7 +50,6 @@ class Server
 
 //=== Execution -----------------------------------------------------------===//
         bool                executeCommand(Client* client, const std::string &message);
-        std::string         getMessage(Client *client, Client *target, Channel *channel, const std::string &command, size_t code);
         void                privMsgBroadcast(const std::string& msg, Channel* channel, int sender_fd);
 
         typedef bool (Server::*CommandFunction)(Client*, const t_IRCCommand &);
@@ -60,7 +59,15 @@ class Server
         bool                kick    (Client *, const t_IRCCommand &);
         bool                invite  (Client *, const t_IRCCommand &);
         bool                topic   (Client *, const t_IRCCommand &);
+
         bool                mode    (Client *, const t_IRCCommand &);
+        bool                handleModesToChange(t_ModeCommandData &);
+        void                handle_i(t_ModeCommandData &);
+        void                handle_t(t_ModeCommandData &);
+        bool                handle_k(t_ModeCommandData &);
+        bool                handle_o(t_ModeCommandData &);
+        bool                handle_l(t_ModeCommandData &);
+
         bool                join    (Client *, const t_IRCCommand &);
         bool                part    (Client *, const t_IRCCommand &);
         bool                privMsg (Client *, const t_IRCCommand &);
@@ -78,6 +85,7 @@ class Server
         ~Server();
 
         void                runServer(char **argv);
+        std::string         getMessage(Client *client, Client *target, Channel *channel, const std::string &command, size_t code);
 };
 
 //===----------------------------------------------------------------------===//
