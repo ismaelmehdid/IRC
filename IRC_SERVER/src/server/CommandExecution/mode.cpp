@@ -121,6 +121,10 @@ bool    Server::handle_l(t_ModeCommandData &data)
             if (ss.fail() || !ss.eof()) {}
             else
             {
+                if (newLimit < 1) {
+                    data.parameter_index++;
+                    return (true);
+                }
                 data.channelToModify->setUserLimit(newLimit);
                 broadcastMessage((data.client->getPrefix() + " MODE " + data.channelToModify->getName() + " +l " + data.command.params[data.parameter_index] + "\r\n"), data.channelToModify);
                 data.parameter_index++;
