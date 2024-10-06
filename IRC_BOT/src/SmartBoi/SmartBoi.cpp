@@ -55,16 +55,23 @@ void SmartBoi::handle_response(const std::string &request)
 
             const std::string &from = parsed_commands[i].prefix;
 
-            const std::string &message = parsed_commands[i].trailing;
-            std::string api_response = call_weather_api(message);
-            std::string parsed_api_response = parse_weather_api_response(api_response, message);
+            #ifdef __WEATHER__
+                const std::string &message = parsed_commands[i].trailing;
+                std::string api_response = call_weather_api(message);
+                std::string parsed_api_response = parse_weather_api_response(api_response, message);
+            #elif __OPENAI__
+                const std::string &message = parsed_commands[i].trailing;
+                std::string api_response = call_openai_api(message);
+                std::string parsed_api_response = parse_openai_api_response(api_response);
+            #else
+                std::string parsed_api_response("");
+            #endif
 
             const std::string to_send = "PRIVMSG " + from + " :" + parsed_api_response + "\r\n";
 
             if (send(_irc_socket_fd, to_send.c_str(), to_send.size(), 0) < 0) {
                 std::cerr << "Error while sending sending a response to the server." << std::endl;
             }
-
         }
     }
 }

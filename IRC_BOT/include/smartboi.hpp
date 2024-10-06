@@ -6,15 +6,12 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <curl/curl.h>
 #include <cstring>
 #include <vector>
 #include <map>
 #include <exception>
 #include <sstream>
-#include <cstdlib>
-#include <csignal>
-#include <fcntl.h>
-#include <poll.h>
 
 //===----------------------------------------------------------------------===//
 
@@ -60,5 +57,6 @@ struct t_weather_infos
 std::vector<t_IRCCommand>   parseRequests(const std::string &requests);
 std::string                 get_API_key();
 std::string                 parse_weather_api_response(const std::string &raw, const std::string &location);
+std::string                 parse_openai_api_response(const std::string& response);
 
 //===----------------------------------------------------------------------===//

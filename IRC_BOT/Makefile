@@ -1,37 +1,59 @@
-NAME        =   smartboi
+WEATHER_NAME	=	smartboi_weather
+OPENAI_NAME		=	smartboi_openai
 
-SRCS		=	src/main.cpp \
+COMMON_SRCS		=	src/main.cpp \
 					src/SmartBoi/SmartBoi.cpp \
 					src/parsing/parse_API_response.cpp \
 					src/parsing/parseRequests.cpp \
-					src/utils/utils.cpp \
-					src/SmartBoi/Weather_API.cpp
+					src/utils/utils.cpp 
 
-CXX         =   c++
-FLAGS       =   -Wall -Wextra -Werror -std=c++98
-RM          =   rm -rf
+OPENAI_SRCS		=	src/SmartBoi/OpenAI_API.cpp
+WEATHER_SRCS	= 	src/SmartBoi/Weather_API.cpp
 
-OBJS_DIR    =   build/
-OBJS        =   $(addprefix $(OBJS_DIR), $(SRCS:.cpp=.o))
+CXX				=	c++
+FLAGS			=	-Wall -Wextra -Werror -std=c++98
 
-all: $(NAME)
+LDFLAGS_OPENAI	=	-lcurl
 
-$(NAME): $(OBJS)
-	@$(CXX) $(FLAGS) $(OBJS) -o $(NAME)
+OPENAI_OBJS_DIR	=	build_openai/
+WEATHER_OBJS_DIR =	build_weather/
 
-$(OBJS_DIR)%.o: %.cpp
+OPENAI_OBJS		=	$(addprefix $(OPENAI_OBJS_DIR), $(COMMON_SRCS:.cpp=.o) $(OPENAI_SRCS:.cpp=.o))
+WEATHER_OBJS	=	$(addprefix $(WEATHER_OBJS_DIR), $(COMMON_SRCS:.cpp=.o) $(WEATHER_SRCS:.cpp=.o))
+
+all: weather
+
+weather: CXXFLAGS += -D__WEATHER__
+weather: $(WEATHER_NAME)
+
+openai: CXXFLAGS += -D__OPENAI__
+openai: LDFLAGS += $(LDFLAGS_OPENAI)
+openai: $(OPENAI_NAME)
+
+$(WEATHER_NAME): $(WEATHER_OBJS)
+	@$(CXX) $(FLAGS) $(WEATHER_OBJS) -o $(WEATHER_NAME)
+
+$(OPENAI_NAME): $(OPENAI_OBJS)
+	@$(CXX) $(FLAGS) $(OPENAI_OBJS) -o $(OPENAI_NAME) $(LDFLAGS_OPENAI)
+
+$(WEATHER_OBJS_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
-	@$(CXX) $(FLAGS) -c $< -o $@
+	@$(CXX) $(FLAGS) $(CXXFLAGS) -c $< -o $@
+	@echo "\033[92mCompiled: $<\033[0m"
+
+$(OPENAI_OBJS_DIR)%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@$(CXX) $(FLAGS) $(CXXFLAGS) -c $< -o $@
 	@echo "\033[92mCompiled: $<\033[0m"
 
 clean:
-	@$(RM) $(OBJS_DIR)
-	@echo "\033[93mObject files and build directory cleaned.\033[0m"
+	@rm -rf $(OPENAI_OBJS_DIR) $(WEATHER_OBJS_DIR)
+	@echo "\033[93mObject files and build directories cleaned.\033[0m"
 
 fclean: clean
-	@$(RM) $(NAME)
-	@echo "\033[93mExecutable cleaned.\033[0m"
+	@rm -f $(WEATHER_NAME) $(OPENAI_NAME)
+	@echo "\033[93mExecutables cleaned.\033[0m"
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all weather openai clean fclean re
