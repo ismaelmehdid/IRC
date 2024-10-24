@@ -4,6 +4,8 @@
 
 This project is a custom Internet Relay Chat (IRC) server implemented in C++. This project allows users to connect via IRC clients and communicate in real-time using a text-based protocol. The server supports multiple clients, user authentication, and channel management. Additionally, you can use the implemented **OpenAI bot** or the **OpenWeather bot**, which require your API key.
 
+[![basic-irc-architecture.webp](https://i.postimg.cc/767Ys6DQ/basic-irc-architecture.webp)](https://postimg.cc/qhJTgpN8)
+
 ## Features
 
 - **Real-time Messaging:** Users can send and receive messages instantly.
